@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "transports": {
+    "protocol-a": { "reportType": "feature", "reportId": 0, "payloadLength": 64, "hidWriteLength": 65, "stripReadReportId": true },
+    "am35": { "writeReportId": 6, "readReportId": 7, "reportLength": 62, "fragmentPayloadMax": 59, "directType": 0, "receiverType": 128 }
+  }
+}
+

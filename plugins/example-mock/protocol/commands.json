@@ -1,0 +1,1 @@
+{ "schemaVersion": 1, "commands": { "snapshot": { "request": [1], "responseFixture": "snapshot.json" } } }

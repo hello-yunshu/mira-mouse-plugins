@@ -1,0 +1,8 @@
+name: Plugin SDK feature
+description: Propose a brand-neutral schema or tooling capability
+body:
+  - type: textarea
+    id: need
+    attributes: { label: Brand-neutral requirement }
+    validations: { required: true }
+

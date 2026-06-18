@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "topology": { "receiver": true, "mouse": true },
+  "battery": 82,
+  "charging": false,
+  "dpiStages": [{ "value": 400 }, { "value": 800 }, { "value": 1000, "active": true }, { "value": 1600 }, { "value": 3200 }],
+  "pollingRateHz": 1000,
+  "mouseLight": { "mode": "breathing", "color": "#b87ab0" },
+  "receiverGradient": [{ "color": "#7ea7d8", "position": 0 }, { "color": "#bf7fa8", "position": 0.5 }, { "color": "#d39378", "position": 1 }]
+}
+

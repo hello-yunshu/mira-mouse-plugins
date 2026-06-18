@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "readOnly": ["battery", "dpi", "polling-rate", "profile", "firmware", "lighting"],
+  "disabledWrites": ["dpi", "polling-rate", "mouse-lighting", "receiver-lighting", "application-layer-light-link"],
+  "forbidden": ["firmware-update", "bootloader", "dfu", "flash-erase", "receiver-pairing", "macros", "button-mapping"]
+}
+

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "devices": [
+    { "family": "protocol-a-direct", "vendorId": 12625, "productId": 16426, "usagePage": 65535, "usage": 2, "connection": "usb", "evidence": "source-confirmed" },
+    { "family": "protocol-a-receiver", "vendorId": 12625, "productId": 20487, "usagePage": 65281, "usage": 1, "connection": "wireless-receiver", "evidence": "source-confirmed" },
+    { "family": "am35-direct", "vendorId": 3725, "productId": 2176, "usagePage": 65299, "usage": 1, "connection": "usb", "evidence": "source-confirmed" },
+    { "family": "am35-receiver", "vendorId": 3725, "productId": 1795, "usagePage": 65299, "usage": 1, "connection": "wireless-receiver", "evidence": "source-confirmed" }
+  ],
+  "hardwareVerifiedModels": []
+}
+

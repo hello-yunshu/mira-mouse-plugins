@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "pluginId": "mira.amaster",
+  "name": "AMaster Compatible Devices",
+  "version": "1.0.0",
+  "pluginApi": ">=1.0.0, <2.0.0",
+  "publisherKeyId": null,
+  "evidence": "source-confirmed",
+  "permissions": [{ "kind": "hid", "report_types": ["feature", "input", "output"], "max_report_length": 65, "max_reports_per_second": 20 }],
+  "capabilities": [
+    { "id": "battery", "control": "ReadOnlyValue", "labelKey": "battery", "readOnly": true },
+    { "id": "dpi", "control": "DpiStages", "labelKey": "dpi", "readOnly": true },
+    { "id": "polling-rate", "control": "ReadOnlyValue", "labelKey": "pollingRate", "readOnly": true },
+    { "id": "profile", "control": "ReadOnlyValue", "labelKey": "profile", "readOnly": true },
+    { "id": "lighting", "control": "ReadOnlyValue", "labelKey": "lighting", "readOnly": true }
+  ],
+  "writesEnabled": false
+}
+

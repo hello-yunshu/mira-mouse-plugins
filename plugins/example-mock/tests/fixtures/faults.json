@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    { "name": "timeout", "result": "transport-timeout" },
+    { "name": "bad-packet", "result": "parser-rejected" },
+    { "name": "unplug", "result": "transaction-cancelled" },
+    { "name": "low-battery", "battery": 9, "result": "threshold-crossed-once" },
+    { "name": "readback-failure", "result": "actual-state-shown-not-success" }
+  ]
+}
+

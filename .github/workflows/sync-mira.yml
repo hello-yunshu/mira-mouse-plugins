@@ -1,0 +1,25 @@
+name: Propose Mira Lock Update
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag: { description: 'Verified mira.amaster stable tag', required: true, type: string }
+permissions: { contents: read }
+jobs:
+  lock-pr:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    environment: plugin-release
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Verify inputs and credentials
+        env:
+          RELEASE_TAG: '${{ inputs.release_tag }}'
+          MIRA_REPOSITORY: '${{ vars.MIRA_REPOSITORY }}'
+          MIRA_APP_TOKEN: '${{ secrets.MIRA_APP_TOKEN }}'
+        run: |
+          set -euo pipefail
+          case "$RELEASE_TAG" in plugin/mira.amaster/v*) ;; *) exit 1;; esac
+          test -n "$MIRA_REPOSITORY" && test -n "$MIRA_APP_TOKEN"
+          echo 'Cross-repository lock PR creation remains disabled until release verification metadata is implemented.' >&2
+          exit 1
+

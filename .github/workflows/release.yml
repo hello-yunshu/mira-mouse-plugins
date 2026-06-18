@@ -1,0 +1,83 @@
+# SPDX-License-Identifier: CC0-1.0
+# Plugin release workflow — zero-cost edition.
+# Packs and signs .mira-plugin assets with a self-generated or configured Ed25519
+# key. No CA, Apple Developer, or Windows certificate is required.
+name: Plugin Release
+on:
+  push:
+    tags: ['plugin/*/v*']
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+concurrency:
+  group: 'plugin-release-${{ github.ref }}'
+  cancel-in-progress: false
+jobs:
+  gate:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    outputs:
+      dir: '${{ steps.meta.outputs.dir }}'
+      plugin_id: '${{ steps.meta.outputs.plugin_id }}'
+      version: '${{ steps.meta.outputs.version }}'
+      asset: '${{ steps.meta.outputs.asset }}'
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - run: npm run validate && npm test
+      - id: meta
+        env:
+          RELEASE_TAG: '${{ github.ref_name }}'
+        run: |
+          set -euo pipefail
+          dir="${RELEASE_TAG#plugin/}"
+          version="${dir##*/v}"
+          dir="${dir%/v*}"
+          plugin_id="$(node -p "require('./plugins/$dir/plugin.json').pluginId")"
+          version_json="$(node -p "require('./plugins/$dir/plugin.json').version")"
+          test "$version" = "$version_json"
+          asset="${plugin_id//./-}-${version}.mira-plugin"
+          echo "dir=$dir" >> "$GITHUB_OUTPUT"
+          echo "plugin_id=$plugin_id" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "asset=$asset" >> "$GITHUB_OUTPUT"
+  signed-package:
+    needs: gate
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    environment: plugin-release
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - name: Pack and sign plugin
+        env:
+          PLUGIN_SIGNING_KEY: '${{ secrets.MIRA_PLUGIN_SIGNING_KEY }}'
+          PLUGIN_KEY_ID: "${{ secrets.MIRA_PLUGIN_KEY_ID || 'mira-plugins' }}"
+          RELEASE_DIR: '${{ needs.gate.outputs.dir }}'
+          RELEASE_ASSET: '${{ needs.gate.outputs.asset }}'
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          node scripts/pack-sign.mjs "plugins/$RELEASE_DIR" "dist/$RELEASE_ASSET"
+          sha256sum "dist/$RELEASE_ASSET" | awk '{print $1}' > "dist/$RELEASE_ASSET.sha256"
+      - uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3 peeled commit
+        with:
+          subject-path: 'dist/*'
+      - name: Create draft release
+        env:
+          GH_TOKEN: '${{ github.token }}'
+          TAG: '${{ github.ref_name }}'
+        run: |
+          set -euo pipefail
+          gh release create "$TAG" dist/* --draft --verify-tag \
+            --title "Mira Plugin ${{ needs.gate.outputs.plugin_id }} ${{ needs.gate.outputs.version }}" \
+            --notes "Signed plugin draft. Verify the published SHA-256 and public key before distributing."

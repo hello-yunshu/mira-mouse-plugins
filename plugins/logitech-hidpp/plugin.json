@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "pluginId": "mira.logitech-hidpp",
+  "name": "Logitech HID++ Research",
+  "version": "0.1.0",
+  "pluginApi": ">=1.0.0, <2.0.0",
+  "publisherKeyId": null,
+  "evidence": "inferred",
+  "permissions": [],
+  "capabilities": [{ "id": "research-status", "control": "Info", "labelKey": "researchStatus", "readOnly": true }],
+  "writesEnabled": false
+}

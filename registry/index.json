@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "signed": false,
+  "plugins": [],
+  "status": "blocked",
+  "reason": "No production publisher key or stable release exists."
+}
+

@@ -1,0 +1,16 @@
+name: Plugin report
+description: Report a plugin validation, permission, signature, or behavior problem
+body:
+  - type: input
+    id: plugin
+    attributes: { label: Plugin ID and version }
+    validations: { required: true }
+  - type: input
+    id: hash
+    attributes: { label: Package SHA-256 }
+    validations: { required: true }
+  - type: textarea
+    id: report
+    attributes: { label: Redacted report, description: "Do not include signing material, full serial numbers, or unredacted logs." }
+    validations: { required: true }
+
