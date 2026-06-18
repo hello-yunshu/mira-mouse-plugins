@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "pluginId": "mira.example-mock",
+  "name": "Mira Example Mock",
+  "version": "1.0.0",
+  "pluginApi": ">=1.0.0, <2.0.0",
+  "publisherKeyId": null,
+  "evidence": "fixture-verified",
+  "permissions": [],
+  "capabilities": [
+    { "id": "battery", "control": "ReadOnlyValue", "labelKey": "battery", "readOnly": true },
+    { "id": "charging", "control": "ReadOnlyValue", "labelKey": "charging", "readOnly": true },
+    { "id": "dpi", "control": "DpiStages", "labelKey": "dpi", "readOnly": true },
+    { "id": "polling-rate", "control": "Segmented", "labelKey": "pollingRate", "readOnly": true },
+    { "id": "mouse-light", "control": "LightingZone", "labelKey": "mouseLight", "readOnly": true },
+    { "id": "receiver-gradient", "control": "GradientStops", "labelKey": "receiverGradient", "readOnly": true }
+  ],
+  "writesEnabled": false
+}
+

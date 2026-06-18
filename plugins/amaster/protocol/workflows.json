@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "workflows": [
+    { "id": "protocol-a-read", "exclusive": true, "cancelOnUnplug": true, "maxSteps": 32, "maxRetries": 3, "totalTimeoutMs": 1500, "writesEnabled": false },
+    { "id": "protocol-a-receiver-read", "exclusive": true, "cancelOnUnplug": true, "maxSteps": 48, "maxRetries": 10, "totalTimeoutMs": 2000, "writesEnabled": false },
+    { "id": "am35-read", "exclusive": true, "cancelOnUnplug": true, "validateResponseCommandId": true, "reassembleFragments": true, "maxFragments": 8, "totalTimeoutMs": 1500, "writesEnabled": false }
+  ]
+}
+

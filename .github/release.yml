@@ -1,0 +1,9 @@
+changelog:
+  categories:
+    - title: Security
+      labels: [security]
+    - title: Plugin changes
+      labels: [plugin]
+    - title: Tooling and docs
+      labels: ['*']
+

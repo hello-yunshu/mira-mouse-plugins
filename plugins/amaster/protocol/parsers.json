@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "rules": [
+    { "id": "protocol-a-checksum", "kind": "checksum", "algorithm": "ones-complement-sum8" },
+    { "id": "am35-command-id", "kind": "response-command-id", "endianness": "little" },
+    { "id": "am35-fragments", "kind": "bounded-fragment-reassembly", "maxFragments": 8, "maxBytes": 472 }
+  ]
+}
+

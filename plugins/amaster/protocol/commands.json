@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "protocolA": {
+    "checksum": { "algorithm": "ones-complement-sum8" },
+    "queries": { "parameters": 211, "deviceId": 143, "dpi": 212, "buttonsByLayer": 208, "battery": 214, "mainLighting": 136, "characterLighting": 135, "fps": 226, "dpiQuickSwitch": 227, "usbFirmware": 173, "socFirmware": 128 },
+    "pollingRate": { "8": 125, "4": 250, "2": 500, "1": 1000, "132": 2000, "130": 4000, "129": 8000 },
+    "receiver": { "begin": 246, "poll": 247, "setInnerLength": 254, "readResponse": 252, "mutex": true, "maxPolls": 10, "totalTimeoutMs": 1500 }
+  },
+  "am35": {
+    "preamble": [5, 90],
+    "queries": {
+      "mouseBattery": [5,90,2,0,207,48], "receiverBattery": [5,90,2,0,15,48], "firmware": [5,90,3,0,7,28,0],
+      "serial": [5,90,6,0,12,10,12,96,232,3], "profile": [5,90,2,0,201,48], "dpi": [5,90,2,0,197,48],
+      "pollingRate": [5,90,2,0,17,48], "mouseLightingMode": [5,90,6,0,12,10,10,96,232,3],
+      "mouseLightingColor": [5,90,6,0,12,10,0,98,232,3], "receiverLighting": [5,90,2,0,14,48]
+    },
+    "mouseLightingModes": { "0": "steady", "1": "breathing", "2": "neon-read-only" },
+    "receiverLightingType": { "status": "unknown", "namedValues": {} }
+  }
+}
+

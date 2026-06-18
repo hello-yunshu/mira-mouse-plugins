@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "case": "single-fragment-command-id-validation",
+  "reportId": 7,
+  "payload": [5, 90, 2, 0, 207, 48],
+  "expectedCommandIdLittleEndian": 12495,
+  "failureCases": ["wrong-command-id", "truncated", "oversized", "timeout", "unplugged"]
+}
+

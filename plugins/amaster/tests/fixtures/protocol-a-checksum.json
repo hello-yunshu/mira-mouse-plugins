@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "case": "checksum-empty-command",
+  "input": [],
+  "expectedChecksum": 255,
+  "evidence": "fixture-verified"
+}
+

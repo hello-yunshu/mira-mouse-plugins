@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "battery": { "percent": 82, "charging": false },
+  "dpiStages": [400, 800, 1000, 1600, 3200],
+  "pollingRatesHz": [125, 250, 500, 1000],
+  "mouseLighting": { "zones": 1, "modes": ["steady", "breathing"] },
+  "receiverLighting": { "gradientStops": 3, "applicationLayerLink": true }
+}
+

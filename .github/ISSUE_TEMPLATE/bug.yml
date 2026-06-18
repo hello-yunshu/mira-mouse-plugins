@@ -1,0 +1,8 @@
+name: Repository tooling bug
+description: Report validation, packaging, or documentation defects
+body:
+  - type: textarea
+    id: problem
+    attributes: { label: Problem and reproduction, description: "Remove serial numbers and unredacted logs." }
+    validations: { required: true }
+

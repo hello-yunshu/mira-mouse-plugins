@@ -1,0 +1,18 @@
+name: Plugin Maintenance
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run: { description: 'List candidates without deleting', required: true, default: true, type: boolean }
+permissions: { actions: write, contents: read }
+jobs:
+  artifacts:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - env: { GH_TOKEN: '${{ github.token }}', REPO: '${{ github.repository }}', DRY_RUN: '${{ inputs.dry_run }}' }
+        run: |
+          set -euo pipefail
+          gh api --paginate "repos/$REPO/actions/artifacts?per_page=100" --jq '.artifacts[] | select(.expired == true) | [.id,.name,.created_at] | @tsv' | tee candidates.txt
+          if test "$DRY_RUN" = false; then cut -f1 candidates.txt | while read -r id; do gh api --method DELETE "repos/$REPO/actions/artifacts/$id"; done; fi
+          { echo '### Expired temporary artifacts'; cat candidates.txt 2>/dev/null || echo 'None'; } >> "$GITHUB_STEP_SUMMARY"
+

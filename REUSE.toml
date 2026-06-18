@@ -1,0 +1,11 @@
+version = 1
+SPDX-PackageName = "Mira Mouse Plugins"
+SPDX-PackageSupplier = "NOASSERTION"
+SPDX-PackageDownloadLocation = "NOASSERTION"
+
+[[annotations]]
+path = ["*.json", "*.toml", "*.yml", "*.yaml"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "NOASSERTION"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+

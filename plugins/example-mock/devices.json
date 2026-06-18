@@ -1,0 +1,5 @@
+{
+  "schemaVersion": 1,
+  "devices": [{ "family": "virtual-wireless-mouse", "transport": "mock", "topology": ["receiver", "wireless-mouse"], "evidence": "fixture-verified" }]
+}
+

@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: CC0-1.0
+/.research/
+/dist/
+/target/
+/config/project-metadata.toml
+*.key
+*.pem
+*.p12
+*.mira-plugin
+TEST-ONLY-*.pub
+.DS_Store
+

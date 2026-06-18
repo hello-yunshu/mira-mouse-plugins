@@ -1,0 +1,1 @@
+{ "schemaVersion": 1, "workflows": [{ "id": "snapshot", "maxSteps": 4, "totalTimeoutMs": 100, "writesEnabled": false }] }
