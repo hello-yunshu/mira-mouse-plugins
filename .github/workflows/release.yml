@@ -60,8 +60,8 @@ jobs:
           node-version: 22
       - name: Pack and sign plugin
         env:
-          PLUGIN_SIGNING_KEY: '${{ secrets.MIRA_PLUGIN_SIGNING_KEY }}'
-          PLUGIN_KEY_ID: "${{ secrets.MIRA_PLUGIN_KEY_ID || 'mira-plugins' }}"
+          PLUGIN_SIGNING_KEY: '${{ secrets.PLUGIN_SIGNING_KEY }}'
+          PLUGIN_KEY_ID: 'mira-plugins-2026-001'
           RELEASE_DIR: '${{ needs.gate.outputs.dir }}'
           RELEASE_ASSET: '${{ needs.gate.outputs.asset }}'
         run: |
