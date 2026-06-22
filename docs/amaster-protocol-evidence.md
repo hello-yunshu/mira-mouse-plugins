@@ -13,6 +13,8 @@ Research date: 2026-06-18. Local source: `MIRA_AMASTER_RESEARCH_DIR`, read only.
 | AM35 named mouse modes 0/1/2 | `disassembly/AM35model.dis`; reverse analysis | steady/breathing/neon | medium | source-confirmed; neon write unknown |
 | Receiver light type values | control flow is insufficiently resolved | no reliable enumeration | low | unknown; values preserved and unnamed |
 | Application-layer receiver link | no native follow field found in reviewed evidence | two independent writes would be needed | medium | inferred; writes blocked |
+| Protocol A DPI setter | `decompiled/mouseApi.py` `setMouseDPI()` | command `0x54`; preserve the 64-byte DPI structure and update declared stage/value fields | high | source-confirmed; fixture/build-verified |
+| Protocol A settings setter | `decompiled/mouseApi.py` `setMouseInfo()` | command `0x53`; preserve the full settings structure and replace bytes 1-6/checksum as the driver does | high | source-confirmed; fixture/build-verified |
+| Protocol A receiver lighting setter | `decompiled/mouseApi.py` `setMDLight()` and receiver-path evidence | command `0x08`; effect/speed/brightness/option/RGB; checksum follows the eight-byte head | high | source-confirmed; fixture/build-verified |
 
-All device compatibility and write behavior remain `blocked` pending records with exact model, firmware, transport, readback, verifier, and date.
-
+Protocol A read compatibility is hardware-verified for the recorded receiver model. The bounded writes above remain pending a no-op hardware write/readback record with the mouse online. All AM35 writes and every unlisted state-changing operation remain blocked.

@@ -1,8 +1,27 @@
 {
   "schemaVersion": 1,
   "transports": {
-    "protocol-a": { "reportType": "feature", "reportId": 0, "payloadLength": 64, "hidWriteLength": 65, "stripReadReportId": true },
-    "am35": { "writeReportId": 6, "readReportId": 7, "reportLength": 62, "fragmentPayloadMax": 59, "directType": 0, "receiverType": 128 }
+    "protocol-a": {
+      "kind": "hid-feature",
+      "reportId": 0,
+      "writeLength": 65,
+      "readLength": 65,
+      "stripReportIdOnRead": true
+    },
+    "protocol-a-receiver": {
+      "kind": "hid-feature-proxy",
+      "baseTransport": "protocol-a",
+      "startCommand": "receiver-start",
+      "pollCommand": "receiver-poll",
+      "setLengthCommand": "receiver-set-length",
+      "readCommand": "receiver-read",
+      "sendReady": { "offset": 5, "eq": 1 },
+      "readReady": { "offset": 0, "eq": 1 },
+      "online": { "offset": 4, "eq": 0 },
+      "statusParser": "receiver-status",
+      "statusOutput": "receiver",
+      "attempts": 20,
+      "delayMs": 20
+    }
   }
 }
-

@@ -1,0 +1,1577 @@
+{
+  "$schema": "./features.schema.json",
+  "generatedFrom": {
+    "solaar": {
+      "path": "vendor/solaar/lib/logitech_receiver/hidpp20_constants.py",
+      "license": "GPL-2.0-or-later"
+    },
+    "cpgDocs": {
+      "path": "vendor/cpg-docs/hidpp20/features",
+      "license": "See upstream repository"
+    }
+  },
+  "generatedAt": "2026-06-21T15:19:55.584Z",
+  "features": {
+    "ROOT": {
+      "id": "0x0000",
+      "decimal": 0,
+      "documented": "0x0000-IRoot.rst",
+      "sources": [
+        "solaar",
+        "cpg-docs"
+      ]
+    },
+    "FEATURE_SET": {
+      "id": "0x0001",
+      "decimal": 1,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "FEATURE_INFO": {
+      "id": "0x0002",
+      "decimal": 2,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "DEVICE_FW_VERSION": {
+      "id": "0x0003",
+      "decimal": 3,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "DEVICE_UNIT_ID": {
+      "id": "0x0004",
+      "decimal": 4,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "DEVICE_NAME": {
+      "id": "0x0005",
+      "decimal": 5,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "DEVICE_GROUPS": {
+      "id": "0x0006",
+      "decimal": 6,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "DEVICE_FRIENDLY_NAME": {
+      "id": "0x0007",
+      "decimal": 7,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "KEEP_ALIVE": {
+      "id": "0x0008",
+      "decimal": 8,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "PROPERTY_ACCESS": {
+      "id": "0x0011",
+      "decimal": 17,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "CONFIG_CHANGE": {
+      "id": "0x0020",
+      "decimal": 32,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "CRYPTO_ID": {
+      "id": "0x0021",
+      "decimal": 33,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "TARGET_SOFTWARE": {
+      "id": "0x0030",
+      "decimal": 48,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "WIRELESS_SIGNAL_STRENGTH": {
+      "id": "0x0080",
+      "decimal": 128,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "DFUCONTROL_LEGACY": {
+      "id": "0x00C0",
+      "decimal": 192,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "DFUCONTROL_UNSIGNED": {
+      "id": "0x00C1",
+      "decimal": 193,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "DFUCONTROL_SIGNED": {
+      "id": "0x00C2",
+      "decimal": 194,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "DFUCONTROL": {
+      "id": "0x00C3",
+      "decimal": 195,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "DFU": {
+      "id": "0x00D0",
+      "decimal": 208,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "BATTERY_STATUS": {
+      "id": "0x1000",
+      "decimal": 4096,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "BATTERY_VOLTAGE": {
+      "id": "0x1001",
+      "decimal": 4097,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "UNIFIED_BATTERY": {
+      "id": "0x1004",
+      "decimal": 4100,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "CHARGING_CONTROL": {
+      "id": "0x1010",
+      "decimal": 4112,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "LED_CONTROL": {
+      "id": "0x1300",
+      "decimal": 4864,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "FORCE_PAIRING": {
+      "id": "0x1500",
+      "decimal": 5376,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "GENERIC_TEST": {
+      "id": "0x1800",
+      "decimal": 6144,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "DEVICE_RESET": {
+      "id": "0x1802",
+      "decimal": 6146,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "OOBSTATE": {
+      "id": "0x1805",
+      "decimal": 6149,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "CONFIG_DEVICE_PROPS": {
+      "id": "0x1806",
+      "decimal": 6150,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "CHANGE_HOST": {
+      "id": "0x1814",
+      "decimal": 6164,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HOSTS_INFO": {
+      "id": "0x1815",
+      "decimal": 6165,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "BLE_PRO_PRE_PAIRING": {
+      "id": "0x1816",
+      "decimal": 6166,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "BACKLIGHT": {
+      "id": "0x1981",
+      "decimal": 6529,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "BACKLIGHT2": {
+      "id": "0x1982",
+      "decimal": 6530,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "BACKLIGHT3": {
+      "id": "0x1983",
+      "decimal": 6531,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "ILLUMINATION": {
+      "id": "0x1990",
+      "decimal": 6544,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "FORCE_SENSING_BUTTON": {
+      "id": "0x19C0",
+      "decimal": 6592,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HAPTIC": {
+      "id": "0x19B0",
+      "decimal": 6576,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "PRESENTER_CONTROL": {
+      "id": "0x1A00",
+      "decimal": 6656,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "SENSOR_3D": {
+      "id": "0x1A01",
+      "decimal": 6657,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "REPROG_CONTROLS": {
+      "id": "0x1B00",
+      "decimal": 6912,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "REPROG_CONTROLS_V2": {
+      "id": "0x1B01",
+      "decimal": 6913,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "REPROG_CONTROLS_V2_2": {
+      "id": "0x1B02",
+      "decimal": 6914,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "REPROG_CONTROLS_V3": {
+      "id": "0x1B03",
+      "decimal": 6915,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "REPROG_CONTROLS_V4": {
+      "id": "0x1B04",
+      "decimal": 6916,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "ANALOG_BUTTONS": {
+      "id": "0x1B0C",
+      "decimal": 6924,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "FULL_KEY_CUSTOMIZATION": {
+      "id": "0x1B05",
+      "decimal": 6917,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "CONTROL_LIST": {
+      "id": "0x1B10",
+      "decimal": 6928,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "SWITCH_SWAPABILITY": {
+      "id": "0x1B20",
+      "decimal": 6944,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "DEVICE_MODE": {
+      "id": "0x1B30",
+      "decimal": 6960,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "REPORT_HID_USAGE": {
+      "id": "0x1BC0",
+      "decimal": 7104,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "PERSISTENT_REMAPPABLE_ACTION": {
+      "id": "0x1C00",
+      "decimal": 7168,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "WIRELESS_DEVICE_STATUS": {
+      "id": "0x1D4B",
+      "decimal": 7499,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "REMAINING_PAIRING": {
+      "id": "0x1DF0",
+      "decimal": 7664,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "ENABLE_HIDDEN_FEATURES": {
+      "id": "0x1E00",
+      "decimal": 7680,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "FIRMWARE_PROPERTIES": {
+      "id": "0x1F1F",
+      "decimal": 7967,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "ADC_MEASUREMENT": {
+      "id": "0x1F20",
+      "decimal": 7968,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "LEFT_RIGHT_SWAP": {
+      "id": "0x2001",
+      "decimal": 8193,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "SWAP_BUTTON_CANCEL": {
+      "id": "0x2005",
+      "decimal": 8197,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "POINTER_AXIS_ORIENTATION": {
+      "id": "0x2006",
+      "decimal": 8198,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "VERTICAL_SCROLLING": {
+      "id": "0x2100",
+      "decimal": 8448,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "SMART_SHIFT": {
+      "id": "0x2110",
+      "decimal": 8464,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "SMART_SHIFT_ENHANCED": {
+      "id": "0x2111",
+      "decimal": 8465,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HI_RES_SCROLLING": {
+      "id": "0x2120",
+      "decimal": 8480,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HIRES_WHEEL": {
+      "id": "0x2121",
+      "decimal": 8481,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "LOWRES_WHEEL": {
+      "id": "0x2130",
+      "decimal": 8496,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "THUMB_WHEEL": {
+      "id": "0x2150",
+      "decimal": 8528,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "MOUSE_POINTER": {
+      "id": "0x2200",
+      "decimal": 8704,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "ADJUSTABLE_DPI": {
+      "id": "0x2201",
+      "decimal": 8705,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "EXTENDED_ADJUSTABLE_DPI": {
+      "id": "0x2202",
+      "decimal": 8706,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "POINTER_SPEED": {
+      "id": "0x2205",
+      "decimal": 8709,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "ANGLE_SNAPPING": {
+      "id": "0x2230",
+      "decimal": 8752,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "SURFACE_TUNING": {
+      "id": "0x2240",
+      "decimal": 8768,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "XY_STATS": {
+      "id": "0x2250",
+      "decimal": 8784,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "WHEEL_STATS": {
+      "id": "0x2251",
+      "decimal": 8785,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HYBRID_TRACKING": {
+      "id": "0x2400",
+      "decimal": 9216,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "FN_INVERSION": {
+      "id": "0x40A0",
+      "decimal": 16544,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "NEW_FN_INVERSION": {
+      "id": "0x40A2",
+      "decimal": 16546,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "K375S_FN_INVERSION": {
+      "id": "0x40A3",
+      "decimal": 16547,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "ENCRYPTION": {
+      "id": "0x4100",
+      "decimal": 16640,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "LOCK_KEY_STATE": {
+      "id": "0x4220",
+      "decimal": 16928,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "SOLAR_DASHBOARD": {
+      "id": "0x4301",
+      "decimal": 17153,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "KEYBOARD_LAYOUT": {
+      "id": "0x4520",
+      "decimal": 17696,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "KEYBOARD_DISABLE_KEYS": {
+      "id": "0x4521",
+      "decimal": 17697,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "KEYBOARD_DISABLE_BY_USAGE": {
+      "id": "0x4522",
+      "decimal": 17698,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "KEYBOARD_DISABLE_CONTROLS": {
+      "id": "0x4523",
+      "decimal": 17699,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "DUALPLATFORM": {
+      "id": "0x4530",
+      "decimal": 17712,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "MULTIPLATFORM": {
+      "id": "0x4531",
+      "decimal": 17713,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "KEYBOARD_LAYOUT_2": {
+      "id": "0x4540",
+      "decimal": 17728,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "CROWN": {
+      "id": "0x4600",
+      "decimal": 17920,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "TOUCHPAD_FW_ITEMS": {
+      "id": "0x6010",
+      "decimal": 24592,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "TOUCHPAD_SW_ITEMS": {
+      "id": "0x6011",
+      "decimal": 24593,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "TOUCHPAD_WIN8_FW_ITEMS": {
+      "id": "0x6012",
+      "decimal": 24594,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "TAP_ENABLE": {
+      "id": "0x6020",
+      "decimal": 24608,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "TAP_ENABLE_EXTENDED": {
+      "id": "0x6021",
+      "decimal": 24609,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "CURSOR_BALLISTIC": {
+      "id": "0x6030",
+      "decimal": 24624,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "TOUCHPAD_RESOLUTION": {
+      "id": "0x6040",
+      "decimal": 24640,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "TOUCHPAD_RAW_XY": {
+      "id": "0x6100",
+      "decimal": 24832,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "TOUCHMOUSE_RAW_POINTS": {
+      "id": "0x6110",
+      "decimal": 24848,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "TOUCHMOUSE_6120": {
+      "id": "0x6120",
+      "decimal": 24864,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "GESTURE": {
+      "id": "0x6500",
+      "decimal": 25856,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "GESTURE_2": {
+      "id": "0x6501",
+      "decimal": 25857,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "GKEY": {
+      "id": "0x8010",
+      "decimal": 32784,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "MKEYS": {
+      "id": "0x8020",
+      "decimal": 32800,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "MR": {
+      "id": "0x8030",
+      "decimal": 32816,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "BRIGHTNESS_CONTROL": {
+      "id": "0x8040",
+      "decimal": 32832,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "LOGI_MODIFIERS": {
+      "id": "0x8051",
+      "decimal": 32849,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "REPORT_RATE": {
+      "id": "0x8060",
+      "decimal": 32864,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "EXTENDED_ADJUSTABLE_REPORT_RATE": {
+      "id": "0x8061",
+      "decimal": 32865,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "COLOR_LED_EFFECTS": {
+      "id": "0x8070",
+      "decimal": 32880,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "RGB_EFFECTS": {
+      "id": "0x8071",
+      "decimal": 32881,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "RPM_INDICATOR": {
+      "id": "0x807A",
+      "decimal": 32890,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "RPM_LED_PATTERN": {
+      "id": "0x807B",
+      "decimal": 32891,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "PER_KEY_LIGHTING": {
+      "id": "0x8080",
+      "decimal": 32896,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "PER_KEY_LIGHTING_V2": {
+      "id": "0x8081",
+      "decimal": 32897,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "MODE_STATUS": {
+      "id": "0x8090",
+      "decimal": 32912,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "LEGACY_AXIS_RESPONSE_CURVE": {
+      "id": "0x80A3",
+      "decimal": 32931,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "AXIS_RESPONSE_CURVE": {
+      "id": "0x80A4",
+      "decimal": 32932,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "BANDED_AXIS": {
+      "id": "0x80B1",
+      "decimal": 32945,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "COMBINED_PEDALS": {
+      "id": "0x80D0",
+      "decimal": 32976,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "BUNNY_HOPPING": {
+      "id": "0x80E0",
+      "decimal": 32992,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "ONBOARD_PROFILES": {
+      "id": "0x8100",
+      "decimal": 33024,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "PROFILE_MANAGEMENT": {
+      "id": "0x8101",
+      "decimal": 33025,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "MOUSE_BUTTON_SPY": {
+      "id": "0x8110",
+      "decimal": 33040,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "LATENCY_MONITORING": {
+      "id": "0x8111",
+      "decimal": 33041,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "GAMING_ATTACHMENTS": {
+      "id": "0x8120",
+      "decimal": 33056,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "FORCE_FEEDBACK": {
+      "id": "0x8123",
+      "decimal": 33059,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "DUAL_CLUTCH": {
+      "id": "0x8127",
+      "decimal": 33063,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "WHEEL_CENTER_POSITION": {
+      "id": "0x812C",
+      "decimal": 33068,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "DISPLAY_GAME_DATA": {
+      "id": "0x8130",
+      "decimal": 33072,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "CENTER_SPRING": {
+      "id": "0x8131",
+      "decimal": 33073,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "AXIS_MAPPING": {
+      "id": "0x8132",
+      "decimal": 33074,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "GLOBAL_DAMPING": {
+      "id": "0x8133",
+      "decimal": 33075,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "BRAKE_FORCE": {
+      "id": "0x8134",
+      "decimal": 33076,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "PEDAL_STATUS": {
+      "id": "0x8135",
+      "decimal": 33077,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "TORQUE_LIMIT": {
+      "id": "0x8136",
+      "decimal": 33078,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "CONFIGURATION_PROFILES": {
+      "id": "0x8137",
+      "decimal": 33079,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "OPERATING_RANGE": {
+      "id": "0x8138",
+      "decimal": 33080,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "TRUE_FORCE": {
+      "id": "0x8139",
+      "decimal": 33081,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "FFB_FILTER": {
+      "id": "0x8140",
+      "decimal": 33088,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "SIDETONE": {
+      "id": "0x8300",
+      "decimal": 33536,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "EQUALIZER": {
+      "id": "0x8310",
+      "decimal": 33552,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_OUT": {
+      "id": "0x8320",
+      "decimal": 33568,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "CENTURION_DEVICE_INFO": {
+      "id": "0x0100",
+      "decimal": 256,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "CENTURION_DEVICE_NAME": {
+      "id": "0x0101",
+      "decimal": 257,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "CENTURION_ROOT": {
+      "id": "0x0102",
+      "decimal": 258,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "CENTURION_MEMFAULT": {
+      "id": "0x0103",
+      "decimal": 259,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "CENTURION_BATTERY_SOC": {
+      "id": "0x0104",
+      "decimal": 260,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "CENTURION_AUTO_SLEEP": {
+      "id": "0x0108",
+      "decimal": 264,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "CENTURION_GENERIC_DFU": {
+      "id": "0x010A",
+      "decimal": 266,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "CENTURION_LED_BRIGHTNESS": {
+      "id": "0x0110",
+      "decimal": 272,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "CENTURION_EU_POWER_MODE": {
+      "id": "0x0115",
+      "decimal": 277,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "CENTURION_DEVICE_BOOL_STATE": {
+      "id": "0x0116",
+      "decimal": 278,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_VOLUME": {
+      "id": "0x0200",
+      "decimal": 512,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_EQ": {
+      "id": "0x0201",
+      "decimal": 513,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_ADVANCED_PARA_EQ": {
+      "id": "0x020D",
+      "decimal": 525,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_MIC_TEST": {
+      "id": "0x020E",
+      "decimal": 526,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_EQ_STYLES": {
+      "id": "0x0213",
+      "decimal": 531,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "BT_HOST_INFO": {
+      "id": "0x0305",
+      "decimal": 773,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "LIGHTSPEED_PAIRING": {
+      "id": "0x0309",
+      "decimal": 777,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "BT_GAMING_MODE": {
+      "id": "0x030A",
+      "decimal": 778,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_RGB_EFFECTS": {
+      "id": "0x0600",
+      "decimal": 1536,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_MIC_MUTE": {
+      "id": "0x0601",
+      "decimal": 1537,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_MIC_SNR": {
+      "id": "0x0602",
+      "decimal": 1538,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_AUDIO_SIDETONE": {
+      "id": "0x0604",
+      "decimal": 1540,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_HOST_SWITCH": {
+      "id": "0x0607",
+      "decimal": 1543,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_MIX": {
+      "id": "0x0609",
+      "decimal": 1545,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_TONES": {
+      "id": "0x060B",
+      "decimal": 1547,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_NOISE_EXPOSURE": {
+      "id": "0x060D",
+      "decimal": 1549,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_AI_NOISE_REDUCTION": {
+      "id": "0x060E",
+      "decimal": 1550,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_MIC_GAIN": {
+      "id": "0x0611",
+      "decimal": 1553,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_USAGE_TRACKING": {
+      "id": "0x0617",
+      "decimal": 1559,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_BATTERY_SAVER": {
+      "id": "0x0618",
+      "decimal": 1560,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_RGB_HOSTMODE": {
+      "id": "0x0620",
+      "decimal": 1568,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_RGB_ONBOARD_EFFECTS": {
+      "id": "0x0621",
+      "decimal": 1569,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_RGB_SIGNATURE_EFFECTS": {
+      "id": "0x0622",
+      "decimal": 1570,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_DO_NOT_DISTURB": {
+      "id": "0x0631",
+      "decimal": 1585,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "CENTURION_ONBOARD_PROFILES": {
+      "id": "0x0634",
+      "decimal": 1588,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_RGB_STREAMING": {
+      "id": "0x0635",
+      "decimal": 1589,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "HEADSET_ONBOARD_EQ": {
+      "id": "0x0636",
+      "decimal": 1590,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "MIXER_AUDIO": {
+      "id": "0x0800",
+      "decimal": 2048,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "MIXER_MIC": {
+      "id": "0x0801",
+      "decimal": 2049,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "LOGIVOICE": {
+      "id": "0x0900",
+      "decimal": 2304,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "LOGIVOICE_NOISE_REDUCTION": {
+      "id": "0x0901",
+      "decimal": 2305,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "LOGIVOICE_NOISE_GATE": {
+      "id": "0x0902",
+      "decimal": 2306,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "LOGIVOICE_COMPRESSOR": {
+      "id": "0x0903",
+      "decimal": 2307,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "LOGIVOICE_DE_ESSER": {
+      "id": "0x0904",
+      "decimal": 2308,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "LOGIVOICE_DE_POPPER": {
+      "id": "0x0905",
+      "decimal": 2309,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "LOGIVOICE_LIMITER": {
+      "id": "0x0906",
+      "decimal": 2310,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "LOGIVOICE_HIGH_PASS_FILTER": {
+      "id": "0x0907",
+      "decimal": 2311,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "LOGIVOICE_EQUALIZER": {
+      "id": "0x0908",
+      "decimal": 2312,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "LOGIVOICE_AINR": {
+      "id": "0x0909",
+      "decimal": 2313,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "METERING": {
+      "id": "0x0B01",
+      "decimal": 2817,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "MIC_GAIN_AUTO_MODE": {
+      "id": "0x0B02",
+      "decimal": 2818,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    },
+    "MOUSE_GESTURE": {
+      "id": "0xFE00",
+      "decimal": 65024,
+      "documented": null,
+      "sources": [
+        "solaar"
+      ]
+    }
+  }
+}

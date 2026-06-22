@@ -1,12 +1,94 @@
 {
   "schemaVersion": 1,
   "pluginId": "mira.logitech-hidpp",
-  "name": "Logitech HID++ Research",
-  "version": "0.1.0",
+  "name": "Logitech HID++",
+  "version": "0.6.1",
   "pluginApi": ">=1.0.0, <2.0.0",
   "publisherKeyId": null,
-  "evidence": "inferred",
-  "permissions": [],
-  "capabilities": [{ "id": "research-status", "control": "Info", "labelKey": "researchStatus", "readOnly": true }],
-  "writesEnabled": false
+  "evidence": "hardware-verified",
+  "permissions": [
+    {
+      "kind": "hid",
+      "report_types": ["feature", "input", "output"],
+      "max_report_length": 20,
+      "max_reports_per_second": 60
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "battery", "control": "ReadOnlyValue", "labelKey": "capability.battery", "readOnly": true,
+      "placements": [{ "region": "hero", "order": 10, "span": 1, "icon": "battery" }]
+    },
+    {
+      "id": "control-mode",
+      "control": "Segmented",
+      "labelKey": "capability.control-mode",
+      "readOnly": false,
+      "placements": [
+        { "region": "control", "group": "configuration", "order": 5, "span": 1, "icon": "profile" },
+        { "region": "status", "order": 10, "span": 1, "icon": "profile" }
+      ],
+      "metadata": {
+        "label": "配置控制",
+        "section": "control",
+        "status": true,
+        "source": "capabilities.controlMode.mode",
+        "mutation": "set-control-mode",
+        "param": "mode",
+        "options": [
+          { "value": 1, "label": "板载" },
+          { "value": 2, "label": "软件" }
+        ],
+        "description": "软件模式由 Mira 下发当前设置；板载模式使用鼠标内部保存的配置。"
+      }
+    },
+    {
+      "id": "dpi", "control": "DpiStages", "labelKey": "capability.dpi", "readOnly": false,
+      "placements": [{ "region": "control", "group": "performance", "order": 10, "span": 1, "icon": "gauge" }],
+      "metadata": {
+        "label": "DPI", "source": "dpiStages",
+        "mutations": { "select": "set-dpi-stage", "value": "set-dpi-value" }
+      }
+    },
+    {
+      "id": "polling-rate", "control": "Select", "labelKey": "capability.polling-rate", "readOnly": false,
+      "placements": [{ "region": "control", "group": "polling", "order": 20, "span": 1, "icon": "wave" }],
+      "metadata": {
+        "label": "回报率", "source": "pollingRate", "mutation": "set-polling-rate", "param": "rate", "unit": "Hz",
+        "options": [
+          { "value": 125, "label": "125 Hz" }, { "value": 250, "label": "250 Hz" },
+          { "value": 500, "label": "500 Hz" }, { "value": 1000, "label": "1000 Hz" },
+          { "value": 2000, "label": "2000 Hz" }, { "value": 4000, "label": "4000 Hz" },
+          { "value": 8000, "label": "8000 Hz" }
+        ],
+        "summary": [
+          {
+            "label": "控制模式", "source": "capabilities.controlMode.mode",
+            "options": [{ "value": 1, "label": "板载" }, { "value": 2, "label": "软件" }]
+          },
+          { "label": "配置文件", "source": "profile" }
+        ]
+      }
+    },
+    {
+      "id": "mouse-lighting", "control": "LightingZone", "labelKey": "capability.mouse-lighting", "readOnly": false,
+      "placements": [
+        { "region": "control", "group": "lighting", "order": 30, "span": 1, "icon": "lightbulb" },
+        { "region": "status", "order": 20, "span": 1, "icon": "lightbulb" }
+      ],
+      "metadata": {
+        "label": "鼠标灯光", "source": "lighting.mouseLightColor",
+        "mutations": { "mouse": "set-mouse-lighting" }
+      }
+    },
+    {
+      "id": "device-info", "control": "Info", "labelKey": "capability.device-info", "readOnly": true,
+      "placements": [{ "region": "details", "order": 10, "span": 1, "icon": "info" }]
+    },
+    {
+      "id": "feature-index", "control": "Info", "labelKey": "capability.feature-index", "readOnly": true,
+      "placements": [{ "region": "details", "order": 20, "span": 1, "icon": "info" }]
+    }
+  ],
+  "writesEnabled": true
 }

@@ -1,0 +1,294 @@
+{
+  "schemaVersion": 1,
+  "parsers": {
+    "root-get-feature": {
+      "validWhen": [],
+      "fields": {
+        "deviceIndex": { "offset": 0, "kind": "u8" },
+        "featureIndex": { "offset": 3, "kind": "u8" },
+        "featureVersion": { "offset": 4, "kind": "u8" }
+      },
+      "derived": {
+        "connection": {
+          "kind": "lookup",
+          "source": "deviceIndex",
+          "table": {
+            "0x01": "wireless",
+            "0x02": "wireless",
+            "0x03": "wireless",
+            "0x04": "wireless",
+            "0x05": "wireless",
+            "0x06": "wireless",
+            "0xFF": "usb"
+          }
+        }
+      }
+    },
+    "device-info-get": {
+      "validWhen": [],
+      "fields": {
+        "entityCount": { "offset": 3, "kind": "u8" },
+        "unitId": { "offset": 4, "kind": "bytes", "count": 4 },
+        "transport": { "offset": 8, "kind": "u8" },
+        "modelId": { "offset": 9, "kind": "bytes", "count": 6 }
+      }
+    },
+    "device-name-get-count": {
+      "validWhen": [],
+      "fields": { "length": { "offset": 3, "kind": "u8" } }
+    },
+    "device-name-get": {
+      "validWhen": [],
+      "fields": { "name": { "offset": 3, "kind": "ascii", "count": 16 } }
+    },
+    "battery-get-status": {
+      "validWhen": [],
+      "fields": {
+        "percentage": { "offset": 3, "kind": "u8" },
+        "nextPercentage": { "offset": 4, "kind": "u8" },
+        "statusRaw": { "offset": 5, "kind": "u8" }
+      },
+      "derived": {
+        "charging": {
+          "kind": "lookup",
+          "source": "statusRaw",
+          "table": {
+            "0x00": false,
+            "0x01": true,
+            "0x02": true,
+            "0x03": false,
+            "0x04": true,
+            "0x05": false,
+            "0x06": false,
+            "0x07": false
+          }
+        },
+        "statusName": {
+          "kind": "lookup",
+          "source": "statusRaw",
+          "table": {
+            "0x00": "discharging",
+            "0x01": "recharging",
+            "0x02": "charge-in-final-stage",
+            "0x03": "charge-complete",
+            "0x04": "recharging-below-optimal",
+            "0x05": "invalid-battery",
+            "0x06": "thermal-error",
+            "0x07": "charging-error"
+          }
+        }
+      }
+    },
+    "battery-get-capability": {
+      "validWhen": [],
+      "fields": {
+        "numLevels": { "offset": 3, "kind": "u8" },
+        "capabilityFlags": { "offset": 4, "kind": "u8" }
+      }
+    },
+    "unified-battery-get-capabilities": {
+      "validWhen": [],
+      "fields": {
+        "supportedLevels": { "offset": 3, "kind": "u8" },
+        "capabilityFlags": { "offset": 4, "kind": "u8" }
+      }
+    },
+    "unified-battery-get-status": {
+      "validWhen": [],
+      "fields": {
+        "percentage": { "offset": 3, "kind": "u8" },
+        "levelFlags": { "offset": 4, "kind": "u8" },
+        "chargingStatus": { "offset": 5, "kind": "u8" },
+        "externalPowerStatus": { "offset": 6, "kind": "u8" }
+      },
+      "derived": {
+        "charging": {
+          "kind": "lookup",
+          "source": "chargingStatus",
+          "table": {
+            "0x00": false,
+            "0x01": true,
+            "0x02": true,
+            "0x03": false,
+            "0x04": false
+          }
+        },
+        "statusName": {
+          "kind": "lookup",
+          "source": "chargingStatus",
+          "table": {
+            "0x00": "discharging",
+            "0x01": "charging",
+            "0x02": "charging-slow",
+            "0x03": "complete",
+            "0x04": "charging-error"
+          }
+        }
+      }
+    },
+    "dpi-get-current": {
+      "validWhen": [],
+      "fields": {
+        "sensorIndex": { "offset": 3, "kind": "u8" },
+        "dpiValue": { "offset": 4, "kind": "be-u16" },
+        "defaultDpi": { "offset": 6, "kind": "be-u16" }
+      }
+    },
+    "report-rate-get-list": {
+      "validWhen": [],
+      "fields": {
+        "rateListFlags": { "offset": 3, "kind": "u8" }
+      },
+      "derived": {
+        "supportedRates": {
+          "kind": "bitmap",
+          "source": "rateListFlags",
+          "bitmap": [
+            { "bit": 0, "value": 1000 },
+            { "bit": 1, "value": 500 },
+            { "bit": 2, "value": 333 },
+            { "bit": 3, "value": 250 },
+            { "bit": 4, "value": 200 },
+            { "bit": 5, "value": 167 },
+            { "bit": 6, "value": 143 },
+            { "bit": 7, "value": 125 }
+          ]
+        }
+      }
+    },
+    "report-rate-get": {
+      "validWhen": [],
+      "fields": {
+        "rateMs": { "offset": 3, "kind": "u8" }
+      },
+      "derived": {
+        "pollingRate": {
+          "kind": "lookup",
+          "source": "rateMs",
+          "table": {
+            "1": 1000,
+            "2": 500,
+            "3": 500,
+            "4": 250,
+            "5": 250,
+            "6": 125,
+            "7": 125,
+            "8": 125
+          }
+        }
+      }
+    },
+    "color-led-effects-get-info": {
+      "validWhen": [],
+      "fields": {
+        "zoneCount": { "offset": 3, "kind": "u8" },
+        "nvCaps": { "offset": 4, "kind": "be-u16" },
+        "extCaps": { "offset": 6, "kind": "be-u16" }
+      }
+    },
+    "color-led-effects-get-zone-effect": {
+      "validWhen": [],
+      "fields": {
+        "zoneIndex": { "offset": 3, "kind": "u8" },
+        "mode": { "offset": 4, "kind": "u8" },
+        "enabled": { "offset": 4, "kind": "bool", "mask": "0xff" },
+        "color": { "offset": 5, "kind": "rgb" },
+        "effect": { "offset": 8, "kind": "u8" }
+      },
+      "derived": {
+        "effectName": {
+          "kind": "lookup",
+          "source": "mode",
+          "table": {
+            "0x00": "已关闭",
+            "0x01": "常亮",
+            "0x03": "循环",
+            "0x04": "光波",
+            "0x05": "星夜",
+            "0x0a": "呼吸",
+            "0x0b": "涟漪",
+            "0x0c": "自定义"
+          }
+        }
+      }
+    },
+    "onboard-get-description": {
+      "validWhen": [],
+      "fields": {
+        "memoryModelId": { "offset": 3, "kind": "u8" },
+        "profileFormatId": { "offset": 4, "kind": "u8" },
+        "macroFormatId": { "offset": 5, "kind": "u8" },
+        "profileCount": { "offset": 6, "kind": "u8" },
+        "readOnlyProfileCount": { "offset": 7, "kind": "u8" },
+        "buttonCount": { "offset": 8, "kind": "u8" },
+        "sectorCount": { "offset": 9, "kind": "u8" },
+        "sectorSize": { "offset": 10, "kind": "be-u16" },
+        "mechanicalLayout": { "offset": 12, "kind": "u8" },
+        "variousInfo": { "offset": 13, "kind": "u8" }
+      }
+    },
+    "onboard-get-mode": {
+      "validWhen": [],
+      "fields": {
+        "mode": { "offset": 3, "kind": "u8" }
+      },
+      "derived": {
+        "modeName": {
+          "kind": "lookup",
+          "source": "mode",
+          "table": { "0x01": "onboard", "0x02": "host" }
+        }
+      }
+    },
+    "onboard-get-current-profile": {
+      "validWhen": [],
+      "fields": {
+        "sector": { "offset": 3, "kind": "be-u16" }
+      }
+    },
+    "onboard-get-current-dpi-index": {
+      "validWhen": [],
+      "fields": {
+        "index": { "offset": 3, "kind": "u8" }
+      }
+    },
+    "onboard-memory-read": {
+      "validWhen": [],
+      "fields": {
+        "bytes": { "offset": 3, "kind": "bytes", "count": 16 }
+      }
+    },
+    "profile-mgmt-get-info": {
+      "validWhen": [],
+      "fields": {
+        "featureVersion": { "offset": 3, "kind": "u8" },
+        "maxProfileCount": { "offset": 4, "kind": "u8" },
+        "profileNameLength": { "offset": 5, "kind": "u8" }
+      }
+    },
+    "profile-mgmt-get-count": {
+      "validWhen": [],
+      "fields": {
+        "profileCount": { "offset": 3, "kind": "u8" }
+      }
+    },
+    "profile-mgmt-get-current": {
+      "validWhen": [],
+      "fields": {
+        "profileIndex": { "offset": 3, "kind": "u8" }
+      }
+    },
+    "profile-mgmt-set-current": {
+      "validWhen": [],
+      "fields": {
+        "profileIndex": { "offset": 3, "kind": "u8" }
+      }
+    },
+    "profile-mgmt-control": {
+      "validWhen": [],
+      "fields": {
+        "control": { "offset": 3, "kind": "u8" }
+      }
+    }
+  }
+}

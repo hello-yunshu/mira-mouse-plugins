@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: CC0-1.0
+# Verified developer identity for Mira Mouse Plugins.
+github_owner = "hello-yunshu"
+main_repository_url = "https://github.com/hello-yunshu/mira-mouse"
+plugin_repository_url = "https://github.com/hello-yunshu/mira-mouse-plugins"
+developer_display_name = "云云舒"
+copyright_holder = "云云舒"

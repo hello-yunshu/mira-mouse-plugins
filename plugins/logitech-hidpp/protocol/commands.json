@@ -1,0 +1,362 @@
+{
+  "schemaVersion": 1,
+  "commands": {
+    "root-get-feature": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "value": "0x00" },
+          { "offset": 2, "value": "0x01" },
+          { "offset": 3, "param": "featureId", "encoding": "be-u16" }
+        ],
+        "checksum": null
+      }
+    },
+    "device-info-get": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x01" }
+        ],
+        "checksum": null
+      }
+    },
+    "device-name-get-count": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x01" }
+        ],
+        "checksum": null
+      }
+    },
+    "device-name-get": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x11" },
+          { "offset": 3, "param": "charIndex" }
+        ],
+        "checksum": null
+      }
+    },
+    "battery-get-status": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x01" }
+        ],
+        "checksum": null
+      }
+    },
+    "battery-get-capability": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x11" }
+        ],
+        "checksum": null
+      }
+    },
+    "unified-battery-get-capabilities": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x01" }
+        ],
+        "checksum": null
+      }
+    },
+    "unified-battery-get-status": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x11" }
+        ],
+        "checksum": null
+      }
+    },
+    "dpi-get-current": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x21" }
+        ],
+        "checksum": null
+      }
+    },
+    "dpi-set": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x30" },
+          { "offset": 3, "value": "0x00" },
+          { "offset": 4, "param": "dpi", "encoding": "be-u16" }
+        ],
+        "checksum": null
+      }
+    },
+    "report-rate-get-list": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x00" }
+        ],
+        "checksum": null
+      }
+    },
+    "report-rate-get": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x10" }
+        ],
+        "checksum": null
+      }
+    },
+    "report-rate-set": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x20" },
+          { "offset": 3, "param": "rate", "encoding": "lookup-u8", "lookup": { "125": 8, "250": 4, "500": 2, "1000": 1 } }
+        ],
+        "checksum": null
+      }
+    },
+    "color-led-effects-get-info": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x00" }
+        ],
+        "checksum": null
+      }
+    },
+    "color-led-effects-get-zone-effect": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x10" },
+          { "offset": 3, "value": "0x00" }
+        ],
+        "checksum": null
+      }
+    },
+    "color-led-effects-set-zone-effect": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x30" },
+          { "offset": 3, "value": "0x00" },
+          { "offset": 4, "param": "enabled", "encoding": "bool" },
+          { "offset": 5, "param": "color", "encoding": "rgb" },
+          { "offset": 8, "value": "0x01" },
+          { "offset": 9, "value": "0x00" },
+          { "offset": 10, "value": "0x00" },
+          { "offset": 11, "value": "0x00" },
+          { "offset": 12, "value": "0x00" },
+          { "offset": 13, "value": "0x00" },
+          { "offset": 14, "value": "0x00" },
+          { "offset": 15, "value": "0x01" }
+        ],
+        "checksum": null
+      }
+    },
+    "onboard-get-description": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x01" }
+        ],
+        "checksum": null
+      }
+    },
+    "onboard-get-mode": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x21" }
+        ],
+        "checksum": null
+      }
+    },
+    "onboard-set-mode": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x11" },
+          { "offset": 3, "param": "mode" }
+        ],
+        "checksum": null
+      }
+    },
+    "onboard-get-current-profile": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x41" }
+        ],
+        "checksum": null
+      }
+    },
+    "onboard-get-current-dpi-index": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0xb1" }
+        ],
+        "checksum": null
+      }
+    },
+    "onboard-memory-read": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x51" },
+          { "offset": 3, "param": "sector", "encoding": "be-u16" },
+          { "offset": 5, "param": "offset", "encoding": "be-u16" }
+        ],
+        "checksum": null
+      }
+    },
+    "onboard-memory-write-start": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x61" },
+          { "offset": 3, "param": "sector", "encoding": "be-u16" },
+          { "offset": 5, "value": "0x00" },
+          { "offset": 6, "value": "0x00" },
+          { "offset": 7, "param": "count", "encoding": "be-u16" }
+        ],
+        "checksum": null
+      }
+    },
+    "onboard-memory-write-chunk": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x71" },
+          { "offset": 3, "param": "data", "encoding": "bytes" }
+        ],
+        "checksum": null
+      }
+    },
+    "onboard-memory-write-end": {
+      "request": {
+        "length": 6,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x81" }
+        ],
+        "checksum": null
+      }
+    },
+    "profile-mgmt-get-info": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x00" }
+        ],
+        "checksum": null
+      }
+    },
+    "profile-mgmt-get-count": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x10" }
+        ],
+        "checksum": null
+      }
+    },
+    "profile-mgmt-get-current": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x20" }
+        ],
+        "checksum": null
+      }
+    },
+    "profile-mgmt-set-current": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x30" },
+          { "offset": 3, "param": "profileIndex" }
+        ],
+        "checksum": null
+      }
+    },
+    "profile-mgmt-control": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x60" },
+          { "offset": 3, "param": "control" }
+        ],
+        "checksum": null
+      }
+    }
+  }
+}
