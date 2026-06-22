@@ -1,1 +1,9 @@
-{ "schemaVersion": 1, "readOnly": [], "writes": [], "stage": "research-only" }
+{
+  "schemaVersion": 1,
+  "readOnly": ["battery", "device-info", "feature-index", "color-led-info", "profile-mgmt-info"],
+  "enabledWrites": ["control-mode", "dpi-value", "polling-rate", "mouse-lighting"],
+  "disabledWrites": ["pointer-speed", "onboard-profile-write", "profile-mgmt-switch", "receiver-lighting", "bluetooth-sleep-time", "wireless-sleep-time"],
+  "forbidden": ["firmware-update", "bootloader", "dfu", "flash-erase", "receiver-pairing", "macros"],
+  "pollingRatesHz": [125, 250, 500, 1000],
+  "stage": "hardware-verified"
+}

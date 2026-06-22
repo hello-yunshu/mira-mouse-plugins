@@ -1,0 +1,8 @@
+[submodule "solaar"]
+	path = vendor/solaar
+	url = https://github.com/pwr-Solaar/Solaar.git
+	branch = master
+[submodule "cpg-docs"]
+	path = vendor/cpg-docs
+	url = https://github.com/Logitech/cpg-docs.git
+	branch = master

@@ -1,9 +1,131 @@
 {
   "schemaVersion": 1,
-  "rules": [
-    { "id": "protocol-a-checksum", "kind": "checksum", "algorithm": "ones-complement-sum8" },
-    { "id": "am35-command-id", "kind": "response-command-id", "endianness": "little" },
-    { "id": "am35-fragments", "kind": "bounded-fragment-reassembly", "maxFragments": 8, "maxBytes": 472 }
-  ]
+  "parsers": {
+    "battery": {
+      "validWhen": [{ "offset": 0, "eq": 214 }],
+      "fields": {
+        "charging": { "offset": 1, "kind": "bool", "mask": "0x80" },
+        "valid": { "offset": 2, "kind": "bool" },
+        "percentage": { "offset": 3, "kind": "u8" }
+      }
+    },
+    "dpi": {
+      "validWhen": [{ "offset": 0, "eq": 212 }],
+      "fields": {
+        "profile": { "offset": 1, "kind": "u8" },
+        "currentStage": { "offset": 2, "kind": "u8" },
+        "stageCount": { "offset": 3, "kind": "u8" },
+        "dpiX": { "offset": 8, "kind": "le-u16-array", "count": 8 },
+        "dpiY": { "offset": 24, "kind": "le-u16-array", "count": 8 },
+        "stageColors": { "offset": 40, "kind": "rgb-array", "count": 8 }
+      }
+    },
+    "settings": {
+      "validWhen": [{ "offset": 0, "eq": 211 }],
+      "fields": {
+        "profile": { "offset": 8, "kind": "u8" },
+        "pollingRaw": { "offset": 9, "kind": "u8" },
+        "usbDebounce": { "offset": 10, "kind": "u8" },
+        "rippleCorrection": { "offset": 12, "kind": "bool" },
+        "buttonChangeTime": { "offset": 14, "kind": "u8" },
+        "wheelToButton": { "offset": 15, "kind": "u8" },
+        "buttonToWheel": { "offset": 16, "kind": "u8" },
+        "bluetoothSleepValue": { "offset": 40, "kind": "le-u16" },
+        "wirelessSleepValue": { "offset": 44, "kind": "le-u16" },
+        "liftCutOff": { "offset": 52, "kind": "u8" },
+        "angleSnap": { "offset": 53, "kind": "bool" },
+        "mouseLightStartColor": { "offset": 54, "kind": "rgb" },
+        "mouseLightEndColor": { "offset": 57, "kind": "rgb" },
+        "mouseLightEnabled": { "offset": 60, "kind": "bool" },
+        "wirelessDebounce": { "offset": 61, "kind": "u8" },
+        "bluetoothDebounce": { "offset": 62, "kind": "u8" },
+        "motionSync": { "offset": 63, "kind": "bool", "invert": true }
+      },
+      "derived": {
+        "pollingRate": {
+          "kind": "lookup",
+          "source": "pollingRaw",
+          "table": { "0x08": 125, "0x04": 250, "0x02": 500, "0x01": 1000, "0x84": 2000, "0x82": 4000, "0x81": 8000 }
+        }
+      }
+    },
+    "lighting": {
+      "validWhen": [{ "offset": 0, "eq": 136 }],
+      "fields": {
+        "effect": { "offset": 1, "kind": "u8" },
+        "speed": { "offset": 2, "kind": "u8" },
+        "brightness": { "offset": 3, "kind": "u8" },
+        "option": { "offset": 4, "kind": "u8" },
+        "color": { "offset": 5, "kind": "rgb" }
+      },
+      "derived": {
+        "enabled": {
+          "kind": "lookup",
+          "source": "effect",
+          "table": {
+            "0x00": false,
+            "0x01": true, "0x02": true, "0x03": true, "0x04": true,
+            "0x05": true, "0x06": true, "0x07": true, "0x08": true
+          }
+        },
+        "effectName": {
+          "kind": "lookup",
+          "source": "effect",
+          "table": {
+            "0x01": "常亮", "0x02": "呼吸", "0x03": "霓虹", "0x04": "光波",
+            "0x05": "跑马", "0x06": "圆环", "0x07": "缓冲", "0x08": "追捕"
+          }
+        },
+        "optionName": {
+          "kind": "lookup",
+          "source": "option",
+          "table": {
+            "0x00": "红", "0x01": "橙", "0x02": "黄", "0x03": "绿",
+            "0x04": "青", "0x05": "蓝", "0x06": "紫", "0x07": "自定义", "0x08": "炫彩"
+          }
+        },
+        "speedLabel": {
+          "kind": "lookup",
+          "source": "speed",
+          "table": {
+            "0x00": "最快", "0x01": "快", "0x02": "中", "0x03": "慢", "0x04": "最慢"
+          }
+        },
+        "brightnessLabel": {
+          "kind": "lookup",
+          "source": "brightness",
+          "table": {
+            "0x00": "最暗", "0x01": "暗", "0x02": "中", "0x03": "亮", "0x04": "最亮"
+          }
+        }
+      }
+    },
+    "mouse-light-switch": { "validWhen": [{ "offset": 0, "eq": 135 }], "fields": { "enabled": { "offset": 1, "kind": "bool" } } },
+    "fps": { "validWhen": [{ "offset": 0, "eq": 226 }], "fields": { "enabled": { "offset": 1, "kind": "bool" } } },
+    "dpi-button": { "validWhen": [{ "offset": 0, "eq": 227 }], "fields": { "enabled": { "offset": 1, "kind": "bool" } } },
+    "firmware": { "validWhen": [], "fields": { "versionRaw": { "offset": 1, "kind": "le-u16" } } },
+    "receiver-firmware-soc": { "validWhen": [], "fields": { "versionRaw": { "offset": 3, "kind": "u8" } } },
+    "receiver-status": {
+      "validWhen": [],
+      "fields": {
+        "readReady": { "offset": 0, "kind": "u8" },
+        "mouseBattery": { "offset": 2, "kind": "u8" },
+        "mouseOnline": { "offset": 4, "kind": "bool", "invert": true },
+        "sendReady": { "offset": 5, "kind": "u8" },
+        "receiverBattery": { "offset": 10, "kind": "u8" }
+      }
+    },
+    "button-mappings": {
+      "validWhen": [{ "offset": 0, "eq": 1 }],
+      "fields": {
+        "0x00": { "offset": 0, "kind": "bytes", "count": 4 },
+        "0x01": { "offset": 4, "kind": "bytes", "count": 4 },
+        "0x02": { "offset": 8, "kind": "bytes", "count": 4 },
+        "0x03": { "offset": 12, "kind": "bytes", "count": 4 },
+        "0x04": { "offset": 16, "kind": "bytes", "count": 4 },
+        "0x0e": { "offset": 56, "kind": "bytes", "count": 4 },
+        "0x0f": { "offset": 60, "kind": "bytes", "count": 4 }
+      }
+    }
+  }
 }
-

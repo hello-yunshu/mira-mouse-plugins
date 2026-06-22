@@ -2,8 +2,12 @@ cff-version: 1.2.0
 message: "If you use these plugin definitions in research, cite the software release."
 title: "Mira Mouse Plugins"
 type: software
-version: 0.1.0
-date-released: "2026-06-18"
+version: 1.2.0
+date-released: "2026-06-19"
 license: AGPL-3.0-or-later
 abstract: "Declarative device plugins and offline protocol Fixtures for Mira."
-
+authors:
+  - name: "云云舒"
+    alias: "hello-yunshu"
+repository-code: "https://github.com/hello-yunshu/mira-mouse-plugins"
+url: "https://github.com/hello-yunshu/mira-mouse-plugins"
