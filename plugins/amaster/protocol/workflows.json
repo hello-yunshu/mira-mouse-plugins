@@ -1,9 +1,163 @@
 {
   "schemaVersion": 1,
-  "workflows": [
-    { "id": "protocol-a-read", "exclusive": true, "cancelOnUnplug": true, "maxSteps": 32, "maxRetries": 3, "totalTimeoutMs": 1500, "writesEnabled": false },
-    { "id": "protocol-a-receiver-read", "exclusive": true, "cancelOnUnplug": true, "maxSteps": 48, "maxRetries": 10, "totalTimeoutMs": 2000, "writesEnabled": false },
-    { "id": "am35-read", "exclusive": true, "cancelOnUnplug": true, "validateResponseCommandId": true, "reassembleFragments": true, "maxFragments": 8, "totalTimeoutMs": 1500, "writesEnabled": false }
-  ]
+  "workflows": {
+    "protocol-a-direct-read": {
+      "transport": "protocol-a",
+      "steps": [
+        { "command": "battery", "parser": "battery", "output": "battery" },
+        { "command": "dpi", "parser": "dpi", "output": "dpi" },
+        { "command": "settings", "parser": "settings", "output": "settings" },
+        { "command": "lighting", "parser": "lighting", "output": "mouseEffect" },
+        { "command": "mouse-light-switch", "parser": "mouse-light-switch", "output": "mouseLightSwitch" },
+        { "command": "fps", "parser": "fps", "output": "fps" },
+        { "command": "dpi-button", "parser": "dpi-button", "output": "dpiButton" },
+        { "command": "firmware-usb", "parser": "firmware", "output": "firmwareUsb" },
+        { "command": "firmware-soc", "parser": "firmware", "output": "firmwareSoc" },
+        { "command": "button-mappings", "parser": "button-mappings", "output": "buttonMappings", "params": { "layer": 0 } }
+      ]
+    },
+    "protocol-a-receiver-read": {
+      "transport": "protocol-a-receiver",
+      "steps": [
+        { "command": "receiver-firmware-usb", "parser": "firmware", "output": "receiverFirmwareUsb", "transport": "protocol-a" },
+        { "command": "receiver-firmware-soc", "parser": "receiver-firmware-soc", "output": "receiverFirmwareSoc", "transport": "protocol-a" },
+        { "command": "receiver-firmware-led", "parser": "firmware", "output": "receiverFirmwareLed", "transport": "protocol-a" },
+        { "command": "battery", "parser": "battery", "output": "battery" },
+        { "command": "dpi", "parser": "dpi", "output": "dpi" },
+        { "command": "settings", "parser": "settings", "output": "settings" },
+        { "command": "lighting", "parser": "lighting", "output": "receiverLighting", "transport": "protocol-a" },
+        { "command": "mouse-light-switch", "parser": "mouse-light-switch", "output": "receiverLightSwitch", "transport": "protocol-a" },
+        { "command": "fps", "parser": "fps", "output": "fps" },
+        { "command": "dpi-button", "parser": "dpi-button", "output": "dpiButton" },
+        { "command": "firmware-usb", "parser": "firmware", "output": "firmwareUsb" },
+        { "command": "firmware-soc", "parser": "firmware", "output": "firmwareSoc" },
+        { "command": "button-mappings", "parser": "button-mappings", "output": "buttonMappings", "params": { "layer": 0 } }
+      ]
+    }
+  },
+  "mutations": {
+    "protocol-a-direct-set-dpi-stage": {
+      "transport": "protocol-a",
+      "inputs": { "stage": { "kind": "integer", "min": 1, "max": 8 } },
+      "read": { "command": "dpi", "parser": "dpi" },
+      "writeCommand": "dpi-stage-write",
+      "preserveUnknown": true,
+      "settleMs": 30,
+      "verify": { "command": "dpi", "parser": "dpi", "assertions": [{ "field": "currentStage", "param": "stage" }] }
+    },
+    "protocol-a-receiver-set-dpi-stage": {
+      "transport": "protocol-a-receiver",
+      "inputs": { "stage": { "kind": "integer", "min": 1, "max": 8 } },
+      "read": { "command": "dpi", "parser": "dpi" },
+      "writeCommand": "dpi-stage-write",
+      "preserveUnknown": true,
+      "settleMs": 30,
+      "verify": { "command": "dpi", "parser": "dpi", "assertions": [{ "field": "currentStage", "param": "stage" }] }
+    },
+    "protocol-a-direct-set-dpi-value": {
+      "transport": "protocol-a",
+      "inputs": { "stage": { "kind": "integer", "min": 1, "max": 8 }, "dpi": { "kind": "integer", "min": 50, "max": 30000, "step": 50 } },
+      "read": { "command": "dpi", "parser": "dpi" },
+      "writeCommand": "dpi-value-write",
+      "preserveUnknown": true,
+      "settleMs": 30,
+      "verify": { "command": "dpi", "parser": "dpi", "assertions": [{ "field": "dpiX", "param": "dpi", "indexParam": "stage", "indexBase": 1 }, { "field": "dpiY", "param": "dpi", "indexParam": "stage", "indexBase": 1 }] }
+    },
+    "protocol-a-receiver-set-dpi-value": {
+      "transport": "protocol-a-receiver",
+      "inputs": { "stage": { "kind": "integer", "min": 1, "max": 8 }, "dpi": { "kind": "integer", "min": 50, "max": 30000, "step": 50 } },
+      "read": { "command": "dpi", "parser": "dpi" },
+      "writeCommand": "dpi-value-write",
+      "preserveUnknown": true,
+      "settleMs": 30,
+      "verify": { "command": "dpi", "parser": "dpi", "assertions": [{ "field": "dpiX", "param": "dpi", "indexParam": "stage", "indexBase": 1 }, { "field": "dpiY", "param": "dpi", "indexParam": "stage", "indexBase": 1 }] }
+    },
+    "protocol-a-direct-set-polling-rate": {
+      "transport": "protocol-a",
+      "inputs": { "rate": { "kind": "integer", "allowed": [125, 250, 500, 1000, 2000, 4000, 8000] } },
+      "read": { "command": "settings", "parser": "settings" },
+      "writeCommand": "polling-rate-write",
+      "preserveUnknown": true,
+      "settleMs": 30,
+      "verify": { "command": "settings", "parser": "settings", "assertions": [{ "field": "pollingRate", "param": "rate" }] }
+    },
+    "protocol-a-receiver-set-polling-rate": {
+      "transport": "protocol-a-receiver",
+      "inputs": { "rate": { "kind": "integer", "allowed": [125, 250, 500, 1000, 2000, 4000, 8000] } },
+      "read": { "command": "settings", "parser": "settings" },
+      "writeCommand": "polling-rate-write",
+      "preserveUnknown": true,
+      "settleMs": 30,
+      "verify": { "command": "settings", "parser": "settings", "assertions": [{ "field": "pollingRate", "param": "rate" }] }
+    },
+    "protocol-a-direct-set-bluetooth-sleep-time": {
+      "transport": "protocol-a",
+      "inputs": { "seconds": { "kind": "integer", "min": 10, "max": 65535 } },
+      "read": { "command": "settings", "parser": "settings" },
+      "writeCommand": "bluetooth-sleep-write",
+      "preserveUnknown": true,
+      "settleMs": 30,
+      "verify": { "command": "settings", "parser": "settings", "assertions": [{ "field": "bluetoothSleepValue", "param": "seconds" }] }
+    },
+    "protocol-a-receiver-set-bluetooth-sleep-time": {
+      "transport": "protocol-a-receiver",
+      "inputs": { "seconds": { "kind": "integer", "min": 10, "max": 65535 } },
+      "read": { "command": "settings", "parser": "settings" },
+      "writeCommand": "bluetooth-sleep-write",
+      "preserveUnknown": true,
+      "settleMs": 30,
+      "verify": { "command": "settings", "parser": "settings", "assertions": [{ "field": "bluetoothSleepValue", "param": "seconds" }] }
+    },
+    "protocol-a-direct-set-wireless-sleep-time": {
+      "transport": "protocol-a",
+      "inputs": { "seconds": { "kind": "integer", "min": 10, "max": 65535 } },
+      "read": { "command": "settings", "parser": "settings" },
+      "writeCommand": "wireless-sleep-write",
+      "preserveUnknown": true,
+      "settleMs": 30,
+      "verify": { "command": "settings", "parser": "settings", "assertions": [{ "field": "wirelessSleepValue", "param": "seconds" }] }
+    },
+    "protocol-a-receiver-set-wireless-sleep-time": {
+      "transport": "protocol-a-receiver",
+      "inputs": { "seconds": { "kind": "integer", "min": 10, "max": 65535 } },
+      "read": { "command": "settings", "parser": "settings" },
+      "writeCommand": "wireless-sleep-write",
+      "preserveUnknown": true,
+      "settleMs": 30,
+      "verify": { "command": "settings", "parser": "settings", "assertions": [{ "field": "wirelessSleepValue", "param": "seconds" }] }
+    },
+    "protocol-a-direct-set-mouse-lighting": {
+      "transport": "protocol-a",
+      "inputs": { "color": { "kind": "color" }, "enabled": { "kind": "boolean" } },
+      "read": { "command": "settings", "parser": "settings" },
+      "writeCommand": "mouse-lighting-write",
+      "preserveUnknown": true,
+      "settleMs": 30,
+      "verify": { "command": "settings", "parser": "settings", "assertions": [{ "field": "mouseLightStartColor", "param": "color" }, { "field": "mouseLightEndColor", "param": "color" }, { "field": "mouseLightEnabled", "param": "enabled" }] }
+    },
+    "protocol-a-receiver-set-mouse-lighting": {
+      "transport": "protocol-a-receiver",
+      "inputs": { "color": { "kind": "color" }, "enabled": { "kind": "boolean" } },
+      "read": { "command": "settings", "parser": "settings" },
+      "writeCommand": "mouse-lighting-write",
+      "preserveUnknown": true,
+      "settleMs": 30,
+      "verify": { "command": "settings", "parser": "settings", "assertions": [{ "field": "mouseLightStartColor", "param": "color" }, { "field": "mouseLightEndColor", "param": "color" }, { "field": "mouseLightEnabled", "param": "enabled" }] }
+    },
+    "protocol-a-receiver-set-receiver-lighting": {
+      "transport": "protocol-a",
+      "inputs": {
+        "effect": { "kind": "integer", "min": 0, "max": 8 },
+        "speed": { "kind": "integer", "min": 0, "max": 4 },
+        "brightness": { "kind": "integer", "min": 0, "max": 4 },
+        "option": { "kind": "integer", "min": 0, "max": 8 },
+        "color": { "kind": "color" }
+      },
+      "read": { "command": "lighting", "parser": "lighting" },
+      "writeCommand": "receiver-lighting-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "lighting", "parser": "lighting", "assertions": [{ "field": "effect", "param": "effect" }, { "field": "speed", "param": "speed" }, { "field": "brightness", "param": "brightness" }, { "field": "option", "param": "option" }, { "field": "color", "param": "color" }] }
+    }
+  }
 }
-

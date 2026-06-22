@@ -1,3 +1,129 @@
-# Logitech HID++ research plugin
+# mira.logitech-hidpp
 
-Experimental, unbundled, and currently matches no device. No model support or write capability is claimed.
+HID++ 2.0 plugin with protocol-level discovery instead of a model whitelist.
+
+## Current scope
+
+- Matches vendor `0x046D`, usage page `0xFF00`, usage `2`.
+- Uses HID++ long Output/Input reports (`0x11`, 20 bytes total: report ID plus
+  19-byte payload).
+- Tries receiver slots `1..6`, then direct-device index `0xFF`, and reuses the
+  device index echoed by the first valid Root response.
+- Discovers runtime feature indices through Root `0x0000`.
+- Reads Device Information `0x0003`, Device Name `0x0005`, Battery Level Status
+  `0x1000`, Unified Battery `0x1004`, and Adjustable DPI `0x2201` when present.
+- Reads and writes Report Rate `0x8060` when present.
+- Switches `0x8100` between onboard mode (`1`) and host/software mode (`2`)
+  through a bounded, readback-verified mutation.
+- Reads HID++ Onboard Profiles `0x8100` using the device-reported sector size,
+  verifies CRC-CCITT, and discovers the active profile and DPI index.
+- Discovers and reads Profile Management `0x8101` when present, exposing
+  profile count, capability info, and the active profile index. Write paths
+  (`profile-mgmt-set-current` and `profile-mgmt-control`) are wired but kept
+  disabled until hardware-verified.
+- Skips unsupported optional features instead of issuing commands to index zero.
+
+The feature byte includes client id `1`, and responses are matched against the
+device index, feature index, and function/client byte. HID++ error responses
+(`feature index 0xFF`) are rejected by the host runtime.
+
+## Profile Management (`0x8101`)
+
+This feature is not documented in the public Logitech HID++ specification and
+has no known open-source implementation beyond the constant name in Solaar and
+a single cleanup call (`feature 0x8101`, function `0x60`, payload `0x03`) used
+to hand LED control back to the firmware. The commands and parsers added here
+are therefore protocol-informed placeholders based on HID++ 2.0 conventions:
+
+| Command | Function | Purpose |
+|---------|----------|---------|
+| `profile-mgmt-get-info` | `0x00` | Feature version, max profile count, name length |
+| `profile-mgmt-get-count` | `0x10` | Number of stored profiles |
+| `profile-mgmt-get-current` | `0x20` | Currently active profile index |
+| `profile-mgmt-set-current` | `0x30` | Activate a profile by index (disabled) |
+| `profile-mgmt-control` | `0x60` | Control byte pass-through, e.g. Solaar's `0x03` (disabled) |
+
+These definitions need hardware validation. When a device exposes `0x8101`, the
+read workflow will surface `profileMgmtInfo`, `profileMgmtCount`, and
+`profileMgmtCurrent`; actual command semantics should be confirmed against a
+captured trace before enabling the write paths.
+
+## Upstream HID++ references
+
+To keep this plugin in sync with evolving public knowledge of the HID++
+protocol, the upstream reference projects are vendored as Git submodules and
+feature IDs are referenced by name instead of by hard-coded decimal values:
+
+```
+vendor/solaar      → https://github.com/pwr-Solaar/Solaar.git     (master)
+vendor/cpg-docs    → https://github.com/Logitech/cpg-docs.git     (master)
+```
+
+- `vendor/solaar/lib/logitech_receiver/hidpp20_constants.py` is the source of
+  truth for feature IDs (e.g. `PROFILE_MANAGEMENT = 0x8101`).
+- `vendor/cpg-docs/hidpp20/features/` contains Logitech's public feature
+  specifications, when available.
+- `protocol/features.json` is generated from those two sources.
+- `protocol/workflows.json` refers to features as `"featureRef": "NAME"`, and
+  both the Node.js validator and the Rust runtime expand it to the numeric
+  `featureId` at load time.
+
+### Syncing feature IDs
+
+After checking out the repository with submodules:
+
+```sh
+git submodule update --init --recursive
+```
+
+Pull upstream master and regenerate the local registry:
+
+```sh
+cd vendor/solaar && git pull origin master && cd ../..
+cd vendor/cpg-docs && git pull origin master && cd ../..
+node scripts/sync-hidpp-features.mjs
+```
+
+Review the diff to `protocol/features.json`, then run the validator and tests:
+
+```sh
+node scripts/validate.mjs
+npm test
+```
+
+For CI, `node scripts/sync-hidpp-features.mjs --check` fails if
+`protocol/features.json` is out of sync with the vendored upstream sources.
+
+### Other references
+
+- [Logitech cpg-docs HID++ 2.0](https://github.com/Logitech/cpg-docs/tree/master/hidpp20) — public packet structure and documented feature specs.
+- [Solaar](https://github.com/pwr-Solaar/Solaar) — `lib/logitech_receiver/hidpp20_constants.py` for feature IDs and `hidpp20.py` / `rgb_power.py` for observed traffic.
+- [openlogi-hidpp](https://crates.io/crates/openlogi-hidpp) / upstream [lus/logy](https://github.com/lus/logy) — Rust HID++ implementation used as a cross-check.
+
+Future updates to undocumented features (e.g. `0x8101`) should be reconciled
+against new Solaar releases or captured device traces before being promoted from
+`disabledWrites` to `enabledWrites`.
+
+## Evidence and limitations
+
+The generic workflow is hardware-verified with a G705 Mouse through a
+`046d:c547` receiver on macOS. That device is a validation sample, not a model
+restriction. Runtime support is determined from the HID++ collection and the
+feature indices each connected device actually exposes.
+
+The workflow currently selects the first responding receiver slot. Multiple
+simultaneously exposed paired devices remain unsupported. In onboard mode, DPI
+and polling-rate edits patch the active profile, preserve unknown bytes, update
+CRC, and verify the complete sector. Profile format `5` also enables the
+verified secondary-slot lighting patch. Other lighting layouts remain guarded.
+When onboard mode is unavailable, standard feature writes remain the fallback.
+
+Run the signed-package path with:
+
+```sh
+MIRA_PLUGIN=mira.logitech-hidpp \
+  cargo run -p mira-plugin-runtime --example enumerate_hid
+```
+
+Set `MIRA_WRITE_SMOKE=1` to repeat the currently read DPI and polling rate and
+require successful readback without changing the user's settings.

@@ -14,9 +14,11 @@ fn main() -> ExitCode {
         match Command::new("npm").args(*args).status() {
             Ok(status) if status.success() => {}
             Ok(status) => return ExitCode::from(status.code().unwrap_or(1) as u8),
-            Err(error) => { eprintln!("unable to run npm: {error}"); return ExitCode::FAILURE; }
+            Err(error) => {
+                eprintln!("unable to run npm: {error}");
+                return ExitCode::FAILURE;
+            }
         }
     }
     ExitCode::SUCCESS
 }
-

@@ -1,1 +1,14 @@
-{ "schemaVersion": 1, "devices": [], "reason": "No model/firmware/connection-specific whitelist has been verified." }
+{
+  "schemaVersion": 1,
+  "devices": [
+    {
+      "family": "hidpp2-device",
+      "vendorId": 1133,
+      "usagePage": 65280,
+      "usage": 2,
+      "connection": "hidpp",
+      "evidence": "protocol-verified"
+    }
+  ],
+  "hardwareVerifiedModels": ["G705 Mouse through 046d:c547 receiver on macOS"]
+}

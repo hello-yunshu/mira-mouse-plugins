@@ -1,7 +1,8 @@
 {
   "schemaVersion": 1,
-  "readOnly": ["battery", "dpi", "polling-rate", "profile", "firmware", "lighting"],
-  "disabledWrites": ["dpi", "polling-rate", "mouse-lighting", "receiver-lighting", "application-layer-light-link"],
-  "forbidden": ["firmware-update", "bootloader", "dfu", "flash-erase", "receiver-pairing", "macros", "button-mapping"]
+  "readOnly": ["battery", "profile", "firmware", "device-settings", "receiver-status", "button-mappings"],
+  "enabledWrites": ["current-dpi-stage", "dpi-value", "polling-rate", "sleep-time", "mouse-lighting", "receiver-lighting"],
+  "disabledWrites": ["application-layer-light-link", "button-mapping"],
+  "forbidden": ["firmware-update", "bootloader", "dfu", "flash-erase", "receiver-pairing", "macros"],
+  "pollingRatesHz": [125, 250, 500, 1000, 2000, 4000, 8000]
 }
-

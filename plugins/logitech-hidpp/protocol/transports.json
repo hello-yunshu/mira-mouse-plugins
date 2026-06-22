@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "transports": {
+    "hidpp2-long": {
+      "kind": "hid-output-input",
+      "reportId": 17,
+      "writeLength": 20,
+      "readLength": 20,
+      "stripReportIdOnRead": true,
+      "readTimeoutMs": 250
+    },
+    "hidpp2-short": {
+      "kind": "hid-output-input",
+      "reportId": 16,
+      "writeLength": 7,
+      "readLength": 7,
+      "stripReportIdOnRead": true,
+      "readTimeoutMs": 250
+    }
+  }
+}

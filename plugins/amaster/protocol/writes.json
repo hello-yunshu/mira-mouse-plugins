@@ -1,7 +1,6 @@
 {
   "schemaVersion": 1,
-  "enabled": false,
+  "enabled": true,
   "policy": { "snapshot": true, "preserveUnknownFields": true, "validateRange": true, "readback": true, "compareTarget": true, "showActualOnFailure": true, "undoWhenSupported": true },
-  "reason": "blocked: no model/firmware/connection-specific hardware readback record"
+  "reason": "enabled for bounded low-risk mutations with pre-read, preserved unknown fields, and field-level readback verification"
 }
-
