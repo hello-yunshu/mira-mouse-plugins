@@ -2,7 +2,6 @@
 /.research/
 /dist/
 /target/
-/config/project-metadata.toml
 *.key
 *.pem
 *.p12

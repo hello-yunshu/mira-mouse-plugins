@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "case": "battery-status-discharging",
+  "evidence": "source-confirmed",
+  "description": "HID++ 2.0 BatteryStatus.GetStatus response. Byte 3 is the percentage, byte 4 is the next percentage threshold, and byte 5 is the charge status.",
+  "response": [1, 3, 1, 77, 70, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "expected": { "percentage": 77, "nextPercentage": 70, "statusRaw": 0, "charging": false, "statusName": "discharging" }
+}

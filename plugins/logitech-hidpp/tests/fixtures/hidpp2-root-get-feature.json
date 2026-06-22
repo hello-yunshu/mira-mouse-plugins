@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "case": "root-get-feature-battery",
+  "evidence": "source-confirmed",
+  "description": "HID++ 2.0 Root.GetFeature response for feature ID 0x1000. Byte 0 echoes paired device index 1 and byte 2 includes client id 1.",
+  "featureId": 4096,
+  "featureName": "BatteryStatus",
+  "response": [1, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "expected": { "featureIndex": 3, "featureVersion": 0, "supported": true }
+}

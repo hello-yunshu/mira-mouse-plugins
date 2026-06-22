@@ -1,0 +1,721 @@
+{
+  "schemaVersion": 1,
+  "workflows": {
+    "hidpp2-device-read": {
+      "transport": "hidpp2-long",
+      "steps": [
+        {
+          "command": "root-get-feature",
+          "parser": "root-get-feature",
+          "output": "device",
+          "params": { "featureRef": "DEVICE_FW_VERSION" },
+          "paramCandidates": { "deviceIndex": [1, 2, 3, 4, 5, 6, 255] }
+        },
+        {
+          "command": "root-get-feature",
+          "parser": "root-get-feature",
+          "output": "featureIndexDeviceName",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureRef": "DEVICE_NAME"
+          }
+        },
+        {
+          "command": "root-get-feature",
+          "parser": "root-get-feature",
+          "output": "featureIndexBattery",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureRef": "BATTERY_STATUS"
+          }
+        },
+        {
+          "command": "root-get-feature",
+          "parser": "root-get-feature",
+          "output": "featureIndexUnifiedBattery",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureRef": "UNIFIED_BATTERY"
+          }
+        },
+        {
+          "command": "root-get-feature",
+          "parser": "root-get-feature",
+          "output": "featureIndexDpi",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureRef": "ADJUSTABLE_DPI"
+          }
+        },
+        {
+          "command": "device-info-get",
+          "parser": "device-info-get",
+          "output": "deviceInfo",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "device", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "device", "field": "featureIndex" }]
+        },
+        {
+          "command": "device-name-get-count",
+          "parser": "device-name-get-count",
+          "output": "deviceNameLength",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexDeviceName", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexDeviceName", "field": "featureIndex" }]
+        },
+        {
+          "command": "device-name-get",
+          "parser": "device-name-get",
+          "output": "deviceName",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexDeviceName", "field": "featureIndex" },
+            "charIndex": 0
+          },
+          "skipIfZero": [{ "output": "featureIndexDeviceName", "field": "featureIndex" }]
+        },
+        {
+          "command": "battery-get-status",
+          "parser": "battery-get-status",
+          "output": "battery",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexBattery", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexBattery", "field": "featureIndex" }]
+        },
+        {
+          "command": "battery-get-capability",
+          "parser": "battery-get-capability",
+          "output": "batteryCapability",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexBattery", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexBattery", "field": "featureIndex" }]
+        },
+        {
+          "command": "unified-battery-get-capabilities",
+          "parser": "unified-battery-get-capabilities",
+          "output": "unifiedBatteryCapability",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexUnifiedBattery", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexUnifiedBattery", "field": "featureIndex" }]
+        },
+        {
+          "command": "unified-battery-get-status",
+          "parser": "unified-battery-get-status",
+          "output": "battery",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexUnifiedBattery", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexUnifiedBattery", "field": "featureIndex" }]
+        },
+        {
+          "command": "dpi-get-current",
+          "parser": "dpi-get-current",
+          "output": "dpi",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexDpi", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexDpi", "field": "featureIndex" }]
+        },
+        {
+          "command": "root-get-feature",
+          "parser": "root-get-feature",
+          "output": "featureIndexReportRate",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureRef": "REPORT_RATE"
+          }
+        },
+        {
+          "command": "root-get-feature",
+          "parser": "root-get-feature",
+          "output": "featureIndexColorLed",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureRef": "COLOR_LED_EFFECTS"
+          }
+        },
+        {
+          "command": "root-get-feature",
+          "parser": "root-get-feature",
+          "output": "featureIndexRgbEffects",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureRef": "RGB_EFFECTS"
+          }
+        },
+        {
+          "command": "root-get-feature",
+          "parser": "root-get-feature",
+          "output": "featureIndexOnboardProfiles",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureRef": "ONBOARD_PROFILES"
+          }
+        },
+        {
+          "command": "onboard-get-mode",
+          "parser": "onboard-get-mode",
+          "output": "controlMode",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexOnboardProfiles", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexOnboardProfiles", "field": "featureIndex" }]
+        },
+        {
+          "command": "root-get-feature",
+          "parser": "root-get-feature",
+          "output": "featureIndexProfileManagement",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureRef": "PROFILE_MANAGEMENT"
+          }
+        },
+        {
+          "command": "report-rate-get",
+          "parser": "report-rate-get",
+          "output": "settings",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexReportRate", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexReportRate", "field": "featureIndex" }]
+        },
+        {
+          "command": "report-rate-get-list",
+          "parser": "report-rate-get-list",
+          "output": "reportRateList",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexReportRate", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexReportRate", "field": "featureIndex" }]
+        },
+        {
+          "command": "color-led-effects-get-info",
+          "parser": "color-led-effects-get-info",
+          "output": "colorLedInfo",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexColorLed", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexColorLed", "field": "featureIndex" }]
+        },
+        {
+          "command": "color-led-effects-get-zone-effect",
+          "parser": "color-led-effects-get-zone-effect",
+          "output": "mouseEffect",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexColorLed", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexColorLed", "field": "featureIndex" }]
+        }
+      ]
+    },
+    "hidpp2-device-onboard-read": {
+      "transport": "hidpp2-long",
+      "steps": [
+        {
+          "command": "root-get-feature",
+          "parser": "root-get-feature",
+          "output": "onboardFeature",
+          "params": { "featureRef": "ONBOARD_PROFILES" },
+          "paramCandidates": { "deviceIndex": [1, 2, 3, 4, 5, 6, 255] }
+        },
+        {
+          "command": "onboard-get-description",
+          "parser": "onboard-get-description",
+          "output": "onboardDescription",
+          "params": {
+            "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "onboardFeature", "field": "featureIndex" }]
+        },
+        {
+          "command": "onboard-get-mode",
+          "parser": "onboard-get-mode",
+          "output": "onboardMode",
+          "params": {
+            "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "onboardFeature", "field": "featureIndex" }]
+        },
+        {
+          "command": "onboard-get-current-profile",
+          "parser": "onboard-get-current-profile",
+          "output": "onboardCurrentProfile",
+          "params": {
+            "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "onboardFeature", "field": "featureIndex" }]
+        },
+        {
+          "command": "onboard-get-current-dpi-index",
+          "parser": "onboard-get-current-dpi-index",
+          "output": "onboardCurrentDpiIndex",
+          "params": {
+            "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "onboardFeature", "field": "featureIndex" }]
+        },
+        {
+          "command": "onboard-memory-read",
+          "parser": "onboard-memory-read",
+          "output": "onboardProfileChunk00",
+          "params": {
+            "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" },
+            "sector": { "fromOutput": "onboardCurrentProfile", "field": "sector" },
+            "offset": 0
+          }
+        },
+        {
+          "command": "onboard-memory-read",
+          "parser": "onboard-memory-read",
+          "output": "onboardProfileChunk01",
+          "params": {
+            "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" },
+            "sector": { "fromOutput": "onboardCurrentProfile", "field": "sector" },
+            "offset": 16
+          }
+        },
+        {
+          "command": "onboard-memory-read",
+          "parser": "onboard-memory-read",
+          "output": "onboardProfileChunk02",
+          "params": {
+            "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" },
+            "sector": { "fromOutput": "onboardCurrentProfile", "field": "sector" },
+            "offset": 32
+          }
+        },
+        {
+          "command": "onboard-memory-read",
+          "parser": "onboard-memory-read",
+          "output": "onboardProfileChunk03",
+          "params": {
+            "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" },
+            "sector": { "fromOutput": "onboardCurrentProfile", "field": "sector" },
+            "offset": 48
+          }
+        },
+        {
+          "command": "onboard-memory-read",
+          "parser": "onboard-memory-read",
+          "output": "onboardProfileChunk04",
+          "params": {
+            "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" },
+            "sector": { "fromOutput": "onboardCurrentProfile", "field": "sector" },
+            "offset": 64
+          }
+        },
+        {
+          "command": "onboard-memory-read",
+          "parser": "onboard-memory-read",
+          "output": "onboardProfileChunk05",
+          "params": {
+            "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" },
+            "sector": { "fromOutput": "onboardCurrentProfile", "field": "sector" },
+            "offset": 80
+          }
+        },
+        {
+          "command": "onboard-memory-read",
+          "parser": "onboard-memory-read",
+          "output": "onboardProfileChunk06",
+          "params": {
+            "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" },
+            "sector": { "fromOutput": "onboardCurrentProfile", "field": "sector" },
+            "offset": 96
+          }
+        },
+        {
+          "command": "onboard-memory-read",
+          "parser": "onboard-memory-read",
+          "output": "onboardProfileChunk07",
+          "params": {
+            "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" },
+            "sector": { "fromOutput": "onboardCurrentProfile", "field": "sector" },
+            "offset": 112
+          }
+        },
+        {
+          "command": "onboard-memory-read",
+          "parser": "onboard-memory-read",
+          "output": "onboardProfileChunk08",
+          "params": {
+            "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" },
+            "sector": { "fromOutput": "onboardCurrentProfile", "field": "sector" },
+            "offset": 128
+          }
+        },
+        {
+          "command": "onboard-memory-read",
+          "parser": "onboard-memory-read",
+          "output": "onboardProfileChunk09",
+          "params": {
+            "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" },
+            "sector": { "fromOutput": "onboardCurrentProfile", "field": "sector" },
+            "offset": 144
+          }
+        },
+        {
+          "command": "onboard-memory-read",
+          "parser": "onboard-memory-read",
+          "output": "onboardProfileChunk10",
+          "params": {
+            "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" },
+            "sector": { "fromOutput": "onboardCurrentProfile", "field": "sector" },
+            "offset": 160
+          }
+        },
+        {
+          "command": "onboard-memory-read",
+          "parser": "onboard-memory-read",
+          "output": "onboardProfileChunk11",
+          "params": {
+            "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" },
+            "sector": { "fromOutput": "onboardCurrentProfile", "field": "sector" },
+            "offset": 176
+          }
+        },
+        {
+          "command": "onboard-memory-read",
+          "parser": "onboard-memory-read",
+          "output": "onboardProfileChunk12",
+          "params": {
+            "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" },
+            "sector": { "fromOutput": "onboardCurrentProfile", "field": "sector" },
+            "offset": 192
+          }
+        },
+        {
+          "command": "onboard-memory-read",
+          "parser": "onboard-memory-read",
+          "output": "onboardProfileChunk13",
+          "params": {
+            "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" },
+            "sector": { "fromOutput": "onboardCurrentProfile", "field": "sector" },
+            "offset": 208
+          }
+        },
+        {
+          "command": "onboard-memory-read",
+          "parser": "onboard-memory-read",
+          "output": "onboardProfileChunk14",
+          "params": {
+            "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" },
+            "sector": { "fromOutput": "onboardCurrentProfile", "field": "sector" },
+            "offset": 224
+          }
+        },
+        {
+          "command": "onboard-memory-read",
+          "parser": "onboard-memory-read",
+          "output": "onboardProfileChunk15",
+          "params": {
+            "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" },
+            "sector": { "fromOutput": "onboardCurrentProfile", "field": "sector" },
+            "offset": { "fromOutput": "onboardDescription", "field": "sectorSize", "subtract": 16 }
+          }
+        }
+      ]
+    },
+    "hidpp2-device-profile-mgmt-read": {
+      "transport": "hidpp2-long",
+      "steps": [
+        {
+          "command": "root-get-feature",
+          "parser": "root-get-feature",
+          "output": "profileMgmtFeature",
+          "params": { "featureRef": "PROFILE_MANAGEMENT" },
+          "paramCandidates": { "deviceIndex": [1, 2, 3, 4, 5, 6, 255] }
+        },
+        {
+          "command": "profile-mgmt-get-info",
+          "parser": "profile-mgmt-get-info",
+          "output": "profileMgmtInfo",
+          "params": {
+            "deviceIndex": { "fromOutput": "profileMgmtFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "profileMgmtFeature", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "profileMgmtFeature", "field": "featureIndex" }]
+        },
+        {
+          "command": "profile-mgmt-get-count",
+          "parser": "profile-mgmt-get-count",
+          "output": "profileMgmtCount",
+          "params": {
+            "deviceIndex": { "fromOutput": "profileMgmtFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "profileMgmtFeature", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "profileMgmtFeature", "field": "featureIndex" }]
+        },
+        {
+          "command": "profile-mgmt-get-current",
+          "parser": "profile-mgmt-get-current",
+          "output": "profileMgmtCurrent",
+          "params": {
+            "deviceIndex": { "fromOutput": "profileMgmtFeature", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "profileMgmtFeature", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "profileMgmtFeature", "field": "featureIndex" }]
+        }
+      ]
+    }
+  },
+  "mutations": {
+    "hidpp2-device-set-control-mode": {
+      "transport": "hidpp2-long",
+      "skipIfZero": [{ "output": "featureIndexOnboardProfiles", "field": "featureIndex" }],
+      "inputs": {
+        "mode": { "kind": "integer", "min": 1, "max": 2, "step": 1, "allowed": [1, 2] }
+      },
+      "read": {
+        "command": "onboard-get-mode",
+        "parser": "onboard-get-mode",
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexOnboardProfiles", "field": "featureIndex" }
+        }
+      },
+      "writeCommand": "onboard-set-mode",
+      "writeParams": {
+        "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+        "featureIndex": { "fromOutput": "featureIndexOnboardProfiles", "field": "featureIndex" }
+      },
+      "preserveUnknown": false,
+      "settleMs": 80,
+      "verify": {
+        "command": "onboard-get-mode",
+        "parser": "onboard-get-mode",
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexOnboardProfiles", "field": "featureIndex" }
+        },
+        "assertions": [
+          { "field": "mode", "param": "mode" }
+        ]
+      }
+    },
+    "hidpp2-device-set-dpi-value": {
+      "transport": "hidpp2-long",
+      "skipIfZero": [{"output": "featureIndexDpi", "field": "featureIndex"}],
+      "inputs": {
+        "stage": { "kind": "integer", "min": 1, "max": 8, "step": 1 },
+        "dpi": { "kind": "integer", "min": 50, "max": 30000, "step": 50 }
+      },
+      "read": {
+        "command": "dpi-get-current",
+        "parser": "dpi-get-current",
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexDpi", "field": "featureIndex" }
+        }
+      },
+      "writeCommand": "dpi-set",
+      "writeParams": {
+        "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+        "featureIndex": { "fromOutput": "featureIndexDpi", "field": "featureIndex" }
+      },
+      "memory": {
+        "readWorkflow": "hidpp2-device-onboard-read",
+        "availableWhen": { "output": "featureIndexOnboardProfiles", "field": "featureIndex" },
+        "enabledWhen": { "output": "onboardMode", "field": "mode", "eq": 1 },
+        "size": { "output": "onboardDescription", "field": "sectorSize" },
+        "chunkOutputPrefix": "onboardProfileChunk",
+        "chunkField": "bytes",
+        "chunkSize": 16,
+        "checksum": "crc-ccitt-false",
+        "patches": [
+          { "offset": 3, "param": "dpi", "encoding": "le-u16", "indexedBy": "dpiIndex", "indexBase": 0, "stride": 2 }
+        ],
+        "patchParams": {
+          "dpiIndex": { "fromOutput": "onboardCurrentDpiIndex", "field": "index" }
+        },
+        "transport": "hidpp2-long",
+        "startCommand": "onboard-memory-write-start",
+        "chunkCommand": "onboard-memory-write-chunk",
+        "endTransport": "hidpp2-short",
+        "endCommand": "onboard-memory-write-end",
+        "endExpectResponse": false,
+        "contextParams": {
+          "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" },
+          "sector": { "fromOutput": "onboardCurrentProfile", "field": "sector" }
+        }
+      },
+      "preserveUnknown": false,
+      "settleMs": 50,
+      "verify": {
+        "command": "dpi-get-current",
+        "parser": "dpi-get-current",
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexDpi", "field": "featureIndex" }
+        },
+        "assertions": [
+          { "field": "dpiValue", "param": "dpi" }
+        ]
+      }
+    },
+    "hidpp2-device-set-polling-rate": {
+      "transport": "hidpp2-long",
+      "skipIfZero": [{"output": "featureIndexReportRate", "field": "featureIndex"}],
+      "inputs": {
+        "rate": { "kind": "integer", "min": 125, "max": 1000, "step": 125, "allowed": [125, 250, 500, 1000] }
+      },
+      "read": {
+        "command": "report-rate-get",
+        "parser": "report-rate-get",
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexReportRate", "field": "featureIndex" }
+        }
+      },
+      "writeCommand": "report-rate-set",
+      "writeParams": {
+        "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+        "featureIndex": { "fromOutput": "featureIndexReportRate", "field": "featureIndex" }
+      },
+      "memory": {
+        "readWorkflow": "hidpp2-device-onboard-read",
+        "availableWhen": { "output": "featureIndexOnboardProfiles", "field": "featureIndex" },
+        "enabledWhen": { "output": "onboardMode", "field": "mode", "eq": 1 },
+        "size": { "output": "onboardDescription", "field": "sectorSize" },
+        "chunkOutputPrefix": "onboardProfileChunk",
+        "chunkField": "bytes",
+        "chunkSize": 16,
+        "checksum": "crc-ccitt-false",
+        "patches": [
+          { "offset": 0, "param": "rate", "encoding": "lookup-u8", "lookup": { "125": 8, "250": 4, "500": 2, "1000": 1 } }
+        ],
+        "transport": "hidpp2-long",
+        "startCommand": "onboard-memory-write-start",
+        "chunkCommand": "onboard-memory-write-chunk",
+        "endTransport": "hidpp2-short",
+        "endCommand": "onboard-memory-write-end",
+        "endExpectResponse": false,
+        "contextParams": {
+          "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" },
+          "sector": { "fromOutput": "onboardCurrentProfile", "field": "sector" }
+        }
+      },
+      "preserveUnknown": false,
+      "settleMs": 50,
+      "verify": {
+        "command": "report-rate-get",
+        "parser": "report-rate-get",
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexReportRate", "field": "featureIndex" }
+        },
+        "assertions": [
+          { "field": "pollingRate", "param": "rate" }
+        ]
+      }
+    },
+    "hidpp2-device-set-mouse-lighting": {
+      "transport": "hidpp2-long",
+      "skipIfZero": [
+        { "output": "featureIndexColorLed", "field": "featureIndex" }
+      ],
+      "inputs": {
+        "color": { "kind": "color" },
+        "enabled": { "kind": "boolean" }
+      },
+      "read": {
+        "command": "color-led-effects-get-zone-effect",
+        "parser": "color-led-effects-get-zone-effect",
+        "skipIfZero": [{ "output": "featureIndexColorLed", "field": "featureIndex" }],
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexColorLed", "field": "featureIndex" }
+        }
+      },
+      "writeCommand": "color-led-effects-set-zone-effect",
+      "writeParams": {
+        "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+        "featureIndex": { "fromOutput": "featureIndexColorLed", "field": "featureIndex" }
+      },
+      "memory": {
+        "readWorkflow": "hidpp2-device-onboard-read",
+        "availableWhen": { "output": "featureIndexOnboardProfiles", "field": "featureIndex" },
+        "enabledWhen": { "output": "onboardMode", "field": "mode", "eq": 1 },
+        "requiredWhen": [
+          { "output": "onboardDescription", "field": "profileFormatId", "eq": 5 }
+        ],
+        "size": { "output": "onboardDescription", "field": "sectorSize" },
+        "chunkOutputPrefix": "onboardProfileChunk",
+        "chunkField": "bytes",
+        "chunkSize": 16,
+        "checksum": "crc-ccitt-false",
+        "patches": [
+          { "offset": 219, "param": "enabled", "encoding": "bool" },
+          { "offset": 220, "param": "color", "encoding": "rgb" },
+          { "offset": 223, "value": "0x00" },
+          { "offset": 252, "value": "0x00" }
+        ],
+        "transport": "hidpp2-long",
+        "startCommand": "onboard-memory-write-start",
+        "chunkCommand": "onboard-memory-write-chunk",
+        "endTransport": "hidpp2-short",
+        "endCommand": "onboard-memory-write-end",
+        "endExpectResponse": false,
+        "contextParams": {
+          "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" },
+          "sector": { "fromOutput": "onboardCurrentProfile", "field": "sector" }
+        }
+      },
+      "preserveUnknown": false,
+      "settleMs": 100,
+      "verify": {
+        "command": "color-led-effects-get-zone-effect",
+        "parser": "color-led-effects-get-zone-effect",
+        "skipIfZero": [{ "output": "featureIndexColorLed", "field": "featureIndex" }],
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexColorLed", "field": "featureIndex" }
+        },
+        "assertions": [
+          { "field": "enabled", "param": "enabled" },
+          { "field": "color", "param": "color" }
+        ]
+      }
+    }
+  }
+}
