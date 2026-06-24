@@ -133,7 +133,7 @@ for (const [name, data] of Object.entries(pluginData)) {
     for (const byte of bytes) {
       if (byte.offset < 0 || byte.offset >= length) fail(`${name}/${id}: byte offset out of range`);
       if ((byte.value === undefined) === (byte.param === undefined)) fail(`${name}/${id}: byte must have exactly one source`);
-      if (byte.encoding && !['u8', 'bool', 'le-u16', 'be-u16', 'rgb', 'bytes', 'lookup-u8'].includes(byte.encoding)) fail(`${name}/${id}: unsupported encoding`);
+      if (byte.encoding && !['u8', 'bool', 'le-u16', 'be-u16', 'rgb', 'bytes', 'lookup-u8', 'bool-lookup-u8'].includes(byte.encoding)) fail(`${name}/${id}: unsupported encoding`);
       if (byte.indexedBy && (!Number.isInteger(byte.stride) || byte.stride < 1)) fail(`${name}/${id}: invalid indexed stride`);
     }
     if (command.request.base && command.request.base !== 'read-response') fail(`${name}/${id}: invalid request base`);
@@ -191,7 +191,7 @@ for (const [name, data] of Object.entries(pluginData)) {
   }
 
   for (const [id, transport] of Object.entries(transports)) {
-    if (!['hid-feature', 'hid-feature-proxy', 'hid-output-input'].includes(transport.kind)) {
+    if (!['hid-feature', 'hid-feature-proxy', 'hid-output-input', 'hid-race'].includes(transport.kind)) {
       fail(`${name}/${id}: unsupported transport kind`);
     }
     if (transport.kind === 'hid-output-input') {
@@ -205,6 +205,13 @@ for (const [name, data] of Object.entries(pluginData)) {
         if (!commands[transport[key]]) fail(`${name}/${id}: missing ${key}`);
       }
       if (!parsers[transport.statusParser]) fail(`${name}/${id}: missing status parser`);
+    }
+    if (transport.kind === 'hid-race') {
+      if (![0x06, 0x07].includes(transport.writeReportId)) fail(`${name}/${id}: invalid race write report id`);
+      if (![0x06, 0x07].includes(transport.readReportId)) fail(`${name}/${id}: invalid race read report id`);
+      if (transport.writeLength < 2 || transport.readLength < 2) fail(`${name}/${id}: invalid race report length`);
+      if (![0, 128].includes(transport.raceType)) fail(`${name}/${id}: invalid race type`);
+      if (!Number.isInteger(transport.readTimeoutMs) || transport.readTimeoutMs < 1 || transport.readTimeoutMs > 5000) fail(`${name}/${id}: invalid read timeout`);
     }
   }
 
@@ -236,7 +243,7 @@ for (const [name, data] of Object.entries(pluginData)) {
     }
   }
 
-  const familyPrefixes = name === 'amaster' ? ['protocol-a-'] : ['hidpp2-'];
+  const familyPrefixes = name === 'amaster' ? ['protocol-a-', 'am35-'] : ['hidpp2-'];
   for (const device of devices.devices) {
     for (const prefix of familyPrefixes) {
       if (device.family.startsWith(prefix) && !workflows[`${device.family}-read`]) {

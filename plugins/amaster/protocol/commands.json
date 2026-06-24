@@ -24,7 +24,182 @@
     ,"bluetooth-sleep-write": { "request": { "length": 64, "base": "read-response", "bytes": [{ "offset": 0, "value": "0x53" }, { "offset": 1, "value": "0x00" }, { "offset": 2, "value": "0x00" }, { "offset": 3, "value": "0x00" }, { "offset": 4, "value": "0x00" }, { "offset": 5, "value": "0x00" }, { "offset": 6, "value": "0x00" }, { "offset": 40, "param": "seconds", "encoding": "le-u16" }], "checksum": { "algorithm": "ff-minus-sum8", "start": 0, "endExclusive": 7, "writeOffset": 7 } } }
     ,"wireless-sleep-write": { "request": { "length": 64, "base": "read-response", "bytes": [{ "offset": 0, "value": "0x53" }, { "offset": 1, "value": "0x00" }, { "offset": 2, "value": "0x00" }, { "offset": 3, "value": "0x00" }, { "offset": 4, "value": "0x00" }, { "offset": 5, "value": "0x00" }, { "offset": 6, "value": "0x00" }, { "offset": 44, "param": "seconds", "encoding": "le-u16" }], "checksum": { "algorithm": "ff-minus-sum8", "start": 0, "endExclusive": 7, "writeOffset": 7 } } }
     ,"mouse-lighting-write": { "request": { "length": 64, "base": "read-response", "bytes": [{ "offset": 0, "value": "0x53" }, { "offset": 1, "value": "0x00" }, { "offset": 2, "value": "0x00" }, { "offset": 3, "value": "0x00" }, { "offset": 4, "value": "0x00" }, { "offset": 5, "value": "0x00" }, { "offset": 6, "value": "0x00" }, { "offset": 54, "param": "color", "encoding": "rgb" }, { "offset": 57, "param": "color", "encoding": "rgb" }, { "offset": 60, "param": "enabled", "encoding": "bool" }], "checksum": { "algorithm": "ff-minus-sum8", "start": 0, "endExclusive": 7, "writeOffset": 7 } } }
+    ,"profile-write": { "request": { "length": 64, "base": "read-response", "bytes": [{ "offset": 0, "value": "0x53" }, { "offset": 1, "value": "0x00" }, { "offset": 2, "value": "0x00" }, { "offset": 3, "value": "0x00" }, { "offset": 4, "value": "0x00" }, { "offset": 5, "value": "0x00" }, { "offset": 6, "value": "0x00" }, { "offset": 8, "param": "profile", "encoding": "u8" }], "checksum": { "algorithm": "ff-minus-sum8", "start": 0, "endExclusive": 7, "writeOffset": 7 } } }
     ,"receiver-lighting-write": { "request": { "length": 64, "bytes": [{ "offset": 0, "value": "0x08" }, { "offset": 1, "param": "effect" }, { "offset": 2, "param": "speed" }, { "offset": 3, "param": "brightness" }, { "offset": 4, "param": "option" }, { "offset": 5, "param": "color", "encoding": "rgb" }], "checksum": { "algorithm": "ff-minus-sum8", "start": 0, "endExclusive": 8, "writeOffset": 8 } } }
+    ,"am35-battery": { "request": { "length": 6, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x02" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xCF" },
+      { "offset": 5, "value": "0x30" }
+    ], "checksum": null } }
+    ,"am35-receiver-battery": { "request": { "length": 6, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x02" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0x0F" },
+      { "offset": 5, "value": "0x30" }
+    ], "checksum": null } }
+    ,"am35-firmware": { "request": { "length": 7, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x03" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0x07" },
+      { "offset": 5, "value": "0x1C" },
+      { "offset": 6, "value": "0x00" }
+    ], "checksum": null } }
+    ,"am35-serial": { "request": { "length": 10, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x06" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0x0C" },
+      { "offset": 5, "value": "0x0A" },
+      { "offset": 6, "value": "0x0C" },
+      { "offset": 7, "value": "0x60" },
+      { "offset": 8, "value": "0xE8" },
+      { "offset": 9, "value": "0x03" }
+    ], "checksum": null } }
+    ,"am35-profile": { "request": { "length": 6, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x02" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xC9" },
+      { "offset": 5, "value": "0x30" }
+    ], "checksum": null } }
+    ,"am35-profile-write": { "request": { "length": 7, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x03" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xC8" },
+      { "offset": 5, "value": "0x30" },
+      { "offset": 6, "param": "profile", "encoding": "u8" }
+    ], "checksum": null } }
+    ,"am35-dpi": { "request": { "length": 6, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x02" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xC5" },
+      { "offset": 5, "value": "0x30" }
+    ], "checksum": null } }
+    ,"am35-polling-rate": { "request": { "length": 6, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x02" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0x11" },
+      { "offset": 5, "value": "0x30" }
+    ], "checksum": null } }
+    ,"am35-sleep-time": { "request": { "length": 6, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x02" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0x13" },
+      { "offset": 5, "value": "0x30" }
+    ], "checksum": null } }
+    ,"am35-fps": { "request": { "length": 6, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x02" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xDF" },
+      { "offset": 5, "value": "0x30" }
+    ], "checksum": null } }
+    ,"am35-dpi-button": { "request": { "length": 6, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x02" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xEB" },
+      { "offset": 5, "value": "0x30" }
+    ], "checksum": null } }
+    ,"am35-rotation": { "request": { "length": 6, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x02" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xD9" },
+      { "offset": 5, "value": "0x30" }
+    ], "checksum": null } }
+    ,"am35-mouse-light-mode": { "request": { "length": 10, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x06" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0x0C" },
+      { "offset": 5, "value": "0x0A" },
+      { "offset": 6, "value": "0x0A" },
+      { "offset": 7, "value": "0x60" },
+      { "offset": 8, "value": "0xE8" },
+      { "offset": 9, "value": "0x03" }
+    ], "checksum": null } }
+    ,"am35-mouse-light-color": { "request": { "length": 10, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x06" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0x0C" },
+      { "offset": 5, "value": "0x0A" },
+      { "offset": 6, "value": "0x00" },
+      { "offset": 7, "value": "0x62" },
+      { "offset": 8, "value": "0xE8" },
+      { "offset": 9, "value": "0x03" }
+    ], "checksum": null } }
+    ,"am35-receiver-light": { "request": { "length": 6, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x02" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0x0E" },
+      { "offset": 5, "value": "0x30" }
+    ], "checksum": null } }
+    ,"am35-debounce": { "request": { "length": 6, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x02" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xE9" },
+      { "offset": 5, "value": "0x30" }
+    ], "checksum": null } }
+    ,"am35-lod": { "request": { "length": 6, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x02" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xCD" },
+      { "offset": 5, "value": "0x30" }
+    ], "checksum": null } }
+    ,"am35-motion-sync": { "request": { "length": 6, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x02" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xD3" },
+      { "offset": 5, "value": "0x30" }
+    ], "checksum": null } }
+    ,"am35-angle-snapping": { "request": { "length": 6, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x02" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xD5" },
+      { "offset": 5, "value": "0x30" }
+    ], "checksum": null } }
+    ,"am35-ripple-control": { "request": { "length": 6, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x02" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xD7" },
+      { "offset": 5, "value": "0x30" }
+    ], "checksum": null } }
   },
   "am35": {
     "receiverLightingType": {
