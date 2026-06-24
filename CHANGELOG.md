@@ -12,6 +12,9 @@
 - Added declarative HID++ `0x8100` metadata and full-sector reads using the
   device-reported sector size, including aligned final-block reads and
   CRC-CCITT verification.
+- Expanded Logitech HID++ polling-rate capability metadata to include 2000,
+  4000, and 8000 Hz options when the device exposes the extended report-rate
+  path.
 - Made DPI and report-rate mutations prefer the active onboard profile while
   preserving every unrelated byte; standard HID++ writes remain the fallback.
 - Enabled guarded profile-format-5 lighting writes through the second LED slot.

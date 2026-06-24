@@ -18,6 +18,10 @@ npm run validate
 npm test
 ```
 
+For narrow hardware bring-up, see the single-model guidance in
+[`docs/plugin-sdk.md`](docs/plugin-sdk.md). Keep early plugins read-only, exact
+to tested hardware, and fixture-driven.
+
 ## Host UI placement
 
 Capabilities should explicitly declare `region`, `group`, `order`, and `icon`
