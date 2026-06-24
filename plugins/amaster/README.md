@@ -12,12 +12,17 @@ Bluetooth support is pending hardware evidence and is marked `blocked` in the
 plugin capabilities.
 
 Protocol A exposes bounded writes for the current DPI stage, the selected
-stage's X/Y DPI, polling rate, mouse character-light color/switch, and receiver
-lighting. Full-state setters preserve their pre-read structure and change only
-declared fields; the short lighting setter rebuilds the exact zero-padded frame
-used by the source driver. Every mutation verifies target fields by reading again.
-The write encodings are source-confirmed and fixture/build-verified; the final
-no-op hardware write smoke is still pending an online mouse.
+stage's X/Y DPI, polling rate, mouse character-light color/enabled setting, and
+receiver lighting. Full-state setters preserve their pre-read structure and
+change only declared fields; the short receiver-lighting setter rebuilds the
+exact zero-padded frame used by the source driver. Every mutation verifies target
+fields by reading again.
+
+Protocol reserves are tracked separately from enabled workflows and mutations in
+[`../../docs/protocol-reserve-inventory.md`](../../docs/protocol-reserve-inventory.md).
+The Protocol A `0x87` light-switch primitive is intentionally reserved and must
+not be exposed as a mouse or receiver lighting switch until its physical target
+is hardware-proven.
 
 AM35 writes, button remapping, firmware operations, pairing, macros, and raw
 reports remain unavailable.
