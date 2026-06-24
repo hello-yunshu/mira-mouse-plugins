@@ -37,3 +37,11 @@ This directory contains one subdirectory per plugin. Each plugin is self-contain
 For a narrow plugin that targets one exact mouse model, follow the single-model
 notes in [`../docs/plugin-sdk.md`](../docs/plugin-sdk.md). Start read-only,
 match only tested hardware, and add fixtures before UI metadata.
+
+Protocol files may also contain source-confirmed or public-reference material
+reserved for future development. Keep the current UI contract separate from
+those reserves: a command, parser, or HID++ feature registry entry is not an
+enabled capability until a workflow or mutation references it. See
+[`../docs/protocol-reserve-inventory.md`](../docs/protocol-reserve-inventory.md)
+and run `npm run inventory:protocol` before promoting reserved protocol
+material.
