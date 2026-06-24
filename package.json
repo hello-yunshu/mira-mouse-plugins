@@ -4,9 +4,11 @@
   "private": true,
   "description": "Declarative device plugins for Mira",
   "scripts": {
-    "validate": "node scripts/validate.mjs",
+    "validate": "node scripts/validate.mjs && node scripts/protocol-inventory.mjs --check-docs",
     "test": "node --test tests/*.test.mjs",
     "pack": "node scripts/pack-sign.mjs",
+    "inventory:protocol": "node scripts/protocol-inventory.mjs",
+    "inventory:protocol:check": "node scripts/protocol-inventory.mjs --check-docs",
     "sync:hidpp": "node scripts/sync-hidpp-features.mjs",
     "sync:hidpp:check": "node scripts/sync-hidpp-features.mjs --check"
   },
