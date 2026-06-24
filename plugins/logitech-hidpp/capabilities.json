@@ -4,6 +4,6 @@
   "enabledWrites": ["control-mode", "profile-mgmt-switch", "dpi-value", "dpi-value-extended", "pointer-speed", "polling-rate", "polling-rate-extended", "mouse-lighting", "rgb-control"],
   "disabledWrites": ["onboard-profile-write", "receiver-lighting", "bluetooth-sleep-time", "wireless-sleep-time"],
   "forbidden": ["firmware-update", "bootloader", "dfu", "flash-erase", "receiver-pairing", "macros"],
-  "pollingRatesHz": [125, 250, 500, 1000],
+  "pollingRatesHz": [125, 250, 500, 1000, 2000, 4000, 8000],
   "stage": "hardware-verified"
 }
