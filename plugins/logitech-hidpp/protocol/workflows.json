@@ -14,6 +14,15 @@
         {
           "command": "root-get-feature",
           "parser": "root-get-feature",
+          "output": "featureIndexFeatureSet",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureRef": "FEATURE_SET"
+          }
+        },
+        {
+          "command": "root-get-feature",
+          "parser": "root-get-feature",
           "output": "featureIndexDeviceName",
           "params": {
             "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
@@ -46,6 +55,70 @@
             "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
             "featureRef": "ADJUSTABLE_DPI"
           }
+        },
+        {
+          "command": "root-get-feature",
+          "parser": "root-get-feature",
+          "output": "featureIndexExtendedDpi",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureRef": "EXTENDED_ADJUSTABLE_DPI"
+          }
+        },
+        {
+          "command": "root-get-feature",
+          "parser": "root-get-feature",
+          "output": "featureIndexMousePointer",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureRef": "MOUSE_POINTER"
+          }
+        },
+        {
+          "command": "root-get-feature",
+          "parser": "root-get-feature",
+          "output": "featureIndexPointerSpeed",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureRef": "POINTER_SPEED"
+          }
+        },
+        {
+          "command": "root-get-feature",
+          "parser": "root-get-feature",
+          "output": "featureIndexSurfaceTuning",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureRef": "SURFACE_TUNING"
+          }
+        },
+        {
+          "command": "root-get-feature",
+          "parser": "root-get-feature",
+          "output": "featureIndexXyStats",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureRef": "XY_STATS"
+          }
+        },
+        {
+          "command": "root-get-feature",
+          "parser": "root-get-feature",
+          "output": "featureIndexWheelStats",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureRef": "WHEEL_STATS"
+          }
+        },
+        {
+          "command": "feature-set-get-count",
+          "parser": "feature-set-get-count",
+          "output": "featureSet",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexFeatureSet", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexFeatureSet", "field": "featureIndex" }]
         },
         {
           "command": "device-info-get",
@@ -129,12 +202,51 @@
           "skipIfZero": [{ "output": "featureIndexDpi", "field": "featureIndex" }]
         },
         {
+          "command": "extended-dpi-get-current",
+          "parser": "extended-dpi-get-current",
+          "output": "dpiExtended",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexExtendedDpi", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexExtendedDpi", "field": "featureIndex" }]
+        },
+        {
+          "command": "mouse-pointer-get",
+          "parser": "mouse-pointer-get",
+          "output": "mousePointer",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexMousePointer", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexMousePointer", "field": "featureIndex" }]
+        },
+        {
+          "command": "pointer-speed-get",
+          "parser": "pointer-speed-get",
+          "output": "pointerSpeed",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexPointerSpeed", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexPointerSpeed", "field": "featureIndex" }]
+        },
+        {
           "command": "root-get-feature",
           "parser": "root-get-feature",
           "output": "featureIndexReportRate",
           "params": {
             "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
             "featureRef": "REPORT_RATE"
+          }
+        },
+        {
+          "command": "root-get-feature",
+          "parser": "root-get-feature",
+          "output": "featureIndexExtendedReportRate",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureRef": "EXTENDED_ADJUSTABLE_REPORT_RATE"
           }
         },
         {
@@ -184,6 +296,36 @@
           }
         },
         {
+          "command": "profile-mgmt-get-info",
+          "parser": "profile-mgmt-get-info",
+          "output": "profileMgmtInfo",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexProfileManagement", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexProfileManagement", "field": "featureIndex" }]
+        },
+        {
+          "command": "profile-mgmt-get-count",
+          "parser": "profile-mgmt-get-count",
+          "output": "profileMgmtCount",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexProfileManagement", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexProfileManagement", "field": "featureIndex" }]
+        },
+        {
+          "command": "profile-mgmt-get-current",
+          "parser": "profile-mgmt-get-current",
+          "output": "profileMgmtCurrent",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexProfileManagement", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexProfileManagement", "field": "featureIndex" }]
+        },
+        {
           "command": "report-rate-get",
           "parser": "report-rate-get",
           "output": "settings",
@@ -204,6 +346,26 @@
           "skipIfZero": [{ "output": "featureIndexReportRate", "field": "featureIndex" }]
         },
         {
+          "command": "extended-report-rate-get",
+          "parser": "extended-report-rate-get",
+          "output": "settingsExtended",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexExtendedReportRate", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexExtendedReportRate", "field": "featureIndex" }]
+        },
+        {
+          "command": "extended-report-rate-get-list",
+          "parser": "extended-report-rate-get-list",
+          "output": "reportRateListExtended",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexExtendedReportRate", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexExtendedReportRate", "field": "featureIndex" }]
+        },
+        {
           "command": "color-led-effects-get-info",
           "parser": "color-led-effects-get-info",
           "output": "colorLedInfo",
@@ -212,6 +374,26 @@
             "featureIndex": { "fromOutput": "featureIndexColorLed", "field": "featureIndex" }
           },
           "skipIfZero": [{ "output": "featureIndexColorLed", "field": "featureIndex" }]
+        },
+        {
+          "command": "rgb-effects-get-info",
+          "parser": "rgb-effects-get-info",
+          "output": "rgbEffectsInfo",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexRgbEffects", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexRgbEffects", "field": "featureIndex" }]
+        },
+        {
+          "command": "rgb-control-get",
+          "parser": "rgb-control-get",
+          "output": "rgbControl",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexRgbEffects", "field": "featureIndex" }
+          },
+          "skipIfZero": [{ "output": "featureIndexRgbEffects", "field": "featureIndex" }]
         },
         {
           "command": "color-led-effects-get-zone-effect",
@@ -530,6 +712,105 @@
         ]
       }
     },
+    "hidpp2-device-set-pointer-speed": {
+      "transport": "hidpp2-long",
+      "skipIfZero": [{ "output": "featureIndexPointerSpeed", "field": "featureIndex" }],
+      "inputs": {
+        "speed": { "kind": "integer", "min": 46, "max": 511, "step": 1 }
+      },
+      "read": {
+        "command": "pointer-speed-get",
+        "parser": "pointer-speed-get",
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexPointerSpeed", "field": "featureIndex" }
+        }
+      },
+      "writeCommand": "pointer-speed-set",
+      "writeParams": {
+        "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+        "featureIndex": { "fromOutput": "featureIndexPointerSpeed", "field": "featureIndex" }
+      },
+      "preserveUnknown": false,
+      "settleMs": 50,
+      "verify": {
+        "command": "pointer-speed-get",
+        "parser": "pointer-speed-get",
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexPointerSpeed", "field": "featureIndex" }
+        },
+        "assertions": [
+          { "field": "speedRaw", "param": "speed" }
+        ]
+      }
+    },
+    "hidpp2-device-set-rgb-control": {
+      "transport": "hidpp2-long",
+      "skipIfZero": [{ "output": "featureIndexRgbEffects", "field": "featureIndex" }],
+      "inputs": {
+        "enabled": { "kind": "boolean" }
+      },
+      "read": {
+        "command": "rgb-control-get",
+        "parser": "rgb-control-get",
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexRgbEffects", "field": "featureIndex" }
+        }
+      },
+      "writeCommand": "rgb-control-set",
+      "writeParams": {
+        "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+        "featureIndex": { "fromOutput": "featureIndexRgbEffects", "field": "featureIndex" }
+      },
+      "preserveUnknown": false,
+      "settleMs": 100,
+      "verify": {
+        "command": "rgb-control-get",
+        "parser": "rgb-control-get",
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexRgbEffects", "field": "featureIndex" }
+        },
+        "assertions": [
+          { "field": "enabled", "param": "enabled" }
+        ]
+      }
+    },
+    "hidpp2-device-set-profile-mgmt-current": {
+      "transport": "hidpp2-long",
+      "skipIfZero": [{ "output": "featureIndexProfileManagement", "field": "featureIndex" }],
+      "inputs": {
+        "profileIndex": { "kind": "integer", "min": 0, "max": 15, "step": 1 }
+      },
+      "read": {
+        "command": "profile-mgmt-get-current",
+        "parser": "profile-mgmt-get-current",
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexProfileManagement", "field": "featureIndex" }
+        }
+      },
+      "writeCommand": "profile-mgmt-set-current",
+      "writeParams": {
+        "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+        "featureIndex": { "fromOutput": "featureIndexProfileManagement", "field": "featureIndex" }
+      },
+      "preserveUnknown": false,
+      "settleMs": 100,
+      "verify": {
+        "command": "profile-mgmt-get-current",
+        "parser": "profile-mgmt-get-current",
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexProfileManagement", "field": "featureIndex" }
+        },
+        "assertions": [
+          { "field": "profileIndex", "param": "profileIndex" }
+        ]
+      }
+    },
     "hidpp2-device-set-dpi-value": {
       "transport": "hidpp2-long",
       "skipIfZero": [{"output": "featureIndexDpi", "field": "featureIndex"}],
@@ -591,6 +872,40 @@
         ]
       }
     },
+    "hidpp2-device-set-dpi-value-extended": {
+      "transport": "hidpp2-long",
+      "skipIfZero": [{"output": "featureIndexExtendedDpi", "field": "featureIndex"}],
+      "inputs": {
+        "stage": { "kind": "integer", "min": 1, "max": 8, "step": 1 },
+        "dpi": { "kind": "integer", "min": 50, "max": 30000, "step": 50 }
+      },
+      "read": {
+        "command": "extended-dpi-get-current",
+        "parser": "extended-dpi-get-current",
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexExtendedDpi", "field": "featureIndex" }
+        }
+      },
+      "writeCommand": "extended-dpi-set",
+      "writeParams": {
+        "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+        "featureIndex": { "fromOutput": "featureIndexExtendedDpi", "field": "featureIndex" }
+      },
+      "preserveUnknown": false,
+      "settleMs": 50,
+      "verify": {
+        "command": "extended-dpi-get-current",
+        "parser": "extended-dpi-get-current",
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexExtendedDpi", "field": "featureIndex" }
+        },
+        "assertions": [
+          { "field": "dpiValue", "param": "dpi" }
+        ]
+      }
+    },
     "hidpp2-device-set-polling-rate": {
       "transport": "hidpp2-long",
       "skipIfZero": [{"output": "featureIndexReportRate", "field": "featureIndex"}],
@@ -642,6 +957,39 @@
         "params": {
           "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
           "featureIndex": { "fromOutput": "featureIndexReportRate", "field": "featureIndex" }
+        },
+        "assertions": [
+          { "field": "pollingRate", "param": "rate" }
+        ]
+      }
+    },
+    "hidpp2-device-set-polling-rate-extended": {
+      "transport": "hidpp2-long",
+      "skipIfZero": [{"output": "featureIndexExtendedReportRate", "field": "featureIndex"}],
+      "inputs": {
+        "rate": { "kind": "integer", "min": 125, "max": 8000, "step": 125, "allowed": [125, 250, 500, 1000, 2000, 4000, 8000] }
+      },
+      "read": {
+        "command": "extended-report-rate-get",
+        "parser": "extended-report-rate-get",
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexExtendedReportRate", "field": "featureIndex" }
+        }
+      },
+      "writeCommand": "extended-report-rate-set",
+      "writeParams": {
+        "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+        "featureIndex": { "fromOutput": "featureIndexExtendedReportRate", "field": "featureIndex" }
+      },
+      "preserveUnknown": false,
+      "settleMs": 50,
+      "verify": {
+        "command": "extended-report-rate-get",
+        "parser": "extended-report-rate-get",
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexExtendedReportRate", "field": "featureIndex" }
         },
         "assertions": [
           { "field": "pollingRate", "param": "rate" }

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "pluginId": "mira.logitech-hidpp",
   "name": "Logitech HID++",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "pluginApi": ">=1.0.0, <2.0.0",
   "publisherKeyId": null,
   "evidence": "hardware-verified",
@@ -43,18 +43,52 @@
       }
     },
     {
+      "id": "profile-mgmt-current",
+      "control": "Number",
+      "labelKey": "capability.profile-mgmt-current",
+      "readOnly": false,
+      "placements": [{ "region": "control", "group": "configuration", "order": 6, "span": 1, "icon": "profile" }],
+      "metadata": {
+        "label": "当前配置文件",
+        "source": "capabilities.profileMgmtCurrent.profileIndex",
+        "mutation": "set-profile-mgmt-current",
+        "param": "profileIndex",
+        "min": 0,
+        "max": 15,
+        "step": 1,
+        "description": "使用 HID++ 0x8101 Profile Management 切换当前配置文件索引。"
+      }
+    },
+    {
       "id": "dpi", "control": "DpiStages", "labelKey": "capability.dpi", "readOnly": false,
       "placements": [{ "region": "control", "group": "performance", "order": 10, "span": 1, "icon": "gauge" }],
       "metadata": {
         "label": "DPI", "source": "dpiStages",
-        "mutations": { "select": "set-dpi-stage", "value": "set-dpi-value" }
+        "mutations": { "select": "set-dpi-stage", "value": ["set-dpi-value", "set-dpi-value-extended"] }
+      }
+    },
+    {
+      "id": "pointer-speed",
+      "control": "Number",
+      "labelKey": "capability.pointer-speed",
+      "readOnly": false,
+      "placements": [{ "region": "control", "group": "performance", "order": 15, "span": 1, "icon": "gauge" }],
+      "metadata": {
+        "label": "指针速度",
+        "source": "capabilities.pointerSpeed.speedRaw",
+        "mutation": "set-pointer-speed",
+        "param": "speed",
+        "min": 46,
+        "max": 511,
+        "step": 1,
+        "description": "使用 HID++ 0x2205 Pointer Speed 写入设备指针速度。"
       }
     },
     {
       "id": "polling-rate", "control": "Select", "labelKey": "capability.polling-rate", "readOnly": false,
       "placements": [{ "region": "control", "group": "polling", "order": 20, "span": 1, "icon": "wave" }],
       "metadata": {
-        "label": "回报率", "source": "pollingRate", "mutation": "set-polling-rate", "param": "rate", "unit": "Hz",
+        "label": "回报率", "source": "pollingRate", "mutation": ["set-polling-rate", "set-polling-rate-extended"], "param": "rate", "unit": "Hz",
         "options": [
           { "value": 125, "label": "125 Hz" }, { "value": 250, "label": "250 Hz" },
           { "value": 500, "label": "500 Hz" }, { "value": 1000, "label": "1000 Hz" },
@@ -79,6 +113,23 @@
       "metadata": {
         "label": "鼠标灯光", "source": "lighting.mouseLightColor",
         "mutations": { "mouse": "set-mouse-lighting" }
+      }
+    },
+    {
+      "id": "rgb-control",
+      "control": "Toggle",
+      "labelKey": "capability.rgb-control",
+      "readOnly": false,
+      "placements": [
+        { "region": "control", "group": "lighting", "order": 31, "span": 1, "icon": "lightbulb" },
+        { "region": "status", "order": 21, "span": 1, "icon": "lightbulb" }
+      ],
+      "metadata": {
+        "label": "RGB 接管",
+        "source": "capabilities.rgbControl.enabled",
+        "mutation": "set-rgb-control",
+        "param": "enabled",
+        "description": "使用 HID++ 0x8071 RGB_EFFECTS 的 software active/release 控制位；具体 zone/effect 写入会在枚举 effect index 后再开放。"
       }
     },
     {

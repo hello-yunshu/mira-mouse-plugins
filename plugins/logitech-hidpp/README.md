@@ -10,17 +10,30 @@ HID++ 2.0 plugin with protocol-level discovery instead of a model whitelist.
 - Tries receiver slots `1..6`, then direct-device index `0xFF`, and reuses the
   device index echoed by the first valid Root response.
 - Discovers runtime feature indices through Root `0x0000`.
-- Reads Device Information `0x0003`, Device Name `0x0005`, Battery Level Status
-  `0x1000`, Unified Battery `0x1004`, and Adjustable DPI `0x2201` when present.
-- Reads and writes Report Rate `0x8060` when present.
+- Reads Feature Set `0x0001`, Device Information `0x0003`, Device Name
+  `0x0005`, Battery Level Status `0x1000`, Unified Battery `0x1004`, Mouse
+  Pointer `0x2200`, Adjustable DPI `0x2201`, Extended Adjustable DPI `0x2202`,
+  Pointer Speed `0x2205`, RGB Effects `0x8071`, Onboard Profiles `0x8100`, and
+  Profile Management `0x8101` when present.
+- Discovers Surface Tuning `0x2240`, XY Stats `0x2250`, and Wheel Stats
+  `0x2251` feature indices for future support, but does not issue writes for
+  those features until public semantics are clearer.
+- Reads and writes Pointer Speed `0x2205` using the public HID++ read/write
+  function pair (`0x00` / `0x10`).
+- Reads and writes Report Rate `0x8060` and Extended Adjustable Report Rate
+  `0x8061` when present.
+- Reads RGB Effects `0x8071` capability info and exposes the Solaar-observed
+  software active/release control (`function 0x50`) as a bounded, readback-
+  verified toggle. Zone/effect/color writes remain guarded until the plugin can
+  enumerate device-local effect indices instead of guessing.
 - Switches `0x8100` between onboard mode (`1`) and host/software mode (`2`)
   through a bounded, readback-verified mutation.
 - Reads HID++ Onboard Profiles `0x8100` using the device-reported sector size,
   verifies CRC-CCITT, and discovers the active profile and DPI index.
 - Discovers and reads Profile Management `0x8101` when present, exposing
-  profile count, capability info, and the active profile index. Write paths
-  (`profile-mgmt-set-current` and `profile-mgmt-control`) are wired but kept
-  disabled until hardware-verified.
+  profile count, capability info, and the active profile index. Current-profile
+  switching (`function 0x30`) is exposed as a readback-verified mutation;
+  generic control-byte pass-through remains internal.
 - Skips unsupported optional features instead of issuing commands to index zero.
 
 The feature byte includes client id `1`, and responses are matched against the
@@ -29,24 +42,25 @@ device index, feature index, and function/client byte. HID++ error responses
 
 ## Profile Management (`0x8101`)
 
-This feature is not documented in the public Logitech HID++ specification and
-has no known open-source implementation beyond the constant name in Solaar and
-a single cleanup call (`feature 0x8101`, function `0x60`, payload `0x03`) used
-to hand LED control back to the firmware. The commands and parsers added here
-are therefore protocol-informed placeholders based on HID++ 2.0 conventions:
+This feature is not fully documented in the public Logitech HID++ specification.
+The plugin keeps the surface deliberately narrow: it reads public-shaped metadata
+and exposes only current-profile switching through readback verification.
+Solaar's control call (`feature 0x8101`, function `0x60`, payload `0x03` or
+`0x05`) is tracked for RGB handoff behavior, but not exposed as a generic UI
+write.
 
 | Command | Function | Purpose |
 |---------|----------|---------|
 | `profile-mgmt-get-info` | `0x00` | Feature version, max profile count, name length |
 | `profile-mgmt-get-count` | `0x10` | Number of stored profiles |
 | `profile-mgmt-get-current` | `0x20` | Currently active profile index |
-| `profile-mgmt-set-current` | `0x30` | Activate a profile by index (disabled) |
-| `profile-mgmt-control` | `0x60` | Control byte pass-through, e.g. Solaar's `0x03` (disabled) |
+| `profile-mgmt-set-current` | `0x30` | Activate a profile by index |
+| `profile-mgmt-control` | `0x60` | Internal control byte command for future RGB/Profile handoff work |
 
-These definitions need hardware validation. When a device exposes `0x8101`, the
-read workflow will surface `profileMgmtInfo`, `profileMgmtCount`, and
-`profileMgmtCurrent`; actual command semantics should be confirmed against a
-captured trace before enabling the write paths.
+When a device exposes `0x8101`, the read workflow surfaces `profileMgmtInfo`,
+`profileMgmtCount`, and `profileMgmtCurrent`. Additional profile editing should
+still be confirmed against captured traces before promotion to user-facing
+writes.
 
 ## Upstream HID++ references
 
@@ -100,9 +114,8 @@ For CI, `node scripts/sync-hidpp-features.mjs --check` fails if
 - [Solaar](https://github.com/pwr-Solaar/Solaar) — `lib/logitech_receiver/hidpp20_constants.py` for feature IDs and `hidpp20.py` / `rgb_power.py` for observed traffic.
 - [openlogi-hidpp](https://crates.io/crates/openlogi-hidpp) / upstream [lus/logy](https://github.com/lus/logy) — Rust HID++ implementation used as a cross-check.
 
-Future updates to undocumented features (e.g. `0x8101`) should be reconciled
-against new Solaar releases or captured device traces before being promoted from
-`disabledWrites` to `enabledWrites`.
+Future updates to undocumented features should be reconciled against new Solaar
+releases or captured device traces before being promoted to user-facing writes.
 
 ## Evidence and limitations
 

@@ -22,6 +22,28 @@
       "statusOutput": "receiver",
       "attempts": 20,
       "delayMs": 20
+    },
+    "am35-direct": {
+      "kind": "hid-race",
+      "writeReportId": 6,
+      "readReportId": 7,
+      "writeLength": 62,
+      "readLength": 62,
+      "raceType": 0,
+      "stripReportIdOnRead": true,
+      "readTimeoutMs": 1000,
+      "readRetries": 3
+    },
+    "am35-receiver": {
+      "kind": "hid-race",
+      "writeReportId": 6,
+      "readReportId": 7,
+      "writeLength": 62,
+      "readLength": 62,
+      "raceType": 128,
+      "stripReportIdOnRead": true,
+      "readTimeoutMs": 1000,
+      "readRetries": 3
     }
   }
 }
