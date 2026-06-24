@@ -13,6 +13,17 @@
         "checksum": null
       }
     },
+    "feature-set-get-count": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x00" }
+        ],
+        "checksum": null
+      }
+    },
     "device-info-get": {
       "request": {
         "length": 19,
@@ -115,6 +126,65 @@
         "checksum": null
       }
     },
+    "extended-dpi-get-current": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x50" },
+          { "offset": 3, "value": "0x00" }
+        ],
+        "checksum": null
+      }
+    },
+    "extended-dpi-set": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x60" },
+          { "offset": 3, "value": "0x00" },
+          { "offset": 4, "param": "dpi", "encoding": "be-u16" }
+        ],
+        "checksum": null
+      }
+    },
+    "mouse-pointer-get": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x00" }
+        ],
+        "checksum": null
+      }
+    },
+    "pointer-speed-get": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x00" }
+        ],
+        "checksum": null
+      }
+    },
+    "pointer-speed-set": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x10" },
+          { "offset": 3, "param": "speed", "encoding": "be-u16" }
+        ],
+        "checksum": null
+      }
+    },
     "report-rate-get-list": {
       "request": {
         "length": 19,
@@ -145,6 +215,40 @@
           { "offset": 1, "param": "featureIndex" },
           { "offset": 2, "value": "0x20" },
           { "offset": 3, "param": "rate", "encoding": "lookup-u8", "lookup": { "125": 8, "250": 4, "500": 2, "1000": 1 } }
+        ],
+        "checksum": null
+      }
+    },
+    "extended-report-rate-get-list": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x10" }
+        ],
+        "checksum": null
+      }
+    },
+    "extended-report-rate-get": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x20" }
+        ],
+        "checksum": null
+      }
+    },
+    "extended-report-rate-set": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x30" },
+          { "offset": 3, "param": "rate", "encoding": "lookup-u8", "lookup": { "125": 0, "250": 1, "500": 2, "1000": 3, "2000": 4, "4000": 5, "8000": 6 } }
         ],
         "checksum": null
       }
@@ -190,6 +294,46 @@
           { "offset": 13, "value": "0x00" },
           { "offset": 14, "value": "0x00" },
           { "offset": 15, "value": "0x01" }
+        ],
+        "checksum": null
+      }
+    },
+    "rgb-effects-get-info": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x00" },
+          { "offset": 3, "value": "0xff" },
+          { "offset": 4, "value": "0xff" },
+          { "offset": 5, "value": "0x00" }
+        ],
+        "checksum": null
+      }
+    },
+    "rgb-control-get": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x50" },
+          { "offset": 3, "value": "0x01" }
+        ],
+        "checksum": null
+      }
+    },
+    "rgb-control-set": {
+      "request": {
+        "length": 19,
+        "bytes": [
+          { "offset": 0, "param": "deviceIndex" },
+          { "offset": 1, "param": "featureIndex" },
+          { "offset": 2, "value": "0x50" },
+          { "offset": 3, "value": "0x01" },
+          { "offset": 4, "param": "enabled", "encoding": "bool-lookup-u8", "lookup": { "true": 3, "false": 0 } },
+          { "offset": 5, "param": "enabled", "encoding": "bool-lookup-u8", "lookup": { "true": 4, "false": 0 } }
         ],
         "checksum": null
       }

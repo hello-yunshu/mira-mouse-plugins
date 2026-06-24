@@ -126,6 +126,144 @@
         "0x0e": { "offset": 56, "kind": "bytes", "count": 4 },
         "0x0f": { "offset": 60, "kind": "bytes", "count": 4 }
       }
+    },
+    "am35-battery": {
+      "validWhen": [],
+      "fields": {
+        "charging": { "offset": 10, "kind": "u8" },
+        "percentage": { "offset": 11, "kind": "u8" },
+        "health": { "offset": 12, "kind": "u8" },
+        "present": { "offset": 13, "kind": "u8" }
+      }
+    },
+    "am35-receiver-battery": {
+      "validWhen": [],
+      "fields": {
+        "charging": { "offset": 10, "kind": "u8" },
+        "percentage": { "offset": 11, "kind": "u8" },
+        "health": { "offset": 12, "kind": "u8" },
+        "present": { "offset": 13, "kind": "u8" }
+      }
+    },
+    "am35-firmware": {
+      "validWhen": [],
+      "fields": {
+        "versionLength": { "offset": 8, "kind": "u8" }
+      }
+    },
+    "am35-profile": {
+      "validWhen": [],
+      "fields": {
+        "profile": { "offset": 10, "kind": "u8" }
+      }
+    },
+    "am35-dpi": {
+      "validWhen": [],
+      "fields": {
+        "stageCount": { "offset": 10, "kind": "u8" },
+        "currentStage": { "offset": 11, "kind": "u8" },
+        "dpiX": { "offset": 12, "kind": "le-u16-array", "count": 8 },
+        "dpiY": { "offset": 28, "kind": "le-u16-array", "count": 8 }
+      }
+    },
+    "am35-polling-rate": {
+      "validWhen": [],
+      "fields": {
+        "pollingRate": { "offset": 10, "kind": "le-u16" }
+      }
+    },
+    "am35-sleep-time": {
+      "validWhen": [],
+      "fields": {
+        "sleepValue": { "offset": 10, "kind": "le-u16" }
+      }
+    },
+    "am35-fps": {
+      "validWhen": [],
+      "fields": {
+        "enabled": { "offset": 9, "kind": "u8" }
+      }
+    },
+    "am35-dpi-button": {
+      "validWhen": [],
+      "fields": {
+        "enabled": { "offset": 10, "kind": "u8" }
+      }
+    },
+    "am35-rotation": {
+      "validWhen": [],
+      "fields": {
+        "angle": { "offset": 10, "kind": "u8" },
+        "enabled": { "offset": 11, "kind": "u8" }
+      }
+    },
+    "am35-mouse-light-mode": {
+      "validWhen": [],
+      "fields": {
+        "mode": { "offset": 14, "kind": "u8" },
+        "speed": { "offset": 15, "kind": "u8" },
+        "brightness": { "offset": 16, "kind": "u8" }
+      },
+      "derived": {
+        "modeName": {
+          "kind": "lookup",
+          "source": "mode",
+          "table": { "0": "常亮", "1": "呼吸", "2": "霓虹" }
+        }
+      }
+    },
+    "am35-mouse-light-color": {
+      "validWhen": [],
+      "fields": {
+        "color": { "offset": 18, "kind": "rgb" }
+      }
+    },
+    "am35-receiver-light": {
+      "validWhen": [],
+      "fields": {
+        "enabled": { "offset": 9, "kind": "u8" },
+        "type": { "offset": 10, "kind": "u8" },
+        "color1": { "offset": 11, "kind": "rgb" },
+        "ratio1": { "offset": 14, "kind": "u8" },
+        "color2": { "offset": 15, "kind": "rgb" },
+        "ratio2": { "offset": 18, "kind": "u8" },
+        "color3": { "offset": 19, "kind": "rgb" },
+        "ratio3": { "offset": 22, "kind": "u8" },
+        "speed": { "offset": 23, "kind": "u8" },
+        "brightness": { "offset": 24, "kind": "u8" }
+      }
+    },
+    "am35-debounce": {
+      "validWhen": [],
+      "fields": {
+        "usbDebounce": { "offset": 10, "kind": "u8" },
+        "wirelessDebounce": { "offset": 11, "kind": "u8" },
+        "bluetoothDebounce": { "offset": 12, "kind": "u8" }
+      }
+    },
+    "am35-lod": {
+      "validWhen": [],
+      "fields": {
+        "liftCutOff": { "offset": 10, "kind": "u8" }
+      }
+    },
+    "am35-motion-sync": {
+      "validWhen": [],
+      "fields": {
+        "motionSync": { "offset": 10, "kind": "u8" }
+      }
+    },
+    "am35-angle-snapping": {
+      "validWhen": [],
+      "fields": {
+        "angleSnap": { "offset": 10, "kind": "u8" }
+      }
+    },
+    "am35-ripple-control": {
+      "validWhen": [],
+      "fields": {
+        "rippleControl": { "offset": 10, "kind": "u8" }
+      }
     }
   }
 }

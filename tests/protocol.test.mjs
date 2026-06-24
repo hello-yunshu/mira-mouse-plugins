@@ -141,7 +141,16 @@ test('logitech-hidpp exposes a read workflow per device family and writable muta
   const devices = await read('plugins/logitech-hidpp/devices.json');
   const lighting = manifest.capabilities.find((capability) => capability.id === 'mouse-lighting');
   const polling = manifest.capabilities.find((capability) => capability.id === 'polling-rate');
+  const dpi = manifest.capabilities.find((capability) => capability.id === 'dpi');
+  const pointerSpeed = manifest.capabilities.find((capability) => capability.id === 'pointer-speed');
+  const rgbControl = manifest.capabilities.find((capability) => capability.id === 'rgb-control');
+  const profileCurrent = manifest.capabilities.find((capability) => capability.id === 'profile-mgmt-current');
   assert.equal(polling.metadata.summary.length, 2);
+  assert.deepEqual(polling.metadata.mutation, ['set-polling-rate', 'set-polling-rate-extended']);
+  assert.deepEqual(dpi.metadata.mutations.value, ['set-dpi-value', 'set-dpi-value-extended']);
+  assert.equal(pointerSpeed.metadata.mutation, 'set-pointer-speed');
+  assert.equal(rgbControl.metadata.mutation, 'set-rgb-control');
+  assert.equal(profileCurrent.metadata.mutation, 'set-profile-mgmt-current');
   assert.equal(lighting.placements.find((placement) => placement.region === 'status').span, 1);
   const families = new Set(devices.devices.map((device) => device.family));
   for (const family of families) {
@@ -151,9 +160,25 @@ test('logitech-hidpp exposes a read workflow per device family and writable muta
   assert.deepEqual(Object.keys(mutations).sort(), [
     'hidpp2-device-set-control-mode',
     'hidpp2-device-set-dpi-value',
+    'hidpp2-device-set-dpi-value-extended',
     'hidpp2-device-set-mouse-lighting',
+    'hidpp2-device-set-pointer-speed',
     'hidpp2-device-set-polling-rate',
+    'hidpp2-device-set-polling-rate-extended',
+    'hidpp2-device-set-profile-mgmt-current',
+    'hidpp2-device-set-rgb-control',
   ]);
+  const expectedFeatureGate = {
+    'hidpp2-device-set-control-mode': 'featureIndexOnboardProfiles',
+    'hidpp2-device-set-dpi-value': 'featureIndexDpi',
+    'hidpp2-device-set-dpi-value-extended': 'featureIndexExtendedDpi',
+    'hidpp2-device-set-mouse-lighting': 'featureIndexColorLed',
+    'hidpp2-device-set-pointer-speed': 'featureIndexPointerSpeed',
+    'hidpp2-device-set-polling-rate': 'featureIndexReportRate',
+    'hidpp2-device-set-polling-rate-extended': 'featureIndexExtendedReportRate',
+    'hidpp2-device-set-profile-mgmt-current': 'featureIndexProfileManagement',
+    'hidpp2-device-set-rgb-control': 'featureIndexRgbEffects',
+  };
   for (const [id, mutation] of Object.entries(mutations)) {
     assert.ok(mutation.read.command, id);
     assert.ok(mutation.writeCommand, id);
@@ -161,7 +186,7 @@ test('logitech-hidpp exposes a read workflow per device family and writable muta
     assert.ok(mutation.verify.assertions.length > 0, id);
     assert.deepEqual(
       mutation.skipIfZero,
-      [{ output: id === 'hidpp2-device-set-control-mode' ? 'featureIndexOnboardProfiles' : id === 'hidpp2-device-set-polling-rate' ? 'featureIndexReportRate' : id === 'hidpp2-device-set-dpi-value' ? 'featureIndexDpi' : 'featureIndexColorLed', field: 'featureIndex' }],
+      [{ output: expectedFeatureGate[id], field: 'featureIndex' }],
       `${id}: mutation is not feature-gated`,
     );
     if (mutation.memory) {
@@ -191,6 +216,14 @@ test('Logitech writes are protocol-gated without a model whitelist', async () =>
     mutations['hidpp2-device-set-mouse-lighting'].memory.requiredWhen,
     [{ output: 'onboardDescription', field: 'profileFormatId', eq: 5 }],
   );
+  assert.equal(
+    mutations['hidpp2-device-set-profile-mgmt-current'].writeCommand,
+    'profile-mgmt-set-current',
+  );
+  assert.equal(
+    mutations['hidpp2-device-set-rgb-control'].writeCommand,
+    'rgb-control-set',
+  );
 });
 
 test('logitech-hidpp root-get-feature discovers feature indices via be-u16 featureId', async () => {
@@ -205,6 +238,25 @@ test('logitech-hidpp root-get-feature discovers feature indices via be-u16 featu
   assert.equal(root.request.bytes[1].value, '0x00');
   assert.equal(root.request.bytes[2].value, '0x01');
   assert.equal(featureIdByte.offset, 3);
+});
+
+test('logitech-hidpp declares public HID++ pointer, RGB, and profile commands', async () => {
+  const commands = (await read('plugins/logitech-hidpp/protocol/commands.json')).commands;
+  assert.equal(commands['feature-set-get-count'].request.bytes[2].value, '0x00');
+  assert.equal(commands['mouse-pointer-get'].request.bytes[2].value, '0x00');
+  assert.equal(commands['pointer-speed-set'].request.bytes[2].value, '0x10');
+  assert.equal(commands['pointer-speed-set'].request.bytes.find((byte) => byte.param === 'speed').encoding, 'be-u16');
+  assert.equal(commands['rgb-effects-get-info'].request.bytes[2].value, '0x00');
+  assert.deepEqual(
+    commands['rgb-effects-get-info'].request.bytes.slice(3).map((byte) => byte.value),
+    ['0xff', '0xff', '0x00'],
+  );
+  const rgbEnabledByte = commands['rgb-control-set'].request.bytes.find((byte) => byte.offset === 4);
+  const rgbFlagsByte = commands['rgb-control-set'].request.bytes.find((byte) => byte.offset === 5);
+  assert.equal(rgbEnabledByte.encoding, 'bool-lookup-u8');
+  assert.deepEqual(rgbEnabledByte.lookup, { true: 3, false: 0 });
+  assert.deepEqual(rgbFlagsByte.lookup, { true: 4, false: 0 });
+  assert.equal(commands['profile-mgmt-set-current'].request.bytes[2].value, '0x30');
 });
 
 test('logitech-hidpp battery fixture uses the protocol percentage directly', async () => {
