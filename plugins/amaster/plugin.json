@@ -134,7 +134,45 @@
         "section": "control",
         "status": true,
         "source": "lighting.mouseLightColor",
-        "mutations": { "mouse": "set-mouse-lighting", "receiver": "set-receiver-lighting" }
+        "mutations": { "mouse": "set-mouse-lighting", "receiver": "set-receiver-lighting" },
+        "receiverLightingOptions": {
+          "effect": [
+            { "value": 0, "label": "关闭" },
+            { "value": 1, "label": "常亮" },
+            { "value": 2, "label": "呼吸" },
+            { "value": 3, "label": "霓虹" },
+            { "value": 4, "label": "光波" },
+            { "value": 5, "label": "跑马" },
+            { "value": 6, "label": "圆环" },
+            { "value": 7, "label": "缓冲" },
+            { "value": 8, "label": "追捕" }
+          ],
+          "speed": [
+            { "value": 0, "label": "最快" },
+            { "value": 1, "label": "快" },
+            { "value": 2, "label": "中" },
+            { "value": 3, "label": "慢" },
+            { "value": 4, "label": "最慢" }
+          ],
+          "brightness": [
+            { "value": 0, "label": "最暗" },
+            { "value": 1, "label": "暗" },
+            { "value": 2, "label": "中" },
+            { "value": 3, "label": "亮" },
+            { "value": 4, "label": "最亮" }
+          ],
+          "option": [
+            { "value": 0, "label": "红" },
+            { "value": 1, "label": "橙" },
+            { "value": 2, "label": "黄" },
+            { "value": 3, "label": "绿" },
+            { "value": 4, "label": "青" },
+            { "value": 5, "label": "蓝" },
+            { "value": 6, "label": "紫" },
+            { "value": 7, "label": "自定义" },
+            { "value": 8, "label": "炫彩" }
+          ]
+        }
       }
     },
     {
@@ -162,5 +200,62 @@
       "metadata": { "label": "按键映射", "section": "details", "source": "capabilities.buttonMappings" }
     }
   ],
-  "writesEnabled": true
+  "writesEnabled": true,
+  "exportableFields": [
+    {
+      "id": "current-dpi-stage",
+      "exportKey": "currentDpiStage",
+      "kind": "number",
+      "mutation": "set-dpi-stage",
+      "param": "stage",
+      "source": "capabilities.dpi.currentStage"
+    },
+    {
+      "id": "polling-rate",
+      "exportKey": "pollingRate",
+      "kind": "number",
+      "mutation": "set-polling-rate",
+      "param": "rate",
+      "source": "capabilities.settings.pollingRate"
+    },
+    {
+      "id": "bluetooth-sleep-time",
+      "exportKey": "bluetoothSleepSeconds",
+      "kind": "number",
+      "mutation": "set-bluetooth-sleep-time",
+      "param": "seconds",
+      "source": "capabilities.settings.bluetoothSleepValue"
+    },
+    {
+      "id": "wireless-sleep-time",
+      "exportKey": "wirelessSleepSeconds",
+      "kind": "number",
+      "mutation": "set-wireless-sleep-time",
+      "param": "seconds",
+      "source": "capabilities.settings.wirelessSleepValue"
+    },
+    {
+      "id": "mouse-lighting",
+      "exportKey": "mouseLighting",
+      "kind": "object",
+      "mutation": "set-mouse-lighting",
+      "sources": {
+        "color": "capabilities.settings.mouseLightStartColor",
+        "enabled": "capabilities.settings.mouseLightEnabled"
+      }
+    },
+    {
+      "id": "receiver-lighting",
+      "exportKey": "receiverLighting",
+      "kind": "object",
+      "mutation": "set-receiver-lighting",
+      "sources": {
+        "effect": "capabilities.lighting.effect",
+        "speed": "capabilities.lighting.speed",
+        "brightness": "capabilities.lighting.brightness",
+        "option": "capabilities.lighting.option",
+        "color": "capabilities.lighting.color"
+      }
+    }
+  ]
 }

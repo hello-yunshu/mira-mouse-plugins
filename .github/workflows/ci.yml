@@ -21,8 +21,12 @@ jobs:
         run: |
           set -euo pipefail
           test -z "$(find plugins -type l -print -quit)"
-          ! find plugins -type f | grep -E '\.(exe|dll|dylib|so|wasm|html|css|js|ts|py|sh|bat|cmd|pyc)$'
-          ! find . -path './.git' -prune -o -type f -print | grep -E '(^|/)(\.research|dist)/'
+          if find plugins -type f | grep -E '\.(exe|dll|dylib|so|wasm|html|css|js|ts|py|sh|bat|cmd|pyc)$'; then
+            exit 1
+          fi
+          if find . -path './.git' -prune -o -type f -print | grep -E '(^|/)(\.research|dist)/'; then
+            exit 1
+          fi
       - run: echo 'Offline tests are fixture-verified only; they do not establish hardware support.' >> "$GITHUB_STEP_SUMMARY"
   platform-parse:
     strategy: { fail-fast: false, matrix: { os: [macos-14, windows-2022, ubuntu-22.04] } }
@@ -32,4 +36,3 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - shell: bash
         run: find plugins registry -name '*.json' -print0 | xargs -0 -n1 node -e "JSON.parse(require('fs').readFileSync(process.argv[1]))"
-

@@ -33,6 +33,50 @@
         { "command": "firmware-soc", "parser": "firmware", "output": "firmwareSoc" },
         { "command": "button-mappings", "parser": "button-mappings", "output": "buttonMappings", "params": { "layer": 0 } }
       ]
+    },
+    "am35-direct-read": {
+      "transport": "am35-direct",
+      "steps": [
+        { "command": "am35-battery", "parser": "am35-battery", "output": "battery" },
+        { "command": "am35-dpi", "parser": "am35-dpi", "output": "dpi" },
+        { "command": "am35-polling-rate", "parser": "am35-polling-rate", "output": "pollingRate" },
+        { "command": "am35-sleep-time", "parser": "am35-sleep-time", "output": "sleepTime" },
+        { "command": "am35-fps", "parser": "am35-fps", "output": "fps" },
+        { "command": "am35-dpi-button", "parser": "am35-dpi-button", "output": "dpiButton" },
+        { "command": "am35-rotation", "parser": "am35-rotation", "output": "rotation" },
+        { "command": "am35-mouse-light-mode", "parser": "am35-mouse-light-mode", "output": "mouseLightMode" },
+        { "command": "am35-mouse-light-color", "parser": "am35-mouse-light-color", "output": "mouseLightColor" },
+        { "command": "am35-debounce", "parser": "am35-debounce", "output": "debounce" },
+        { "command": "am35-lod", "parser": "am35-lod", "output": "lod" },
+        { "command": "am35-motion-sync", "parser": "am35-motion-sync", "output": "motionSync" },
+        { "command": "am35-angle-snapping", "parser": "am35-angle-snapping", "output": "angleSnap" },
+        { "command": "am35-ripple-control", "parser": "am35-ripple-control", "output": "rippleControl" },
+        { "command": "am35-profile", "parser": "am35-profile", "output": "profile" },
+        { "command": "am35-firmware", "parser": "am35-firmware", "output": "firmware" }
+      ]
+    },
+    "am35-receiver-read": {
+      "transport": "am35-receiver",
+      "steps": [
+        { "command": "am35-battery", "parser": "am35-battery", "output": "battery" },
+        { "command": "am35-receiver-battery", "parser": "am35-receiver-battery", "output": "receiverBattery", "transport": "am35-direct" },
+        { "command": "am35-dpi", "parser": "am35-dpi", "output": "dpi" },
+        { "command": "am35-polling-rate", "parser": "am35-polling-rate", "output": "pollingRate" },
+        { "command": "am35-sleep-time", "parser": "am35-sleep-time", "output": "sleepTime" },
+        { "command": "am35-fps", "parser": "am35-fps", "output": "fps" },
+        { "command": "am35-dpi-button", "parser": "am35-dpi-button", "output": "dpiButton" },
+        { "command": "am35-rotation", "parser": "am35-rotation", "output": "rotation" },
+        { "command": "am35-mouse-light-mode", "parser": "am35-mouse-light-mode", "output": "mouseLightMode" },
+        { "command": "am35-mouse-light-color", "parser": "am35-mouse-light-color", "output": "mouseLightColor" },
+        { "command": "am35-receiver-light", "parser": "am35-receiver-light", "output": "receiverLight", "transport": "am35-direct" },
+        { "command": "am35-debounce", "parser": "am35-debounce", "output": "debounce" },
+        { "command": "am35-lod", "parser": "am35-lod", "output": "lod" },
+        { "command": "am35-motion-sync", "parser": "am35-motion-sync", "output": "motionSync" },
+        { "command": "am35-angle-snapping", "parser": "am35-angle-snapping", "output": "angleSnap" },
+        { "command": "am35-ripple-control", "parser": "am35-ripple-control", "output": "rippleControl" },
+        { "command": "am35-profile", "parser": "am35-profile", "output": "profile" },
+        { "command": "am35-firmware", "parser": "am35-firmware", "output": "firmware" }
+      ]
     }
   },
   "mutations": {
@@ -158,6 +202,24 @@
       "preserveUnknown": false,
       "settleMs": 30,
       "verify": { "command": "lighting", "parser": "lighting", "assertions": [{ "field": "effect", "param": "effect" }, { "field": "speed", "param": "speed" }, { "field": "brightness", "param": "brightness" }, { "field": "option", "param": "option" }, { "field": "color", "param": "color" }] }
+    },
+    "am35-direct-set-profile": {
+      "transport": "am35-direct",
+      "inputs": { "profile": { "kind": "integer", "min": 1, "max": 8 } },
+      "read": { "command": "am35-profile", "parser": "am35-profile" },
+      "writeCommand": "am35-profile-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-profile", "parser": "am35-profile", "assertions": [{ "field": "profile", "param": "profile" }] }
+    },
+    "am35-receiver-set-profile": {
+      "transport": "am35-receiver",
+      "inputs": { "profile": { "kind": "integer", "min": 1, "max": 8 } },
+      "read": { "command": "am35-profile", "parser": "am35-profile" },
+      "writeCommand": "am35-profile-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-profile", "parser": "am35-profile", "assertions": [{ "field": "profile", "param": "profile" }] }
     }
   }
 }
