@@ -33,3 +33,7 @@ This directory contains one subdirectory per plugin. Each plugin is self-contain
 2. Add the required files: `plugin.json`, `devices.json`, `capabilities.json`, `protocol/*.json`, `README.md`, `LICENSE`.
 3. Run `npm run validate` and `npm test`.
 4. For HID++ based plugins, consider vendoring upstream references under `vendor/` and adding a `features.json` registry.
+
+For a narrow plugin that targets one exact mouse model, follow the single-model
+notes in [`../docs/plugin-sdk.md`](../docs/plugin-sdk.md). Start read-only,
+match only tested hardware, and add fixtures before UI metadata.
