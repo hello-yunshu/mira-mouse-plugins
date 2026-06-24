@@ -117,6 +117,12 @@ For CI, `node scripts/sync-hidpp-features.mjs --check` fails if
 Future updates to undocumented features should be reconciled against new Solaar
 releases or captured device traces before being promoted to user-facing writes.
 
+Protocol reserves are tracked separately from enabled workflows and mutations in
+[`../../docs/protocol-reserve-inventory.md`](../../docs/protocol-reserve-inventory.md).
+The generated HID++ feature registry is intentionally broader than the current
+UI surface; only feature names referenced by workflows and capability metadata
+are enabled.
+
 ## Evidence and limitations
 
 The generic workflow is hardware-verified with a G705 Mouse through a
