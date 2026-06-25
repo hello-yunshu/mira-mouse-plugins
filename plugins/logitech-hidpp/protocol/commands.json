@@ -271,7 +271,7 @@
           { "offset": 0, "param": "deviceIndex" },
           { "offset": 1, "param": "featureIndex" },
           { "offset": 2, "value": "0x10" },
-          { "offset": 3, "value": "0x00" }
+          { "offset": 3, "param": "zone", "encoding": "u8" }
         ],
         "checksum": null
       }
@@ -283,12 +283,12 @@
           { "offset": 0, "param": "deviceIndex" },
           { "offset": 1, "param": "featureIndex" },
           { "offset": 2, "value": "0x30" },
-          { "offset": 3, "value": "0x00" },
+          { "offset": 3, "param": "zone", "encoding": "u8" },
           { "offset": 4, "param": "enabled", "encoding": "bool" },
           { "offset": 5, "param": "color", "encoding": "rgb" },
-          { "offset": 8, "value": "0x01" },
-          { "offset": 9, "value": "0x00" },
-          { "offset": 10, "value": "0x00" },
+          { "offset": 8, "param": "effect", "encoding": "u8" },
+          { "offset": 9, "param": "speed", "encoding": "u8" },
+          { "offset": 10, "param": "brightness", "encoding": "u8" },
           { "offset": 11, "value": "0x00" },
           { "offset": 12, "value": "0x00" },
           { "offset": 13, "value": "0x00" },

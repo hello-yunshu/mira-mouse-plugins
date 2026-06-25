@@ -112,7 +112,23 @@
       ],
       "metadata": {
         "label": "鼠标灯光", "source": "lighting.mouseLightColor",
-        "mutations": { "mouse": "set-mouse-lighting" }
+        "mutations": { "mouse": ["set-mouse-lighting-onboard", "set-mouse-lighting"], "receiver": "set-receiver-lighting" },
+        "effectOptions": {
+          "effect": [
+            { "value": 0, "labelKey": "lighting.off" },
+            { "value": 1, "labelKey": "lighting.fixed" },
+            { "value": 3, "labelKey": "lighting.cycle" },
+            { "value": 4, "labelKey": "lighting.wave" },
+            { "value": 5, "labelKey": "lighting.starlight" },
+            { "value": 10, "labelKey": "lighting.breathing" },
+            { "value": 11, "labelKey": "lighting.ripple" },
+            { "value": 12, "labelKey": "lighting.custom" }
+          ],
+          "speed": { "min": 0, "max": 255, "step": 1 },
+          "brightness": { "min": 0, "max": 100, "step": 1 }
+        },
+        "supportedEffectsSource": ["capabilities.colorLedInfo", "capabilities.rgbEffectsInfo"],
+        "supportedEffectsField": "supportsFixed|supportsCycle|supportsWave|supportsStarlight|supportsBreathing|supportsRipple|supportsCustom"
       }
     },
     {
