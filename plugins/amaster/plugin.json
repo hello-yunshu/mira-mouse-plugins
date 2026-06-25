@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "pluginId": "mira.amaster",
   "name": "AMaster / Angry Miao compatible devices",
-  "version": "1.3.3",
+  "version": "1.3.5",
   "pluginApi": ">=1.0.0,<2.0.0",
   "publisherKeyId": "mira-plugins-2026-001",
   "evidence": "hardware-verified",
@@ -133,7 +133,7 @@
         "label": "灯光",
         "section": "control",
         "status": true,
-        "source": "lighting.mouseLightColor",
+        "source": "capabilities.mouseLighting.color",
         "mutations": { "mouse": "set-mouse-lighting", "receiver": "set-receiver-lighting" },
         "receiverLightingOptions": {
           "effect": [
@@ -240,8 +240,8 @@
       "kind": "object",
       "mutation": "set-mouse-lighting",
       "sources": {
-        "color": "capabilities.settings.mouseLightStartColor",
-        "enabled": "capabilities.settings.mouseLightEnabled"
+        "color": "capabilities.mouseLighting.color",
+        "enabled": "capabilities.mouseLighting.enabled"
       }
     },
     {
@@ -250,11 +250,11 @@
       "kind": "object",
       "mutation": "set-receiver-lighting",
       "sources": {
-        "effect": "capabilities.lighting.effect",
-        "speed": "capabilities.lighting.speed",
-        "brightness": "capabilities.lighting.brightness",
-        "option": "capabilities.lighting.option",
-        "color": "capabilities.lighting.color"
+        "effect": "capabilities.receiverLighting.effect",
+        "speed": "capabilities.receiverLighting.speed",
+        "brightness": "capabilities.receiverLighting.brightness",
+        "option": "capabilities.receiverLighting.option",
+        "color": "capabilities.receiverLighting.color"
       }
     }
   ]
