@@ -268,6 +268,15 @@
         "zoneCount": { "offset": 3, "kind": "u8" },
         "nvCaps": { "offset": 4, "kind": "be-u16" },
         "extCaps": { "offset": 6, "kind": "be-u16" }
+      },
+      "derived": {
+        "supportsFixed": { "kind": "bit", "source": "nvCaps", "bit": 0 },
+        "supportsCycle": { "kind": "bit", "source": "nvCaps", "bit": 1 },
+        "supportsWave": { "kind": "bit", "source": "nvCaps", "bit": 2 },
+        "supportsStarlight": { "kind": "bit", "source": "nvCaps", "bit": 3 },
+        "supportsBreathing": { "kind": "bit", "source": "nvCaps", "bit": 4 },
+        "supportsRipple": { "kind": "bit", "source": "nvCaps", "bit": 5 },
+        "supportsCustom": { "kind": "bit", "source": "nvCaps", "bit": 6 }
       }
     },
     "color-led-effects-get-zone-effect": {
@@ -304,6 +313,15 @@
         "zoneCount": { "offset": 5, "kind": "u8" },
         "responseFlags": { "offset": 6, "kind": "be-u16" },
         "capabilities": { "offset": 8, "kind": "be-u16" }
+      },
+      "derived": {
+        "supportsFixed": { "kind": "bit", "source": "capabilities", "bit": 0 },
+        "supportsCycle": { "kind": "bit", "source": "capabilities", "bit": 1 },
+        "supportsWave": { "kind": "bit", "source": "capabilities", "bit": 2 },
+        "supportsStarlight": { "kind": "bit", "source": "capabilities", "bit": 3 },
+        "supportsBreathing": { "kind": "bit", "source": "capabilities", "bit": 4 },
+        "supportsRipple": { "kind": "bit", "source": "capabilities", "bit": 5 },
+        "supportsCustom": { "kind": "bit", "source": "capabilities", "bit": 6 }
       }
     },
     "rgb-control-get": {
@@ -328,6 +346,9 @@
         "sectorSize": { "offset": 10, "kind": "be-u16" },
         "mechanicalLayout": { "offset": 12, "kind": "u8" },
         "variousInfo": { "offset": 13, "kind": "u8" }
+      },
+      "derived": {
+        "onboardFormatV5": { "kind": "lookup", "source": "profileFormatId", "table": { "5": 1 } }
       }
     },
     "onboard-get-mode": {

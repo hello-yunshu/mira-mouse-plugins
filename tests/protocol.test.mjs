@@ -162,33 +162,59 @@ test('logitech-hidpp exposes a read workflow per device family and writable muta
     'hidpp2-device-set-dpi-value',
     'hidpp2-device-set-dpi-value-extended',
     'hidpp2-device-set-mouse-lighting',
+    'hidpp2-device-set-mouse-lighting-onboard',
     'hidpp2-device-set-pointer-speed',
     'hidpp2-device-set-polling-rate',
     'hidpp2-device-set-polling-rate-extended',
     'hidpp2-device-set-profile-mgmt-current',
     'hidpp2-device-set-rgb-control',
   ]);
-  const expectedFeatureGate = {
+  // Mutations gated by the standard skipIfZero primitive.
+  const skipIfZeroGated = {
     'hidpp2-device-set-control-mode': 'featureIndexOnboardProfiles',
     'hidpp2-device-set-dpi-value': 'featureIndexDpi',
     'hidpp2-device-set-dpi-value-extended': 'featureIndexExtendedDpi',
-    'hidpp2-device-set-mouse-lighting': 'featureIndexColorLed',
     'hidpp2-device-set-pointer-speed': 'featureIndexPointerSpeed',
     'hidpp2-device-set-polling-rate': 'featureIndexReportRate',
     'hidpp2-device-set-polling-rate-extended': 'featureIndexExtendedReportRate',
     'hidpp2-device-set-profile-mgmt-current': 'featureIndexProfileManagement',
     'hidpp2-device-set-rgb-control': 'featureIndexRgbEffects',
   };
+  // Lighting mutations use multi-primitive gating: skipIfAllZero hides when no
+  // relevant feature exists; writeSkipIfZero skips the direct write when only
+  // the onboard path is available; skipIfNonZero (onboard variant) hides when
+  // the direct-write path or format V5 already covers the device.
+  const lightingGating = {
+    'hidpp2-device-set-mouse-lighting': {
+      skipIfAllZero: ['featureIndexColorLed', 'featureIndexOnboardProfiles'],
+      writeSkipIfZero: ['featureIndexColorLed'],
+    },
+    'hidpp2-device-set-mouse-lighting-onboard': {
+      skipIfNonZero: ['featureIndexColorLed', 'onboardDescription'],
+      skipIfAllZero: ['featureIndexOnboardProfiles'],
+      writeSkipIfZero: ['featureIndexColorLed'],
+    },
+  };
   for (const [id, mutation] of Object.entries(mutations)) {
     assert.ok(mutation.read.command, id);
     assert.ok(mutation.writeCommand, id);
     assert.ok(mutation.verify.command, id);
     assert.ok(mutation.verify.assertions.length > 0, id);
-    assert.deepEqual(
-      mutation.skipIfZero,
-      [{ output: expectedFeatureGate[id], field: 'featureIndex' }],
-      `${id}: mutation is not feature-gated`,
-    );
+    if (skipIfZeroGated[id]) {
+      assert.deepEqual(
+        mutation.skipIfZero,
+        [{ output: skipIfZeroGated[id], field: 'featureIndex' }],
+        `${id}: mutation is not feature-gated`,
+      );
+    } else if (lightingGating[id]) {
+      const expected = lightingGating[id];
+      for (const [gate, outputs] of Object.entries(expected)) {
+        assert.ok(
+          mutation[gate]?.length === outputs.length,
+          `${id}: missing or incomplete ${gate}`,
+        );
+      }
+    }
     if (mutation.memory) {
       assert.deepEqual(
         mutation.memory.availableWhen,
