@@ -401,7 +401,8 @@
           "output": "mouseEffect",
           "params": {
             "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
-            "featureIndex": { "fromOutput": "featureIndexColorLed", "field": "featureIndex" }
+            "featureIndex": { "fromOutput": "featureIndexColorLed", "field": "featureIndex" },
+            "zone": 0
           },
           "skipIfZero": [{ "output": "featureIndexColorLed", "field": "featureIndex" }]
         }
@@ -998,12 +999,20 @@
     },
     "hidpp2-device-set-mouse-lighting": {
       "transport": "hidpp2-long",
-      "skipIfZero": [
+      "skipIfAllZero": [
+        { "output": "featureIndexColorLed", "field": "featureIndex" },
+        { "output": "featureIndexOnboardProfiles", "field": "featureIndex" }
+      ],
+      "writeSkipIfZero": [
         { "output": "featureIndexColorLed", "field": "featureIndex" }
       ],
       "inputs": {
         "color": { "kind": "color" },
-        "enabled": { "kind": "boolean" }
+        "enabled": { "kind": "boolean" },
+        "effect": { "kind": "integer", "min": 0, "max": 12, "allowed": [0, 1, 3, 4, 5, 10, 11, 12] },
+        "speed": { "kind": "integer", "min": 0, "max": 255 },
+        "brightness": { "kind": "integer", "min": 0, "max": 100 },
+        "extraColor": { "kind": "color" }
       },
       "read": {
         "command": "color-led-effects-get-zone-effect",
@@ -1011,13 +1020,15 @@
         "skipIfZero": [{ "output": "featureIndexColorLed", "field": "featureIndex" }],
         "params": {
           "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
-          "featureIndex": { "fromOutput": "featureIndexColorLed", "field": "featureIndex" }
+          "featureIndex": { "fromOutput": "featureIndexColorLed", "field": "featureIndex" },
+          "zone": 0
         }
       },
       "writeCommand": "color-led-effects-set-zone-effect",
       "writeParams": {
         "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
-        "featureIndex": { "fromOutput": "featureIndexColorLed", "field": "featureIndex" }
+        "featureIndex": { "fromOutput": "featureIndexColorLed", "field": "featureIndex" },
+        "zone": 0
       },
       "memory": {
         "readWorkflow": "hidpp2-device-onboard-read",
@@ -1032,9 +1043,11 @@
         "chunkSize": 16,
         "checksum": "crc-ccitt-false",
         "patches": [
-          { "offset": 219, "param": "enabled", "encoding": "bool" },
+          { "offset": 219, "param": "effect", "encoding": "u8" },
           { "offset": 220, "param": "color", "encoding": "rgb" },
-          { "offset": 223, "value": "0x00" },
+          { "offset": 223, "param": "speed", "encoding": "be-u16" },
+          { "offset": 225, "param": "brightness", "encoding": "u8" },
+          { "offset": 226, "param": "extraColor", "encoding": "rgb" },
           { "offset": 252, "value": "0x00" }
         ],
         "transport": "hidpp2-long",
@@ -1057,10 +1070,95 @@
         "skipIfZero": [{ "output": "featureIndexColorLed", "field": "featureIndex" }],
         "params": {
           "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
-          "featureIndex": { "fromOutput": "featureIndexColorLed", "field": "featureIndex" }
+          "featureIndex": { "fromOutput": "featureIndexColorLed", "field": "featureIndex" },
+          "zone": 0
         },
         "assertions": [
-          { "field": "enabled", "param": "enabled" },
+          { "field": "effect", "param": "effect" },
+          { "field": "color", "param": "color" }
+        ]
+      }
+    },
+    "hidpp2-device-set-mouse-lighting-onboard": {
+      "transport": "hidpp2-long",
+      "skipIfNonZero": [
+        { "output": "featureIndexColorLed", "field": "featureIndex" },
+        { "output": "onboardDescription", "field": "onboardFormatV5" }
+      ],
+      "skipIfAllZero": [
+        { "output": "featureIndexOnboardProfiles", "field": "featureIndex" }
+      ],
+      "writeSkipIfZero": [
+        { "output": "featureIndexColorLed", "field": "featureIndex" }
+      ],
+      "inputs": {
+        "color": { "kind": "color" },
+        "enabled": { "kind": "boolean" },
+        "effect": { "kind": "integer", "min": 0, "max": 12, "allowed": [0, 1, 3, 4, 5, 10, 11, 12] },
+        "speed": { "kind": "integer", "min": 0, "max": 255 },
+        "brightness": { "kind": "integer", "min": 0, "max": 100 },
+        "extraColor": { "kind": "color" }
+      },
+      "read": {
+        "command": "color-led-effects-get-zone-effect",
+        "parser": "color-led-effects-get-zone-effect",
+        "skipIfZero": [{ "output": "featureIndexColorLed", "field": "featureIndex" }],
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexColorLed", "field": "featureIndex" },
+          "zone": 0
+        }
+      },
+      "writeCommand": "color-led-effects-set-zone-effect",
+      "writeParams": {
+        "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+        "featureIndex": { "fromOutput": "featureIndexColorLed", "field": "featureIndex" },
+        "zone": 0
+      },
+      "memory": {
+        "readWorkflow": "hidpp2-device-onboard-read",
+        "availableWhen": { "output": "featureIndexOnboardProfiles", "field": "featureIndex" },
+        "enabledWhen": { "output": "onboardMode", "field": "mode", "eq": 1 },
+        "requiredWhen": [
+          { "output": "onboardDescription", "field": "profileFormatId", "ne": 5 }
+        ],
+        "size": { "output": "onboardDescription", "field": "sectorSize" },
+        "chunkOutputPrefix": "onboardProfileChunk",
+        "chunkField": "bytes",
+        "chunkSize": 16,
+        "checksum": "crc-ccitt-false",
+        "patches": [
+          { "offset": 208, "param": "effect", "encoding": "u8" },
+          { "offset": 209, "param": "color", "encoding": "rgb" },
+          { "offset": 212, "param": "speed", "encoding": "be-u16" },
+          { "offset": 214, "param": "brightness", "encoding": "u8" },
+          { "offset": 215, "param": "extraColor", "encoding": "rgb" }
+        ],
+        "transport": "hidpp2-long",
+        "startCommand": "onboard-memory-write-start",
+        "chunkCommand": "onboard-memory-write-chunk",
+        "endTransport": "hidpp2-short",
+        "endCommand": "onboard-memory-write-end",
+        "endExpectResponse": false,
+        "contextParams": {
+          "deviceIndex": { "fromOutput": "onboardFeature", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "onboardFeature", "field": "featureIndex" },
+          "sector": { "fromOutput": "onboardCurrentProfile", "field": "sector" }
+        }
+      },
+      "preserveUnknown": false,
+      "settleMs": 100,
+      "verify": {
+        "command": "color-led-effects-get-zone-effect",
+        "parser": "color-led-effects-get-zone-effect",
+        "skipIfZero": [{ "output": "featureIndexColorLed", "field": "featureIndex" }],
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexColorLed", "field": "featureIndex" },
+          "zone": 0
+        },
+        "assertions": [
+          { "field": "effect", "param": "effect" },
           { "field": "color", "param": "color" }
         ]
       }
