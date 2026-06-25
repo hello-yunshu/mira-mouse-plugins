@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 
 const plugins = ['amaster', 'logitech-hidpp'];
 const fail = (message) => { throw new Error(message); };
+const HOST_DEVICE_CONNECTIONS = new Set(['usb', 'wireless', 'bluetooth', 'virtual']);
 
 const REQUIRED_FILES = [
   'plugin.json',
@@ -67,6 +68,22 @@ for (const name of plugins) {
     const options = capability.metadata?.options;
     if (options !== undefined && (!Array.isArray(options) || options.length > 8)) {
       fail(`${name}/${capability.id}: invalid control option count`);
+    }
+    const bindings = capability.metadata?.bindings;
+    if (bindings !== undefined) {
+      if (!Array.isArray(bindings)) fail(`${name}/${capability.id}: invalid capability bindings`);
+      for (const [index, binding] of bindings.entries()) {
+        if (!binding || typeof binding !== 'object' || Array.isArray(binding)) {
+          fail(`${name}/${capability.id}: binding ${index} must be an object`);
+        }
+        const when = binding.when;
+        if (when !== undefined && (!when || typeof when !== 'object' || Array.isArray(when))) {
+          fail(`${name}/${capability.id}: binding ${index} has invalid condition`);
+        }
+        if (when?.path === 'connection' && !HOST_DEVICE_CONNECTIONS.has(when.eq)) {
+          fail(`${name}/${capability.id}: binding ${index} uses unknown host connection ${JSON.stringify(when.eq)}`);
+        }
+      }
     }
     const summary = capability.metadata?.summary;
     if (summary === undefined) continue;

@@ -118,7 +118,7 @@ test('AMaster declares complete host-rendered capability metadata', async () => 
   assert.equal(capabilities.firmware.metadata.section, 'details');
   assert.deepEqual(
     capabilities['sleep-time'].metadata.bindings.map((binding) => binding.when.eq),
-    ['蓝牙', '无线', '虚拟'],
+    ['bluetooth', 'wireless', 'virtual'],
   );
   for (const binding of capabilities['sleep-time'].metadata.bindings) {
     assert.ok(
