@@ -81,21 +81,21 @@
         "step": 10,
         "bindings": [
           {
-            "when": { "path": "connection", "eq": "蓝牙" },
+            "when": { "path": "connection", "eq": "bluetooth" },
             "label": "蓝牙休眠",
             "source": "capabilities.settings.bluetoothSleepValue",
             "mutation": "set-bluetooth-sleep-time",
             "param": "seconds"
           },
           {
-            "when": { "path": "connection", "eq": "无线" },
+            "when": { "path": "connection", "eq": "wireless" },
             "label": "2.4G 休眠",
             "source": "capabilities.settings.wirelessSleepValue",
             "mutation": "set-wireless-sleep-time",
             "param": "seconds"
           },
           {
-            "when": { "path": "connection", "eq": "虚拟" },
+            "when": { "path": "connection", "eq": "virtual" },
             "label": "2.4G 休眠",
             "source": "capabilities.settings.wirelessSleepValue",
             "mutation": "set-wireless-sleep-time",
