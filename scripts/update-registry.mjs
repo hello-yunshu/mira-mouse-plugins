@@ -13,14 +13,18 @@ if (!assetUrl?.startsWith('https://github.com/hello-yunshu/mira-mouse-plugins/re
   throw new Error('ASSET_URL must use the canonical plugin release origin');
 }
 if (!/^[a-f0-9]{64}$/.test(sha256 ?? '')) throw new Error('SHA256 must be lowercase hex');
-if (!releaseTag?.startsWith('plugin/')) throw new Error('RELEASE_TAG must be a plugin tag');
+if (!releaseTag?.startsWith('plugin/') && !releaseTag?.startsWith('release/')) {
+  throw new Error('RELEASE_TAG must be a plugin/ or release/ tag');
+}
 
 const registry = JSON.parse(await readFile(registryPath, 'utf8'));
 const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
 if (!manifest.publisherKeyId || manifest.publisherKeyId.startsWith('TEST-ONLY')) {
   throw new Error('published registry packages require a production publisher key');
 }
-if (!releaseTag.endsWith('/v' + manifest.version)) {
+// For per-plugin tags (plugin/{name}/v{version}), the tag must match the manifest version.
+// For unified release tags (release/v*), the tag is a bundle tag and version matching is not required.
+if (releaseTag.startsWith('plugin/') && !releaseTag.endsWith('/v' + manifest.version)) {
   throw new Error('release tag version does not match plugin manifest');
 }
 const entry = {
