@@ -7,6 +7,7 @@ This directory contains one subdirectory per plugin. Each plugin is self-contain
 ├── plugin.json          # metadata, capabilities, permissions
 ├── devices.json         # supported USB/Bluetooth device IDs
 ├── capabilities.json    # runtime capability mapping (read/write groups)
+├── locales/             # user-facing labels and option text by locale
 ├── protocol/            # commands, parsers, transports and workflows
 │   ├── commands.json
 │   ├── parsers.json
@@ -37,6 +38,12 @@ This directory contains one subdirectory per plugin. Each plugin is self-contain
 For a narrow plugin that targets one exact mouse model, follow the single-model
 notes in [`../docs/plugin-sdk.md`](../docs/plugin-sdk.md). Start read-only,
 match only tested hardware, and add fixtures before UI metadata.
+
+Do not turn a validation sample into a runtime model whitelist. A broad
+protocol plugin should match the stable interface/protocol shape and derive
+capabilities from workflow output. A single-model plugin is appropriate only
+when the protocol is not yet safe to generalize, and its exact model scope must
+be documented in `devices.json`, fixtures, and the plugin README.
 
 Protocol files may also contain source-confirmed or public-reference material
 reserved for future development. Keep the current UI contract separate from

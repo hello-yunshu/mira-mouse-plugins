@@ -37,7 +37,7 @@ Plugins do not contain native code, scripts, web pages, or WASM. The Mira host a
 | Plugin | Target | Evidence | Writes | Notes |
 |---|---|---|---|---|
 | [`mira.amaster`](plugins/amaster/) | AMaster / Angry Miao compatible devices | hardware-verified | enabled | Protocol A and AM35 paths; mouse lighting and receiver lighting are separate capabilities. |
-| [`mira.logitech-hidpp`](plugins/logitech-hidpp/) | Logitech HID++ 2.0 devices | hardware-verified | enabled | Feature discovery, DPI, report rate, profiles, RGB control; no fixed model whitelist. |
+| [`mira.logitech-hidpp`](plugins/logitech-hidpp/) | Logitech HID++ 2.0 devices | hardware-verified | enabled | Feature discovery, DPI, report rate, profiles, and lighting capability reads; no fixed model whitelist. |
 | [`mira.example-mock`](plugins/example-mock/) | Runtime sample | fixture-verified | disabled | Test plugin for the host app and runtime. |
 | [`mira.razer-viper`](plugins/razer-viper/) | Razer Viper research draft | inferred | disabled | Research notes and narrow bring-up placeholder. |
 
@@ -50,6 +50,9 @@ plugins/<plugin-id>/
 ├── plugin.json              # metadata, permissions, capabilities, UI placement
 ├── devices.json             # VID/PID, usage, connection, evidence
 ├── capabilities.json        # exported fields and capability groups
+├── locales/
+│   ├── zh-CN.json           # plugin labels, effect names, and option copy
+│   └── en.json
 ├── protocol/
 │   ├── commands.json        # HID command templates
 │   ├── parsers.json         # response parsing and derived fields
@@ -65,7 +68,24 @@ Rules of the road:
 - `commands`, `parsers`, and feature registries may contain future reserves.
 - Only entries referenced by `workflows.steps` or `mutations` are enabled today.
 - Only capabilities declared in `plugin.json` may surface in the host UI.
+- Plugin-specific capability labels, effect names, and option copy belong in
+  `locales/*.json`; common host labels may use the host fallback, while
+  `plugin.json` keeps `labelKey` plus only necessary fallback labels.
 - Writes must have bounded inputs, pre-read state, unknown-field preservation where needed, and readback assertions.
+
+## Models And Protocol Families
+
+Mira plugins should describe protocol families before they describe individual
+models. For example, the Logitech HID++ plugin uses `0x046D`, the HID++
+collection, and runtime feature discovery to decide what the device supports;
+the G705 is a hardware validation sample, not a runtime whitelist.
+
+Use a single-model plugin only when one exact model has enough evidence to be
+useful but the protocol is not ready for family-wide support. Start read-only,
+match the tested VID/PID, usage page, usage, connection type, and evidence
+scope exactly, then promote writes one by one after bounded inputs,
+unknown-field preservation, and readback verification. See the
+[Plugin SDK](docs/plugin-sdk.md#single-model-plugins) for the full checklist.
 
 ## Development
 

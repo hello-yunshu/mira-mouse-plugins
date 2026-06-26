@@ -67,7 +67,7 @@ Current count from `node scripts/protocol-inventory.mjs`:
 
 | Category | Entries |
 |---|---|
-| Commands | 42 total; 38 enabled by read workflows or mutations; 4 reserved. |
+| Commands | 42 total; 37 enabled by read workflows or mutations; 5 reserved. |
 | Parsers | 31 total; 29 enabled by read workflows or mutations; 2 reserved. |
 | Feature registry | 195 generated entries; 18 currently referenced by workflows. |
 | Mutations | 9 enabled. |
@@ -81,6 +81,7 @@ Reserved protocol primitives:
 | `onboard-memory-write-end` | command | End/commit primitive for future profile memory edits. | Same as above; must not be callable alone. |
 | `profile-mgmt-control` | command/parser | HID++ Profile Management control primitive is reserved for future mode/control operations. | Enable only after public semantics and hardware readback are clear. |
 | `profile-mgmt-set-current` | parser | Parser exists for current-profile write replies, but current mutation verifies by reading `profile-mgmt-get-current`. | Keep reserved unless a direct write-reply workflow needs it. |
+| `rgb-control-set` | command | HID++ RGB Effects host-control write template is kept for future handoff work, but the current UI should not expose a standalone host-control toggle. | Enable only as part of a coherent zone/effect lighting workflow with hardware evidence and readback verification. |
 
 Feature registry reserve:
 

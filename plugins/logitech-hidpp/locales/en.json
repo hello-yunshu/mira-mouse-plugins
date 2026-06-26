@@ -1,0 +1,19 @@
+{
+  "lighting.off": "Off",
+  "lighting.fixed": "Fixed",
+  "lighting.cycle": "Cycle",
+  "lighting.wave": "Wave",
+  "lighting.starlight": "Starlight",
+  "lighting.breathing": "Breathing",
+  "lighting.ripple": "Ripple",
+  "lighting.custom": "Custom",
+  "lighting.extraColor": "Secondary color",
+  "lighting.editMouseLightingTitle": "Mouse lighting — {{field}}",
+  "plugin.label.capability.control-mode": "Control mode",
+  "plugin.label.capability.mouse-lighting": "Mouse lighting",
+  "plugin.label.capability.profile-mgmt-current": "Current profile",
+  "plugin.label.capability.pointer-speed": "Pointer speed",
+  "plugin.label.capability.device-info": "Device info",
+  "plugin.label.capability.feature-index": "Feature index",
+  "plugin.label.capability.onboard-profile": "Onboard profile"
+}

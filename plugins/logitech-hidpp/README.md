@@ -22,10 +22,9 @@ HID++ 2.0 plugin with protocol-level discovery instead of a model whitelist.
   function pair (`0x00` / `0x10`).
 - Reads and writes Report Rate `0x8060` and Extended Adjustable Report Rate
   `0x8061` when present.
-- Reads RGB Effects `0x8071` capability info and exposes the Solaar-observed
-  software active/release control (`function 0x50`) as a bounded, readback-
-  verified toggle. Zone/effect/color writes remain guarded until the plugin can
-  enumerate device-local effect indices instead of guessing.
+- Reads RGB Effects `0x8071` capability info for protocol evidence, but keeps
+  host-control handoff internal until zone/effect writes can be exposed as a
+  coherent lighting workflow.
 - Switches `0x8100` between onboard mode (`1`) and host/software mode (`2`)
   through a bounded, readback-verified mutation.
 - Reads HID++ Onboard Profiles `0x8100` using the device-reported sector size,
@@ -136,6 +135,24 @@ and polling-rate edits patch the active profile, preserve unknown bytes, update
 CRC, and verify the complete sector. Profile format `5` also enables the
 verified secondary-slot lighting patch. Other lighting layouts remain guarded.
 When onboard mode is unavailable, standard feature writes remain the fallback.
+
+## Adding another HID++ model
+
+Do not add a model-specific allowlist for normal HID++ mice. Add evidence
+instead:
+
+1. Capture the HID collection identity and at least one read fixture.
+2. Run the signed package path and record the feature indices the device
+   exposes.
+3. Add parser/workflow support only when the feature shape is stable.
+4. Add or update `plugin.json` capability metadata and `locales/*.json` labels
+   only after workflow output proves the capability exists.
+5. Keep unsupported optional features guarded by zero-index or missing-output
+   checks; do not move that logic into the host UI.
+
+Create a separate single-model plugin only if the device has a layout that
+cannot be represented by HID++ feature discovery, workflow guards, and
+declarative capability metadata.
 
 Run the signed-package path with:
 
