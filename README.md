@@ -35,7 +35,7 @@
 | 插件 | 目标 | 证据状态 | 写入 | 说明 |
 |---|---|---|---|---|
 | [`mira.amaster`](plugins/amaster/) | AMaster / 怒喵兼容设备 | hardware-verified | enabled | Protocol A 与 AM35 路径；鼠标灯光和接收器灯光分开声明。 |
-| [`mira.logitech-hidpp`](plugins/logitech-hidpp/) | Logitech HID++ 2.0 设备 | hardware-verified | enabled | 特性发现、DPI、回报率、配置、RGB 控制；不靠固定型号白名单。 |
+| [`mira.logitech-hidpp`](plugins/logitech-hidpp/) | Logitech HID++ 2.0 设备 | hardware-verified | enabled | 特性发现、DPI、回报率、配置、灯光能力读取；不靠固定型号白名单。 |
 | [`mira.example-mock`](plugins/example-mock/) | 运行时示例 | fixture-verified | disabled | 用于测试主应用和插件运行时。 |
 | [`mira.razer-viper`](plugins/razer-viper/) | Razer Viper 研究草案 | inferred | disabled | 研究笔记和窄范围 bring-up 占位。 |
 
@@ -50,6 +50,9 @@ plugins/<plugin-id>/
 ├── plugin.json              # 插件元数据、权限、能力、UI placement
 ├── devices.json             # 设备匹配：VID/PID、usage、连接方式、证据
 ├── capabilities.json        # 导出字段和能力分组
+├── locales/
+│   ├── zh-CN.json           # 插件标签、灯效名和选项文案
+│   └── en.json
 ├── protocol/
 │   ├── commands.json        # HID 命令模板
 │   ├── parsers.json         # 回包解析和派生字段
@@ -65,7 +68,21 @@ plugins/<plugin-id>/
 - `commands/parsers/features` 可以包含未来储备。
 - 只有被 `workflows.steps` 或 `mutations` 引用的内容，才是当前启用能力。
 - 只有插件 `plugin.json` 声明的 capability metadata，才会进入主应用 UI。
+- 面向用户的插件特有 capability 标签、灯效名和选项文案应放在
+  `locales/*.json`；通用 Host 标签可走主应用 fallback，`plugin.json`
+  只保留 `labelKey` 和必要 fallback。
 - 写入必须是有界输入、预读、必要时保留未知字段，并通过回读断言验证。
+
+## 型号与协议族
+
+Mira 插件优先描述协议族，而不是把每个已验证型号做成运行时白名单。
+例如 Logitech HID++ 插件按 `0x046D`、HID++ collection 和运行时 feature
+discovery 判断能力；G705 只是硬件验证样本，不是唯一允许的型号。
+
+只有当一个型号的协议尚不能安全推广到协议族时，才使用“单型号插件”。
+这种插件应从只读开始，用精确 VID/PID、usage page、usage、连接类型和
+证据说明收窄匹配；写入必须逐项通过有界输入、未知字段保留和回读验证后
+再开放。详细规则见 [插件 SDK](docs/plugin-sdk.md#单型号插件)。
 
 ## 开发
 
