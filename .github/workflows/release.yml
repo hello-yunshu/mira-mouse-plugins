@@ -111,7 +111,7 @@ jobs:
       attestations: write
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - uses: actions/download-artifact@fa0a91b85a4b0c2b5e6c3d06c1c1cc46c1b5d4e5 # v4.1.8
+      - uses: actions/download-artifact@v4
         with:
           path: dist
           pattern: plugin-*
