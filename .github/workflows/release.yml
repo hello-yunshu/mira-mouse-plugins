@@ -1,59 +1,93 @@
 # SPDX-License-Identifier: CC0-1.0
-# Plugin release workflow.
-# Packs and signs .mira-plugin assets with the configured Ed25519 production key.
+# Unified plugin release workflow.
+# Packs and signs all production-ready plugins into a single GitHub Release.
+# Downstream registry publication and Mira lock sync are handled by
+# publish-registry.yml and sync-mira.yml (triggered by the release event).
 name: Plugin Release
 on:
-  push:
-    tags: ['plugin/*/v*']
+  workflow_dispatch:
+    inputs:
+      overwrite_latest:
+        description: 'Overwrite latest release (rebuild without version bump)'
+        required: false
+        default: 'true'
+        type: boolean
+      release_tag:
+        description: 'Tag to create (required when overwrite_latest is false, e.g. release/v2026-06-26)'
+        required: false
+        type: string
 permissions:
   contents: read
   id-token: write
   attestations: write
 concurrency:
-  group: 'plugin-release-${{ github.ref }}'
+  group: "plugin-release-${{ inputs.release_tag || 'overwrite' }}"
   cancel-in-progress: false
 jobs:
   gate:
     runs-on: ubuntu-22.04
     timeout-minutes: 15
     outputs:
-      dir: '${{ steps.meta.outputs.dir }}'
-      plugin_id: '${{ steps.meta.outputs.plugin_id }}'
-      version: '${{ steps.meta.outputs.version }}'
-      asset: '${{ steps.meta.outputs.asset }}'
+      plugins: '${{ steps.list.outputs.plugins }}'
+      release_tag: '${{ steps.list.outputs.release_tag }}'
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 22
       - run: npm run validate && npm test
-      - id: meta
+      - id: list
+        name: Enumerate releasable plugins
         env:
-          RELEASE_TAG: '${{ github.ref_name }}'
+          GH_TOKEN: '${{ github.token }}'
+          OVERWRITE: "${{ inputs.overwrite_latest == true }}"
+          INPUT_TAG: '${{ inputs.release_tag }}'
         run: |
           set -euo pipefail
-          dir="${RELEASE_TAG#plugin/}"
-          version="${dir##*/v}"
-          dir="${dir%/v*}"
-          plugin_id="$(node -p "require('./plugins/$dir/plugin.json').pluginId")"
-          version_json="$(node -p "require('./plugins/$dir/plugin.json').version")"
-          test "$version" = "$version_json"
-          asset="${plugin_id//./-}-${version}.mira-plugin"
-          {
-            echo "dir=$dir"
-            echo "plugin_id=$plugin_id"
-            echo "version=$version"
-            echo "asset=$asset"
-          } >> "$GITHUB_OUTPUT"
+          # A plugin is releasable when its manifest evidence is hardware-verified.
+          # This excludes fixture-verified (example-mock) and inferred (razer-viper) plugins.
+          plugins_json="$(node -e '
+            const fs = require("fs");
+            const path = require("path");
+            const dir = "plugins";
+            const result = [];
+            for (const name of fs.readdirSync(dir).sort()) {
+              const manifestPath = path.join(dir, name, "plugin.json");
+              if (!fs.existsSync(manifestPath)) continue;
+              const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+              if (manifest.evidence === "hardware-verified") {
+                result.push({ dir: name, pluginId: manifest.pluginId, version: manifest.version });
+              }
+            }
+            console.log(JSON.stringify(result));
+          ')"
+          echo "plugins=$plugins_json" >> "$GITHUB_OUTPUT"
+          if [ "$OVERWRITE" = "true" ]; then
+            release_tag=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 1 --json tagName --jq '.[0].tagName' 2>/dev/null || echo "")
+            test -n "$release_tag" || { echo "No existing release to overwrite"; exit 1; }
+          else
+            release_tag="$INPUT_TAG"
+            test -n "$release_tag" || { echo "release_tag input is required when overwrite_latest is false"; exit 1; }
+          fi
+          echo "release_tag=$release_tag" >> "$GITHUB_OUTPUT"
+          echo "### Releasable plugins" >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          echo "$plugins_json" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
   signed-package:
     needs: gate
     runs-on: ubuntu-22.04
     timeout-minutes: 20
     permissions:
-      contents: write
+      contents: read
       id-token: write
       attestations: write
     environment: plugin-release
+    strategy:
+      fail-fast: false
+      matrix:
+        plugin: '${{ fromJson(needs.gate.outputs.plugins) }}'
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
@@ -63,218 +97,61 @@ jobs:
         env:
           PLUGIN_SIGNING_KEY: '${{ secrets.PLUGIN_SIGNING_KEY }}'
           PLUGIN_KEY_ID: 'mira-plugins-2026-001'
-          RELEASE_DIR: '${{ needs.gate.outputs.dir }}'
-          RELEASE_ASSET: '${{ needs.gate.outputs.asset }}'
+          PLUGIN_DIR: '${{ matrix.plugin.dir }}'
         run: |
           set -euo pipefail
+          plugin_id="${{ matrix.plugin.pluginId }}"
+          version="${{ matrix.plugin.version }}"
+          asset="${plugin_id//./-}-${version}.mira-plugin"
           mkdir -p dist
-          node scripts/pack-sign.mjs "plugins/$RELEASE_DIR" "dist/$RELEASE_ASSET"
-          sha256sum "dist/$RELEASE_ASSET" | awk '{print $1}' > "dist/$RELEASE_ASSET.sha256"
+          node scripts/pack-sign.mjs "plugins/$PLUGIN_DIR" "dist/$asset"
+          sha256sum "dist/$asset" | awk '{print $1}' > "dist/$asset.sha256"
+          echo "asset=$asset" >> "$GITHUB_ENV"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: plugin-${{ matrix.plugin.dir }}
+          path: dist/*
+          if-no-files-found: error
+
+  create-release:
+    needs: [gate, signed-package]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: plugin-*
+          merge-multiple: true
+      - name: Verify all expected assets present
+        run: |
+          set -euo pipefail
+          echo "Downloaded assets:"
+          ls -la dist/
       - uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v3 peeled commit
         with:
           subject-path: 'dist/*'
-      - name: Create release
+      - name: Create unified release
         env:
           GH_TOKEN: '${{ github.token }}'
-          TAG: '${{ github.ref_name }}'
+          TAG: '${{ needs.gate.outputs.release_tag }}'
+          TARGET: '${{ github.sha }}'
         run: |
           set -euo pipefail
-          gh release create "$TAG" dist/* --verify-tag \
-            --title "Mira Plugin ${{ needs.gate.outputs.plugin_id }} ${{ needs.gate.outputs.version }}" \
-            --notes "Official signed Mira plugin release. SHA-256 and provenance attestation are attached."
-  publish-registry:
-    needs: [gate, signed-package]
-    runs-on: ubuntu-22.04
-    timeout-minutes: 15
-    permissions: { contents: write }
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        with: { ref: main }
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
-        with: { node-version: 22 }
-      - name: Download and verify published package
-        env:
-          GH_TOKEN: '${{ github.token }}'
-          TAG: '${{ github.ref_name }}'
-          REPO: '${{ github.repository }}'
-        run: |
-          set -euo pipefail
-          mkdir release-asset
-          gh release download "$TAG" --repo "$REPO" --dir release-asset --pattern '*.mira-plugin' --pattern '*.mira-plugin.sha256'
-          asset="$(find release-asset -name '*.mira-plugin' -type f -print -quit)"
-          checksum="$asset.sha256"
-          test -f "$asset" && test -f "$checksum"
-          expected="$(tr -d '[:space:]' < "$checksum")"
-          actual="$(sha256sum "$asset" | awk '{print $1}')"
-          test "$expected" = "$actual"
-          unzip -p "$asset" plugin.json > release-asset/plugin.json
-          asset_name="$(basename "$asset")"
-          asset_url="$(gh api "repos/$REPO/releases/tags/$TAG" --jq ".assets[] | select(.name == \"$asset_name\") | .browser_download_url")"
-          test -n "$asset_url"
-          echo "ASSET_URL=$asset_url" >> "$GITHUB_ENV"
-          echo "SHA256=$actual" >> "$GITHUB_ENV"
-      - name: Update registry
-        env:
-          RELEASE_TAG: '${{ github.ref_name }}'
-        run: node scripts/update-registry.mjs registry/index.json release-asset/plugin.json
-      - run: npm run validate && npm test
-      - name: Commit immutable registry metadata
-        env:
-          TAG: '${{ github.ref_name }}'
-        run: |
-          set -euo pipefail
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add registry/index.json
-          git diff --cached --quiet && exit 0
-          git commit -m "chore(registry): publish $TAG"
-          git push origin HEAD:main
-  sync-mira:
-    needs: [gate, signed-package]
-    runs-on: ubuntu-22.04
-    timeout-minutes: 20
-    environment: plugin-release
-    env:
-      RELEASE_TAG: '${{ github.ref_name }}'
-      MIRA_REPOSITORY: "${{ vars.MIRA_REPOSITORY || 'hello-yunshu/mira-mouse' }}"
-      MIRA_APP_TOKEN: '${{ secrets.MIRA_APP_TOKEN }}'
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        with: { path: plugin-source }
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
-        with: { node-version: 22 }
-      - name: Check optional app-sync token
-        id: credentials
-        run: |
-          set -euo pipefail
-          test -n "$MIRA_REPOSITORY"
-          if test -n "$MIRA_APP_TOKEN"; then
-            echo "has_token=true" >> "$GITHUB_OUTPUT"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; uploading assets."
+            gh release upload "$TAG" dist/* --repo "$GITHUB_REPOSITORY" --clobber
           else
-            echo "has_token=false" >> "$GITHUB_OUTPUT"
+            gh release create "$TAG" dist/* --target "$TARGET" \
+              --title "Mira Plugins $TAG" \
+              --notes "Unified signed Mira plugin release bundle.
+
+          This release contains all production-ready plugins built from tag $TAG.
+          Each plugin asset is individually signed with the Ed25519 production key.
+          SHA-256 checksums and build provenance attestations are attached."
           fi
-      - name: Download and verify published plugin
-        id: asset
-        if: steps.credentials.outputs.has_token == 'true'
-        working-directory: plugin-source
-        env:
-          GH_TOKEN: '${{ github.token }}'
-        run: |
-          set -euo pipefail
-          mkdir ../release-asset
-          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir ../release-asset --pattern '*.mira-plugin' --pattern '*.mira-plugin.sha256'
-          asset="$(find ../release-asset -name '*.mira-plugin' -type f -print -quit)"
-          checksum="$asset.sha256"
-          test -f "$asset" && test -f "$checksum"
-          expected="$(tr -d '[:space:]' < "$checksum")"
-          actual="$(sha256sum "$asset" | awk '{print $1}')"
-          test "$expected" = "$actual"
-          unzip -p "$asset" plugin.json > ../release-asset/plugin.json
-          asset_name="$(basename "$asset")"
-          {
-            echo "asset_path=$(realpath "$asset")"
-            echo "asset_name=$asset_name"
-            echo "sha256=$actual"
-          } >> "$GITHUB_OUTPUT"
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        if: steps.credentials.outputs.has_token == 'true'
-        with:
-          repository: '${{ env.MIRA_REPOSITORY }}'
-          token: '${{ env.MIRA_APP_TOKEN }}'
-          path: mira-app
-      - name: Update Mira plugin lock
-        if: steps.credentials.outputs.has_token == 'true'
-        id: update
-        env:
-          ASSET_PATH: '${{ steps.asset.outputs.asset_path }}'
-          ASSET_NAME: '${{ steps.asset.outputs.asset_name }}'
-          SHA256: '${{ steps.asset.outputs.sha256 }}'
-        run: |
-          set -euo pipefail
-          node <<'NODE'
-          import { appendFileSync, copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-          import { dirname, join } from 'node:path';
-
-          const app = 'mira-app';
-          const manifest = JSON.parse(readFileSync('release-asset/plugin.json', 'utf8'));
-          const lockPath = join(app, 'plugins.lock.json');
-          const lock = JSON.parse(readFileSync(lockPath, 'utf8'));
-          const entry = lock.plugins.find((plugin) => plugin.pluginId === manifest.pluginId);
-          const output = process.env.GITHUB_OUTPUT;
-
-          if (!entry || !entry.bundleByDefault) {
-            appendFileSync(output, `skip=true\nplugin_id=${manifest.pluginId}\nversion=${manifest.version}\n`);
-            process.exit(0);
-          }
-
-          const assetName = process.env.ASSET_NAME;
-          const resourcePath = join('src-tauri', 'resources', 'plugins', assetName);
-          const destination = join(app, resourcePath);
-          mkdirSync(dirname(destination), { recursive: true });
-          copyFileSync(process.env.ASSET_PATH, destination);
-          if (entry.asset !== assetName) {
-            rmSync(join(app, 'src-tauri', 'resources', 'plugins', entry.asset), { force: true });
-          }
-
-          entry.repository = process.env.GITHUB_REPOSITORY;
-          entry.releaseTag = process.env.RELEASE_TAG;
-          entry.version = manifest.version;
-          entry.asset = assetName;
-          entry.sha256 = process.env.SHA256;
-          entry.publisherKeyId = manifest.publisherKeyId;
-          entry.pluginApi = manifest.pluginApi;
-          entry.cachePath = resourcePath.replaceAll('\\', '/');
-
-          const bundled = lock.plugins.filter((plugin) => plugin.bundleByDefault);
-          lock.releaseReady = bundled.every((plugin) =>
-            /^[a-f0-9]{64}$/.test(plugin.sha256) &&
-            plugin.repository === 'hello-yunshu/mira-mouse-plugins' &&
-            plugin.publisherKeyId &&
-            !plugin.publisherKeyId.startsWith('TEST-ONLY')
-          );
-          writeFileSync(lockPath, JSON.stringify(lock, null, 2) + '\n');
-
-          const tauriPath = join(app, 'src-tauri', 'tauri.conf.json');
-          const tauri = JSON.parse(readFileSync(tauriPath, 'utf8'));
-          tauri.bundle.resources = bundled.map((plugin) => `resources/plugins/${plugin.asset}`);
-          writeFileSync(tauriPath, JSON.stringify(tauri, null, 2) + '\n');
-
-          appendFileSync(output, `skip=false\nplugin_id=${manifest.pluginId}\nversion=${manifest.version}\n`);
-          NODE
-      - name: Validate Mira lock update
-        if: steps.credentials.outputs.has_token == 'true' && steps.update.outputs.skip != 'true'
-        working-directory: mira-app
-        run: |
-          set -euo pipefail
-          npm ci
-          npm run check:structured
-          rustup toolchain install stable --profile minimal
-          cargo run --package xtask -- plugins sync --locked --offline
-      - name: Open Mira update PR
-        if: steps.credentials.outputs.has_token == 'true' && steps.update.outputs.skip != 'true'
-        working-directory: mira-app
-        env:
-          GH_TOKEN: '${{ env.MIRA_APP_TOKEN }}'
-          PLUGIN_ID: '${{ steps.update.outputs.plugin_id }}'
-          VERSION: '${{ steps.update.outputs.version }}'
-        run: |
-          set -euo pipefail
-          branch="plugin-sync/${PLUGIN_ID//./-}-${VERSION}"
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git checkout -B "$branch"
-          git add plugins.lock.json src-tauri/tauri.conf.json src-tauri/resources/plugins
-          git diff --cached --quiet && exit 0
-          git commit -m "chore(plugins): bundle $PLUGIN_ID $VERSION"
-          git push --force-with-lease origin "$branch"
-          existing="$(gh pr list --repo "$MIRA_REPOSITORY" --head "$branch" --json url --jq '.[0].url')"
-          if test -n "$existing"; then
-            echo "Updated existing PR: $existing"
-          else
-            gh pr create --repo "$MIRA_REPOSITORY" --base main --head "$branch" \
-              --title "Bundle $PLUGIN_ID $VERSION" \
-              --body "Updates the locked default plugin asset from $RELEASE_TAG and verifies the SHA-256 before opening this PR."
-          fi
-      - name: Skip Mira PR without token
-        if: steps.credentials.outputs.has_token != 'true'
-        run: echo 'MIRA_APP_TOKEN is not configured; plugin release and registry publication remain official, but no app lock PR was opened.' >> "$GITHUB_STEP_SUMMARY"

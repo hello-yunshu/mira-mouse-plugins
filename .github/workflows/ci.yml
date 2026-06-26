@@ -36,3 +36,79 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - shell: bash
         run: find plugins registry -name '*.json' -print0 | xargs -0 -n1 node -e "JSON.parse(require('fs').readFileSync(process.argv[1]))"
+  auto-release:
+    needs: [validate-and-fixtures, platform-parse]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    concurrency:
+      group: plugin-auto-release
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with: { node-version: 22 }
+      - name: Determine release action
+        id: decide
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # Collect current hardware-verified plugin asset names
+          current=$(node -e '
+            const fs = require("fs");
+            const path = require("path");
+            const result = [];
+            for (const name of fs.readdirSync("plugins").sort()) {
+              const m = path.join("plugins", name, "plugin.json");
+              if (!fs.existsSync(m)) continue;
+              const manifest = JSON.parse(fs.readFileSync(m, "utf8"));
+              if (manifest.evidence === "hardware-verified") {
+                const asset = manifest.pluginId.replace(/\./g, "-") + "-" + manifest.version + ".mira-plugin";
+                result.push(asset);
+              }
+            }
+            console.log(JSON.stringify(result));
+          ')
+          echo "Current assets: $current"
+          latest_tag=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 1 --json tagName --jq '.[0].tagName' 2>/dev/null || echo "")
+          if [ -z "$latest_tag" ]; then
+            tag="release/v$(date -u +%Y-%m-%d)"
+            echo "action=new" >> "$GITHUB_OUTPUT"
+            echo "tag=$tag" >> "$GITHUB_OUTPUT"
+            echo "No previous release; creating $tag"
+          else
+            published=$(gh release view "$latest_tag" --repo "$GITHUB_REPOSITORY" --json assets --jq '[.assets[].name | select(endswith(".mira-plugin"))]')
+            need_new=$(node -e "
+              const current = new Set($current);
+              const published = new Set($published);
+              const changed = current.size !== published.size || [...current].some(a => !published.has(a));
+              console.log(changed ? 'yes' : 'no');
+            ")
+            if [ "$need_new" = "yes" ]; then
+              tag="release/v$(date -u +%Y-%m-%d)"
+              echo "action=new" >> "$GITHUB_OUTPUT"
+              echo "tag=$tag" >> "$GITHUB_OUTPUT"
+              echo "Version changed; creating $tag"
+            else
+              echo "action=overwrite" >> "$GITHUB_OUTPUT"
+              echo "tag=$latest_tag" >> "$GITHUB_OUTPUT"
+              echo "Version unchanged; overwriting $latest_tag"
+            fi
+          fi
+      - name: Trigger release workflow
+        run: |
+          if [ "$ACTION" = "new" ]; then
+            gh workflow run release.yml --repo "$GITHUB_REPOSITORY" \
+              -f overwrite_latest=false \
+              -f release_tag="$TAG"
+          else
+            gh workflow run release.yml --repo "$GITHUB_REPOSITORY" \
+              -f overwrite_latest=true
+          fi
+        env:
+          ACTION: ${{ steps.decide.outputs.action }}
+          TAG: ${{ steps.decide.outputs.tag }}
+          GH_TOKEN: ${{ github.token }}
