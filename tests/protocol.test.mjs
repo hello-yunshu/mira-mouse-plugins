@@ -143,14 +143,17 @@ test('logitech-hidpp exposes a read workflow per device family and writable muta
   const polling = manifest.capabilities.find((capability) => capability.id === 'polling-rate');
   const dpi = manifest.capabilities.find((capability) => capability.id === 'dpi');
   const pointerSpeed = manifest.capabilities.find((capability) => capability.id === 'pointer-speed');
-  const rgbControl = manifest.capabilities.find((capability) => capability.id === 'rgb-control');
   const profileCurrent = manifest.capabilities.find((capability) => capability.id === 'profile-mgmt-current');
+  assert.equal(manifest.capabilities.some((capability) => capability.metadata?.description), false);
   assert.equal(polling.metadata.summary.length, 2);
   assert.deepEqual(polling.metadata.mutation, ['set-polling-rate', 'set-polling-rate-extended']);
   assert.deepEqual(dpi.metadata.mutations.value, ['set-dpi-value', 'set-dpi-value-extended']);
   assert.equal(pointerSpeed.metadata.mutation, 'set-pointer-speed');
-  assert.equal(rgbControl.metadata.mutation, 'set-rgb-control');
   assert.equal(profileCurrent.metadata.mutation, 'set-profile-mgmt-current');
+  assert.deepEqual(lighting.metadata.lightingRole, {
+    mouse: 'set-mouse-lighting',
+    receiver: 'set-receiver-lighting',
+  });
   assert.equal(lighting.placements.find((placement) => placement.region === 'status').span, 1);
   const families = new Set(devices.devices.map((device) => device.family));
   for (const family of families) {
@@ -167,30 +170,59 @@ test('logitech-hidpp exposes a read workflow per device family and writable muta
     'hidpp2-device-set-polling-rate',
     'hidpp2-device-set-polling-rate-extended',
     'hidpp2-device-set-profile-mgmt-current',
-    'hidpp2-device-set-rgb-control',
   ]);
   // Mutations gated by the standard skipIfZero primitive.
+  // Mutations WITH a memory path (set-dpi-value, set-polling-rate,
+  // set-mouse-lighting) are intentionally NOT gated by controlMode.hostMode:
+  // their memory.enabledWhen already restricts the onboard-memory patch to
+  // onboard mode (mode eq 1), and the direct-write path covers host mode.
+  // Hiding them via skipIfZero:hostMode would make the memory path dead code
+  // in the exact mode (onboard) where it is the only correct path.
+  // Mutations WITHOUT a memory path (set-dpi-value-extended, set-pointer-speed,
+  // set-polling-rate-extended, set-profile-mgmt-current) only work in host
+  // mode, so skipIfZero:hostMode correctly hides them in onboard mode.
   const skipIfZeroGated = {
-    'hidpp2-device-set-control-mode': 'featureIndexOnboardProfiles',
-    'hidpp2-device-set-dpi-value': 'featureIndexDpi',
-    'hidpp2-device-set-dpi-value-extended': 'featureIndexExtendedDpi',
-    'hidpp2-device-set-pointer-speed': 'featureIndexPointerSpeed',
-    'hidpp2-device-set-polling-rate': 'featureIndexReportRate',
-    'hidpp2-device-set-polling-rate-extended': 'featureIndexExtendedReportRate',
-    'hidpp2-device-set-profile-mgmt-current': 'featureIndexProfileManagement',
-    'hidpp2-device-set-rgb-control': 'featureIndexRgbEffects',
+    'hidpp2-device-set-control-mode': [
+      { output: 'featureIndexOnboardProfiles', field: 'featureIndex' },
+    ],
+    'hidpp2-device-set-dpi-value': [
+      { output: 'featureIndexDpi', field: 'featureIndex' },
+    ],
+    'hidpp2-device-set-dpi-value-extended': [
+      { output: 'featureIndexExtendedDpi', field: 'featureIndex' },
+      { output: 'controlMode', field: 'hostMode' },
+    ],
+    'hidpp2-device-set-pointer-speed': [
+      { output: 'featureIndexPointerSpeed', field: 'featureIndex' },
+      { output: 'controlMode', field: 'hostMode' },
+    ],
+    'hidpp2-device-set-polling-rate': [
+      { output: 'featureIndexReportRate', field: 'featureIndex' },
+    ],
+    'hidpp2-device-set-polling-rate-extended': [
+      { output: 'featureIndexExtendedReportRate', field: 'featureIndex' },
+      { output: 'controlMode', field: 'hostMode' },
+    ],
+    'hidpp2-device-set-profile-mgmt-current': [
+      { output: 'featureIndexProfileManagement', field: 'featureIndex' },
+      { output: 'controlMode', field: 'hostMode' },
+    ],
   };
   // Lighting mutations use multi-primitive gating: skipIfAllZero hides when no
   // relevant feature exists; writeSkipIfZero skips the direct write when only
   // the onboard path is available; skipIfNonZero (onboard variant) hides when
-  // the direct-write path or format V5 already covers the device.
+  // the direct-write path, format V5, or host mode already covers the device.
+  // set-mouse-lighting has a memory path (requiredWhen: profileFormatId eq 5)
+  // so it must stay visible in onboard mode for G705-style devices.
+  // set-mouse-lighting-onboard has no direct-write fallback, so skipIfNonZero:
+  // hostMode hides it in host mode where it would be a silent no-op.
   const lightingGating = {
     'hidpp2-device-set-mouse-lighting': {
       skipIfAllZero: ['featureIndexColorLed', 'featureIndexOnboardProfiles'],
       writeSkipIfZero: ['featureIndexColorLed'],
     },
     'hidpp2-device-set-mouse-lighting-onboard': {
-      skipIfNonZero: ['featureIndexColorLed', 'onboardDescription'],
+      skipIfNonZero: ['featureIndexColorLed', 'onboardDescription', 'controlMode'],
       skipIfAllZero: ['featureIndexOnboardProfiles'],
       writeSkipIfZero: ['featureIndexColorLed'],
     },
@@ -203,15 +235,25 @@ test('logitech-hidpp exposes a read workflow per device family and writable muta
     if (skipIfZeroGated[id]) {
       assert.deepEqual(
         mutation.skipIfZero,
-        [{ output: skipIfZeroGated[id], field: 'featureIndex' }],
+        skipIfZeroGated[id],
         `${id}: mutation is not feature-gated`,
       );
     } else if (lightingGating[id]) {
       const expected = lightingGating[id];
       for (const [gate, outputs] of Object.entries(expected)) {
-        assert.ok(
-          mutation[gate]?.length === outputs.length,
+        // Strengthened assertion: verify both length AND the actual
+        // output/field values, not just the array length. A length-only
+        // check would pass even if the wrong fields were gated.
+        const actual = mutation[gate] ?? [];
+        assert.equal(
+          actual.length,
+          outputs.length,
           `${id}: missing or incomplete ${gate}`,
+        );
+        assert.deepEqual(
+          actual.map((entry) => entry.output),
+          outputs,
+          `${id}: ${gate} references unexpected outputs`,
         );
       }
     }
@@ -221,6 +263,25 @@ test('logitech-hidpp exposes a read workflow per device family and writable muta
         { output: 'featureIndexOnboardProfiles', field: 'featureIndex' },
         `${id}: onboard fallback is not feature-gated`,
       );
+      // Critical invariant: a mutation with memory.enabledWhen: mode eq 1
+      // (designed for onboard mode) must NOT be hidden by skipIfZero on
+      // controlMode.hostMode, because hostMode is 0 in onboard mode and
+      // would make the memory path unreachable. The memory patch is the
+      // only correct write path for 0x8100 devices in onboard mode
+      // (confirmed via libratbag driver-hidpp20.c).
+      if (mutation.memory.enabledWhen &&
+          mutation.memory.enabledWhen.output === 'onboardMode' &&
+          mutation.memory.enabledWhen.field === 'mode' &&
+          mutation.memory.enabledWhen.eq === 1) {
+        const hostModeGated = (mutation.skipIfZero ?? []).some(
+          (entry) => entry.output === 'controlMode' && entry.field === 'hostMode',
+        );
+        assert.equal(
+          hostModeGated,
+          false,
+          `${id}: skipIfZero on controlMode.hostMode contradicts memory.enabledWhen (mode eq 1) — would hide the memory path in onboard mode`,
+        );
+      }
     }
   }
 });
@@ -245,10 +306,6 @@ test('Logitech writes are protocol-gated without a model whitelist', async () =>
   assert.equal(
     mutations['hidpp2-device-set-profile-mgmt-current'].writeCommand,
     'profile-mgmt-set-current',
-  );
-  assert.equal(
-    mutations['hidpp2-device-set-rgb-control'].writeCommand,
-    'rgb-control-set',
   );
 });
 

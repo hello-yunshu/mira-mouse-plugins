@@ -18,6 +18,9 @@
 - Made DPI and report-rate mutations prefer the active onboard profile while
   preserving every unrelated byte; standard HID++ writes remain the fallback.
 - Enabled guarded profile-format-5 lighting writes through the second LED slot.
+- Removed the standalone Logitech HID++ RGB host-control toggle from the
+  user-facing capability and mutation surface until zone/effect lighting writes
+  can be exposed coherently.
 - Hardware-verified and restored G705 round trips for DPI, report rate, and
   lighting; the G705 remains a protocol validation sample, not a model whitelist.
 - Generalized `mira.logitech-hidpp` to the Logitech HID++ long-report collection without a model/PID whitelist, with bounded device-index discovery across receiver slots `1..6` and direct index `0xFF`.

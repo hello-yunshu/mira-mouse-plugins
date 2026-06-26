@@ -48,3 +48,22 @@ after hardware validation of the RACE write framing.
 All AM35 field offsets are source-confirmed from static analysis but
 not yet hardware-verified. The `am35.receiverLightingType` named-values
 table remains `unknown` pending real device testing.
+
+## Adding a specific AMaster-compatible model
+
+Add model support at the plugin boundary, not in the Mira host UI:
+
+1. Add the exact interface match to `devices.json` with VID/PID, usage page,
+   usage, connection type, family name, and evidence level.
+2. Capture fixtures for every field that will become visible in the UI.
+3. Extend `protocol/commands.json`, `protocol/parsers.json`,
+   `protocol/transports.json`, and `protocol/workflows.json` only as needed for
+   that family.
+4. Declare host-rendered capability metadata in `plugin.json`, and put labels,
+   receiver-lighting option names, and effect names in `locales/*.json`.
+5. Keep writes disabled for the new family until bounded inputs, unknown-field
+   preservation, and readback assertions pass on hardware.
+
+If a model shares Protocol A or AM35 framing, prefer workflow guards and family
+descriptors over a new model-specific plugin. Use a separate single-model plugin
+only when the report layout or write semantics are not safe to generalize.

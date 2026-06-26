@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "readOnly": ["battery", "device-info", "feature-index", "feature-set", "mouse-pointer", "surface-tuning", "sensor-stats", "color-led-info", "rgb-effects-info", "profile-mgmt-info"],
-  "enabledWrites": ["control-mode", "profile-mgmt-switch", "dpi-value", "dpi-value-extended", "pointer-speed", "polling-rate", "polling-rate-extended", "mouse-lighting", "mouse-lighting-onboard", "rgb-control"],
+  "enabledWrites": ["control-mode", "profile-mgmt-switch", "dpi-value", "dpi-value-extended", "pointer-speed", "polling-rate", "polling-rate-extended", "mouse-lighting", "mouse-lighting-onboard"],
   "disabledWrites": ["onboard-profile-write", "receiver-lighting", "bluetooth-sleep-time", "wireless-sleep-time"],
   "forbidden": ["firmware-update", "bootloader", "dfu", "flash-erase", "receiver-pairing", "macros"],
   "pollingRatesHz": [125, 250, 500, 1000, 2000, 4000, 8000],
