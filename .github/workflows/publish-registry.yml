@@ -3,6 +3,9 @@ name: Publish Plugin Registry
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      release_tag: { description: 'Published release tag', required: true, type: string }
 permissions:
   contents: write
 concurrency:
@@ -10,7 +13,10 @@ concurrency:
   cancel-in-progress: false
 jobs:
   publish:
-    if: startsWith(github.event.release.tag_name, 'plugin/')
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      startsWith(github.event.release.tag_name, 'plugin/') ||
+      startsWith(github.event.release.tag_name, 'release/')
     runs-on: ubuntu-22.04
     timeout-minutes: 15
     steps:
@@ -18,35 +24,51 @@ jobs:
         with: { ref: main }
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with: { node-version: 22 }
-      - name: Download and verify published package
+      - name: Download and verify all published packages
         env:
           GH_TOKEN: '${{ github.token }}'
-          TAG: '${{ github.event.release.tag_name }}'
+          TAG: '${{ github.event.release.tag_name || inputs.release_tag }}'
           REPO: '${{ github.repository }}'
         run: |
           set -euo pipefail
-          mkdir release-asset
-          gh release download "$TAG" --repo "$REPO" --dir release-asset --pattern '*.mira-plugin' --pattern '*.mira-plugin.sha256'
-          asset="$(find release-asset -name '*.mira-plugin' -type f -print -quit)"
-          checksum="$asset.sha256"
-          test -f "$asset" && test -f "$checksum"
-          expected="$(tr -d '[:space:]' < "$checksum")"
-          actual="$(sha256sum "$asset" | awk '{print $1}')"
-          test "$expected" = "$actual"
-          unzip -p "$asset" plugin.json > release-asset/plugin.json
-          asset_name="$(basename "$asset")"
-          asset_url="$(gh api "repos/$REPO/releases/tags/$TAG" --jq ".assets[] | select(.name == \"$asset_name\") | .browser_download_url")"
-          test -n "$asset_url"
-          echo "ASSET_URL=$asset_url" >> "$GITHUB_ENV"
-          echo "SHA256=$actual" >> "$GITHUB_ENV"
-      - name: Update registry
+          mkdir -p release-asset
+          gh release download "$TAG" --repo "$REPO" --dir release-asset \
+            --pattern '*.mira-plugin' --pattern '*.mira-plugin.sha256'
+          # Verify checksums for every asset
+          for asset in release-asset/*.mira-plugin; do
+            checksum="$asset.sha256"
+            test -f "$asset" && test -f "$checksum"
+            expected="$(tr -d '[:space:]' < "$checksum")"
+            actual="$(sha256sum "$asset" | awk '{print $1}')"
+            test "$expected" = "$actual"
+            unzip -p "$asset" plugin.json > "$asset.plugin.json"
+          done
+          echo "Verified $(find release-asset -name '*.mira-plugin' | wc -l) plugin assets"
+      - name: Fetch asset URLs from release
         env:
-          RELEASE_TAG: '${{ github.event.release.tag_name }}'
-        run: node scripts/update-registry.mjs registry/index.json release-asset/plugin.json
+          GH_TOKEN: '${{ github.token }}'
+          TAG: '${{ github.event.release.tag_name || inputs.release_tag }}'
+          REPO: '${{ github.repository }}'
+        run: |
+          set -euo pipefail
+          gh api "repos/$REPO/releases/tags/$TAG" --jq '.assets[] | select(.name | endswith(".mira-plugin")) | .browser_download_url + " " + .name' > release-asset/asset-urls.txt
+          cat release-asset/asset-urls.txt
+      - name: Update registry for all plugins
+        env:
+          RELEASE_TAG: '${{ github.event.release.tag_name || inputs.release_tag }}'
+        run: |
+          set -euo pipefail
+          while IFS=' ' read -r url name; do
+            asset="release-asset/$name"
+            manifest="$asset.plugin.json"
+            echo "Updating registry for $name ..."
+            ASSET_URL="$url" SHA256="$(cat "$asset.sha256" | tr -d '[:space:]')" \
+              node scripts/update-registry.mjs registry/index.json "$manifest"
+          done < release-asset/asset-urls.txt
       - run: npm run validate && npm test
       - name: Commit immutable registry metadata
         env:
-          TAG: '${{ github.event.release.tag_name }}'
+          TAG: '${{ github.event.release.tag_name || inputs.release_tag }}'
         run: |
           set -euo pipefail
           git config user.name github-actions
