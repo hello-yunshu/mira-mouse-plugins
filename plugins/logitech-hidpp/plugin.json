@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "pluginId": "mira.logitech-hidpp",
   "name": "Logitech HID++",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "pluginApi": ">=1.0.0, <2.0.0",
   "publisherKeyId": null,
   "evidence": "hardware-verified",
@@ -38,8 +38,7 @@
         "options": [
           { "value": 1, "label": "板载" },
           { "value": 2, "label": "软件" }
-        ],
-        "description": "软件模式由 Mira 下发当前设置；板载模式使用鼠标内部保存的配置。"
+        ]
       }
     },
     {
@@ -55,8 +54,7 @@
         "param": "profileIndex",
         "min": 0,
         "max": 15,
-        "step": 1,
-        "description": "使用 HID++ 0x8101 Profile Management 切换当前配置文件索引。"
+        "step": 1
       }
     },
     {
@@ -80,8 +78,7 @@
         "param": "speed",
         "min": 46,
         "max": 511,
-        "step": 1,
-        "description": "使用 HID++ 0x2205 Pointer Speed 写入设备指针速度。"
+        "step": 1
       }
     },
     {
@@ -113,39 +110,22 @@
       "metadata": {
         "label": "鼠标灯光", "source": "lighting.mouseLightColor",
         "mutations": { "mouse": ["set-mouse-lighting-onboard", "set-mouse-lighting"], "receiver": "set-receiver-lighting" },
+        "lightingRole": { "mouse": "set-mouse-lighting", "receiver": "set-receiver-lighting" },
         "effectOptions": {
+          "offValue": 0,
           "effect": [
             { "value": 0, "labelKey": "lighting.off" },
             { "value": 1, "labelKey": "lighting.fixed" },
             { "value": 3, "labelKey": "lighting.cycle" },
             { "value": 4, "labelKey": "lighting.wave" },
-            { "value": 5, "labelKey": "lighting.starlight" },
+            { "value": 5, "labelKey": "lighting.starlight", "requiresExtraColor": true },
             { "value": 10, "labelKey": "lighting.breathing" },
             { "value": 11, "labelKey": "lighting.ripple" },
             { "value": 12, "labelKey": "lighting.custom" }
           ],
           "speed": { "min": 0, "max": 255, "step": 1 },
           "brightness": { "min": 0, "max": 100, "step": 1 }
-        },
-        "supportedEffectsSource": ["capabilities.colorLedInfo", "capabilities.rgbEffectsInfo"],
-        "supportedEffectsField": "supportsFixed|supportsCycle|supportsWave|supportsStarlight|supportsBreathing|supportsRipple|supportsCustom"
-      }
-    },
-    {
-      "id": "rgb-control",
-      "control": "Toggle",
-      "labelKey": "capability.rgb-control",
-      "readOnly": false,
-      "placements": [
-        { "region": "control", "group": "lighting", "order": 31, "span": 1, "icon": "lightbulb" },
-        { "region": "status", "order": 21, "span": 1, "icon": "lightbulb" }
-      ],
-      "metadata": {
-        "label": "RGB 接管",
-        "source": "capabilities.rgbControl.enabled",
-        "mutation": "set-rgb-control",
-        "param": "enabled",
-        "description": "使用 HID++ 0x8071 RGB_EFFECTS 的 software active/release 控制位；具体 zone/effect 写入会在枚举 effect index 后再开放。"
+        }
       }
     },
     {

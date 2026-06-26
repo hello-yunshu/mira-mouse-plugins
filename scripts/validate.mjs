@@ -14,6 +14,8 @@ const REQUIRED_FILES = [
   'protocol/parsers.json',
   'protocol/transports.json',
   'protocol/workflows.json',
+  'locales/zh-CN.json',
+  'locales/en.json',
   'README.md',
   'LICENSE',
 ];
@@ -205,6 +207,12 @@ for (const [name, data] of Object.entries(pluginData)) {
 
   if (Object.keys(mutations).length > 0 && (!manifest.writesEnabled || manifest.evidence !== 'hardware-verified')) {
     fail(`${name}: declared writes require a hardware-verified writable manifest`);
+  }
+
+  for (const capability of manifest.capabilities ?? []) {
+    if (capability.metadata && Object.hasOwn(capability.metadata, 'description')) {
+      fail(`${name}/${capability.id}: capability metadata.description is developer copy; use docs or locales instead`);
+    }
   }
 
   for (const [id, transport] of Object.entries(transports)) {

@@ -361,6 +361,16 @@
           "kind": "lookup",
           "source": "mode",
           "table": { "0x01": "onboard", "0x02": "host" }
+        },
+        "hostMode": {
+          "kind": "lookup",
+          "source": "mode",
+          "table": { "0x01": 0, "0x02": 1 }
+        },
+        "onboardModeFlag": {
+          "kind": "lookup",
+          "source": "mode",
+          "table": { "0x01": 1, "0x02": 0 }
         }
       }
     },

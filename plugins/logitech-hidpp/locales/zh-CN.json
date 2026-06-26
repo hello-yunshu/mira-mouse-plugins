@@ -1,0 +1,19 @@
+{
+  "lighting.off": "已关闭",
+  "lighting.fixed": "常亮",
+  "lighting.cycle": "循环",
+  "lighting.wave": "光波",
+  "lighting.starlight": "星夜",
+  "lighting.breathing": "呼吸",
+  "lighting.ripple": "涟漪",
+  "lighting.custom": "自定义",
+  "lighting.extraColor": "第二色",
+  "lighting.editMouseLightingTitle": "鼠标灯光 — {{field}}",
+  "plugin.label.capability.control-mode": "配置控制",
+  "plugin.label.capability.mouse-lighting": "鼠标灯光",
+  "plugin.label.capability.profile-mgmt-current": "当前配置文件",
+  "plugin.label.capability.pointer-speed": "指针速度",
+  "plugin.label.capability.device-info": "设备信息",
+  "plugin.label.capability.feature-index": "功能索引",
+  "plugin.label.capability.onboard-profile": "板载配置"
+}

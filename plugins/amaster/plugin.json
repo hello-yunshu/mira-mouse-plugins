@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "pluginId": "mira.amaster",
   "name": "AMaster / Angry Miao compatible devices",
-  "version": "1.3.5",
+  "version": "1.3.6",
   "pluginApi": ">=1.0.0,<2.0.0",
   "publisherKeyId": "mira-plugins-2026-001",
   "evidence": "hardware-verified",
@@ -135,42 +135,43 @@
         "status": true,
         "source": "capabilities.mouseLighting.color",
         "mutations": { "mouse": "set-mouse-lighting", "receiver": "set-receiver-lighting" },
+        "lightingRole": { "mouse": "set-mouse-lighting", "receiver": "set-receiver-lighting" },
         "receiverLightingOptions": {
           "effect": [
-            { "value": 0, "label": "关闭" },
-            { "value": 1, "label": "常亮" },
-            { "value": 2, "label": "呼吸" },
-            { "value": 3, "label": "霓虹" },
-            { "value": 4, "label": "光波" },
-            { "value": 5, "label": "跑马" },
-            { "value": 6, "label": "圆环" },
-            { "value": 7, "label": "缓冲" },
-            { "value": 8, "label": "追捕" }
+            { "value": 0, "labelKey": "receiverLighting.effect.off" },
+            { "value": 1, "labelKey": "receiverLighting.effect.fixed" },
+            { "value": 2, "labelKey": "receiverLighting.effect.breathing" },
+            { "value": 3, "labelKey": "receiverLighting.effect.neon" },
+            { "value": 4, "labelKey": "receiverLighting.effect.wave" },
+            { "value": 5, "labelKey": "receiverLighting.effect.running" },
+            { "value": 6, "labelKey": "receiverLighting.effect.ring" },
+            { "value": 7, "labelKey": "receiverLighting.effect.buffer" },
+            { "value": 8, "labelKey": "receiverLighting.effect.chase" }
           ],
           "speed": [
-            { "value": 0, "label": "最快" },
-            { "value": 1, "label": "快" },
-            { "value": 2, "label": "中" },
-            { "value": 3, "label": "慢" },
-            { "value": 4, "label": "最慢" }
+            { "value": 0, "labelKey": "receiverLighting.speed.fastest" },
+            { "value": 1, "labelKey": "receiverLighting.speed.fast" },
+            { "value": 2, "labelKey": "receiverLighting.speed.medium" },
+            { "value": 3, "labelKey": "receiverLighting.speed.slow" },
+            { "value": 4, "labelKey": "receiverLighting.speed.slowest" }
           ],
           "brightness": [
-            { "value": 0, "label": "最暗" },
-            { "value": 1, "label": "暗" },
-            { "value": 2, "label": "中" },
-            { "value": 3, "label": "亮" },
-            { "value": 4, "label": "最亮" }
+            { "value": 0, "labelKey": "receiverLighting.brightness.dimmest" },
+            { "value": 1, "labelKey": "receiverLighting.brightness.dark" },
+            { "value": 2, "labelKey": "receiverLighting.brightness.medium" },
+            { "value": 3, "labelKey": "receiverLighting.brightness.bright" },
+            { "value": 4, "labelKey": "receiverLighting.brightness.brightest" }
           ],
           "option": [
-            { "value": 0, "label": "红" },
-            { "value": 1, "label": "橙" },
-            { "value": 2, "label": "黄" },
-            { "value": 3, "label": "绿" },
-            { "value": 4, "label": "青" },
-            { "value": 5, "label": "蓝" },
-            { "value": 6, "label": "紫" },
-            { "value": 7, "label": "自定义" },
-            { "value": 8, "label": "炫彩" }
+            { "value": 0, "labelKey": "receiverLighting.colorMode.red" },
+            { "value": 1, "labelKey": "receiverLighting.colorMode.orange" },
+            { "value": 2, "labelKey": "receiverLighting.colorMode.yellow" },
+            { "value": 3, "labelKey": "receiverLighting.colorMode.green" },
+            { "value": 4, "labelKey": "receiverLighting.colorMode.cyan" },
+            { "value": 5, "labelKey": "receiverLighting.colorMode.blue" },
+            { "value": 6, "labelKey": "receiverLighting.colorMode.purple" },
+            { "value": 7, "labelKey": "receiverLighting.colorMode.custom" },
+            { "value": 8, "labelKey": "receiverLighting.colorMode.colorful" }
           ]
         }
       }
