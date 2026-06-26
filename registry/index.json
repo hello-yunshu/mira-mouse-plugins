@@ -1,8 +1,16 @@
 {
   "schemaVersion": 1,
-  "signed": false,
-  "plugins": [],
-  "status": "blocked",
-  "reason": "No production publisher key or stable release exists."
+  "signed": true,
+  "plugins": [
+    {
+      "pluginId": "mira.logitech-hidpp",
+      "version": "0.6.3",
+      "releaseTag": "plugin/logitech-hidpp/v0.6.3",
+      "url": "https://github.com/hello-yunshu/mira-mouse-plugins/releases/download/plugin/logitech-hidpp/v0.6.3/mira-logitech-hidpp-0.6.3.mira-plugin",
+      "sha256": "d6b0a6572c7ae7f1e275fe20022715cfe92697b304d7c14026398a2358cbfede",
+      "publisherKeyId": "mira-plugins-2026-001",
+      "notes": "Mira plugin mira.logitech-hidpp 0.6.3"
+    }
+  ],
+  "status": "active"
 }
-
