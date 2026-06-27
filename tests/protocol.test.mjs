@@ -156,9 +156,10 @@ test('logitech-hidpp exposes a read workflow per device family and writable muta
   assert.equal(pointerSpeed.metadata.mutation, 'set-pointer-speed');
   assert.equal(profileCurrent.metadata.mutation, 'set-profile-mgmt-current');
   assert.deepEqual(lighting.metadata.lightingRole, {
-    mouse: ['set-mouse-lighting-onboard', 'set-mouse-lighting'],
+    mouse: 'set-mouse-lighting',
     receiver: 'set-receiver-lighting',
   });
+  assert.equal(lighting.metadata.mutations.mouse, 'set-mouse-lighting');
   assert.equal(lighting.metadata.format, 'color');
   assert.equal(lighting.placements.find((placement) => placement.region === 'status').span, 1);
   const families = new Set(devices.devices.map((device) => device.family));
