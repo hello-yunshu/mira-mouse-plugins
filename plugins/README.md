@@ -52,3 +52,26 @@ enabled capability until a workflow or mutation references it. See
 [`../docs/protocol-reserve-inventory.md`](../docs/protocol-reserve-inventory.md)
 and run `npm run inventory:protocol` before promoting reserved protocol
 material.
+
+## UI contract
+
+The host UI renders plugin capabilities from declarative metadata. A plugin
+must declare the semantic contract and keep protocol details in its own
+workflow and mutation files:
+
+- `placements` decides where a capability appears: hero, control, status, or details.
+- `control` decides which host-rendered widget is prepared.
+- `source` points to the runtime value the widget displays.
+- `mutation` or `mutations.default` declares the write path for generic controls.
+- `bindings` declares connection-specific labels, sources, params, and mutations.
+- `options` declares select and segmented choices.
+- `min`, `max`, and `step` declare numeric editor bounds.
+- `unit` and `format` declare value presentation; supported formats are `sleep` and `color`.
+- `summary` declares compact secondary facts below a control.
+- `DpiStages` must declare `metadata.mutations.select` and `metadata.mutations.value`.
+- `LightingZone` must declare `metadata.lightingRole`, and may add `effectOptions`
+  or `receiverLightingOptions` for host-prepared lighting editors.
+
+The host should not infer protocol-specific commands, effect names, color
+semantics, or writable actions from device data alone. Add or update the
+metadata contract first, then let the plugin protocol map it to the device.
