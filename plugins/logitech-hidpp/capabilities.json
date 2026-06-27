@@ -5,5 +5,34 @@
   "disabledWrites": ["onboard-profile-write", "receiver-lighting", "bluetooth-sleep-time", "wireless-sleep-time"],
   "forbidden": ["firmware-update", "bootloader", "dfu", "flash-erase", "receiver-pairing", "macros"],
   "pollingRatesHz": [125, 250, 500, 1000, 2000, 4000, 8000],
+  "normalizers": {
+    "mouseLighting": {
+      "onboardProfile": {
+        "sourceWorkflow": "hidpp2-device-onboard-read",
+        "sectorSize": { "output": "onboardDescription", "field": "sectorSize" },
+        "enabledOverride": { "output": "rgbControl", "field": "enabled" },
+        "chunkPrefix": "onboardProfileChunk",
+        "chunkField": "bytes",
+        "layouts": [
+          {
+            "when": { "field": "profileFormatId", "eq": 5 },
+            "effectOffset": 219,
+            "colorOffset": 220,
+            "speedOffset": 223,
+            "brightnessOffset": 225,
+            "extraColorOffset": 226
+          },
+          {
+            "default": true,
+            "effectOffset": 208,
+            "colorOffset": 209,
+            "speedOffset": 212,
+            "brightnessOffset": 214,
+            "extraColorOffset": 215
+          }
+        ]
+      }
+    }
+  },
   "stage": "hardware-verified"
 }

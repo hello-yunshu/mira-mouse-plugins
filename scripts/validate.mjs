@@ -5,6 +5,7 @@ import { readFile } from 'node:fs/promises';
 const plugins = ['amaster', 'logitech-hidpp'];
 const fail = (message) => { throw new Error(message); };
 const HOST_DEVICE_CONNECTIONS = new Set(['usb', 'wireless', 'bluetooth', 'virtual']);
+const VALUE_FORMATS = new Set(['sleep', 'color']);
 
 const REQUIRED_FILES = [
   'plugin.json',
@@ -88,19 +89,96 @@ for (const name of plugins) {
       }
     }
     const summary = capability.metadata?.summary;
-    if (summary === undefined) continue;
-    if (!Array.isArray(summary) || summary.length > 4) fail(`${name}/${capability.id}: invalid summary count`);
-    for (const item of summary) {
-      if (!item || typeof item !== 'object' || typeof item.label !== 'string' || item.label.length === 0
-        || typeof item.source !== 'string' || item.source.length === 0) {
-        fail(`${name}/${capability.id}: invalid summary item`);
-      }
-      if (item.options !== undefined && (!Array.isArray(item.options) || item.options.length > 32)) {
-        fail(`${name}/${capability.id}: invalid summary options`);
+    if (summary !== undefined) {
+      if (!Array.isArray(summary) || summary.length > 4) fail(`${name}/${capability.id}: invalid summary count`);
+      for (const item of summary) {
+        if (!item || typeof item !== 'object' || typeof item.label !== 'string' || item.label.length === 0
+          || typeof item.source !== 'string' || item.source.length === 0) {
+          fail(`${name}/${capability.id}: invalid summary item`);
+        }
+        if (item.options !== undefined && (!Array.isArray(item.options) || item.options.length > 32)) {
+          fail(`${name}/${capability.id}: invalid summary options`);
+        }
+        if (item.format !== undefined && !VALUE_FORMATS.has(item.format)) {
+          fail(`${name}/${capability.id}: invalid summary format ${JSON.stringify(item.format)}`);
+        }
       }
     }
+    validatePresentationContract(name, capability);
   }
   if (controlGroups.size > 6 || statusItems > 6) fail(`${name}: dashboard layout exceeds host limits`);
+}
+
+function validMutationRef(value) {
+  if (typeof value === 'string') return value.length > 0;
+  return Array.isArray(value) && value.length > 0 && value.every((item) => typeof item === 'string' && item.length > 0);
+}
+
+function validBindingSources(bindings) {
+  return Array.isArray(bindings) && bindings.length > 0
+    && bindings.every((binding) => binding && typeof binding === 'object'
+      && typeof binding.source === 'string' && binding.source.length > 0);
+}
+
+function validBindingMutations(bindings) {
+  return Array.isArray(bindings) && bindings.length > 0
+    && bindings.every((binding) => binding && typeof binding === 'object' && validMutationRef(binding.mutation));
+}
+
+function validMutationContract(metadata) {
+  return validMutationRef(metadata?.mutation)
+    || validMutationRef(metadata?.mutations?.default)
+    || (validBindingSources(metadata?.bindings) && validBindingMutations(metadata?.bindings));
+}
+
+function validateNumberRange(name, capability) {
+  const metadata = capability.metadata ?? {};
+  for (const key of ['min', 'max', 'step']) {
+    if (metadata[key] !== undefined && typeof metadata[key] !== 'number') {
+      fail(`${name}/${capability.id}: ${key} must be numeric`);
+    }
+  }
+  if (typeof metadata.step === 'number' && metadata.step <= 0) {
+    fail(`${name}/${capability.id}: step must be greater than zero`);
+  }
+  if (typeof metadata.min === 'number' && typeof metadata.max === 'number' && metadata.min > metadata.max) {
+    fail(`${name}/${capability.id}: min must be less than or equal to max`);
+  }
+}
+
+function validatePresentationContract(name, capability) {
+  const metadata = capability.metadata ?? {};
+  if (metadata.format !== undefined && !VALUE_FORMATS.has(metadata.format)) {
+    fail(`${name}/${capability.id}: invalid value format ${JSON.stringify(metadata.format)}`);
+  }
+  validateNumberRange(name, capability);
+  if (capability.readOnly) return;
+
+  if (capability.control === 'DpiStages') {
+    if (!validMutationRef(metadata.mutations?.select) || !validMutationRef(metadata.mutations?.value)) {
+      fail(`${name}/${capability.id}: writable DpiStages requires mutations.select and mutations.value`);
+    }
+    return;
+  }
+  if (capability.control === 'LightingZone') {
+    if (!validMutationRef(metadata.lightingRole?.mouse) && !validMutationRef(metadata.lightingRole?.receiver)) {
+      fail(`${name}/${capability.id}: writable LightingZone requires metadata.lightingRole`);
+    }
+    return;
+  }
+  if (capability.control === 'Select' || capability.control === 'Segmented') {
+    if (!Array.isArray(metadata.options) || metadata.options.length === 0) {
+      fail(`${name}/${capability.id}: ${capability.control} requires metadata.options`);
+    }
+    if (!validMutationContract(metadata)) {
+      fail(`${name}/${capability.id}: writable ${capability.control} requires metadata.mutation or binding mutations`);
+    }
+    return;
+  }
+  if (['Toggle', 'Number', 'Slider', 'Color', 'Action'].includes(capability.control)
+    && !validMutationContract(metadata)) {
+    fail(`${name}/${capability.id}: writable ${capability.control} requires metadata.mutation or binding mutations`);
+  }
 }
 
 function expandFeatureRefs(pluginName, features, workflowsFile) {
