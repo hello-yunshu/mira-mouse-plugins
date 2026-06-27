@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "pluginId": "mira.logitech-hidpp",
   "name": "Logitech HID++",
-  "version": "0.6.3",
+  "version": "0.7.0",
   "pluginApi": ">=1.0.0, <2.0.0",
   "publisherKeyId": null,
   "evidence": "hardware-verified",
@@ -109,8 +109,9 @@
       ],
       "metadata": {
         "label": "鼠标灯光", "source": "lighting.mouseLightColor",
+        "format": "color",
         "mutations": { "mouse": ["set-mouse-lighting-onboard", "set-mouse-lighting"], "receiver": "set-receiver-lighting" },
-        "lightingRole": { "mouse": "set-mouse-lighting", "receiver": "set-receiver-lighting" },
+        "lightingRole": { "mouse": ["set-mouse-lighting-onboard", "set-mouse-lighting"], "receiver": "set-receiver-lighting" },
         "effectOptions": {
           "offValue": 0,
           "effect": [

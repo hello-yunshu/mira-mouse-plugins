@@ -2025,6 +2025,54 @@
           }
         }
       },
+      "postWrites": [
+        {
+          "command": "rgb-control-set",
+          "params": {
+            "deviceIndex": {
+              "fromOutput": "device",
+              "field": "deviceIndex"
+            },
+            "featureIndex": {
+              "fromOutput": "featureIndexRgbEffects",
+              "field": "featureIndex"
+            }
+          },
+          "skipIfZero": [
+            {
+              "output": "featureIndexRgbEffects",
+              "field": "featureIndex"
+            }
+          ],
+          "settleMs": 500,
+          "verify": {
+            "command": "rgb-control-get",
+            "parser": "rgb-control-get",
+            "params": {
+              "deviceIndex": {
+                "fromOutput": "device",
+                "field": "deviceIndex"
+              },
+              "featureIndex": {
+                "fromOutput": "featureIndexRgbEffects",
+                "field": "featureIndex"
+              }
+            },
+            "skipIfZero": [
+              {
+                "output": "featureIndexRgbEffects",
+                "field": "featureIndex"
+              }
+            ],
+            "assertions": [
+              {
+                "field": "enabled",
+                "param": "enabled"
+              }
+            ]
+          }
+        }
+      ],
       "preserveUnknown": false,
       "settleMs": 100,
       "verify": {

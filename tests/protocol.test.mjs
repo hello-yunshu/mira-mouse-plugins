@@ -113,6 +113,11 @@ test('AMaster declares complete host-rendered capability metadata', async () => 
     ],
   );
   assert.equal(capabilities.lighting.control, 'LightingZone');
+  assert.equal(capabilities.lighting.metadata.format, 'color');
+  assert.deepEqual(capabilities.lighting.metadata.lightingRole, {
+    mouse: 'set-mouse-lighting',
+    receiver: 'set-receiver-lighting',
+  });
   assert.equal(capabilities.lighting.metadata.mutations.mouse, 'set-mouse-lighting');
   assert.equal(capabilities.profile.metadata.section, 'status');
   assert.equal(capabilities.firmware.metadata.section, 'details');
@@ -151,9 +156,10 @@ test('logitech-hidpp exposes a read workflow per device family and writable muta
   assert.equal(pointerSpeed.metadata.mutation, 'set-pointer-speed');
   assert.equal(profileCurrent.metadata.mutation, 'set-profile-mgmt-current');
   assert.deepEqual(lighting.metadata.lightingRole, {
-    mouse: 'set-mouse-lighting',
+    mouse: ['set-mouse-lighting-onboard', 'set-mouse-lighting'],
     receiver: 'set-receiver-lighting',
   });
+  assert.equal(lighting.metadata.format, 'color');
   assert.equal(lighting.placements.find((placement) => placement.region === 'status').span, 1);
   const families = new Set(devices.devices.map((device) => device.family));
   for (const family of families) {
@@ -307,6 +313,39 @@ test('Logitech writes are protocol-gated without a model whitelist', async () =>
     mutations['hidpp2-device-set-profile-mgmt-current'].writeCommand,
     'profile-mgmt-set-current',
   );
+});
+
+test('logitech-hidpp declares protocol-level onboard lighting normalization', async () => {
+  const capabilities = await read('plugins/logitech-hidpp/capabilities.json');
+  const normalizer = capabilities.normalizers?.mouseLighting?.onboardProfile;
+  assert.equal(normalizer.sourceWorkflow, 'hidpp2-device-onboard-read');
+  assert.deepEqual(normalizer.sectorSize, { output: 'onboardDescription', field: 'sectorSize' });
+  assert.deepEqual(normalizer.enabledOverride, { output: 'rgbControl', field: 'enabled' });
+  assert.equal(normalizer.chunkPrefix, 'onboardProfileChunk');
+  assert.equal(normalizer.chunkField, 'bytes');
+  assert.equal(
+    normalizer.layouts.some((layout) => Object.hasOwn(layout, 'model') || Object.hasOwn(layout, 'productId')),
+    false,
+  );
+  assert.deepEqual(normalizer.layouts.find((layout) => layout.when?.profileFormatId === 5), undefined);
+  const v5 = normalizer.layouts.find((layout) => layout.when?.field === 'profileFormatId' && layout.when?.eq === 5);
+  assert.deepEqual(
+    {
+      effectOffset: v5.effectOffset,
+      colorOffset: v5.colorOffset,
+      speedOffset: v5.speedOffset,
+      brightnessOffset: v5.brightnessOffset,
+      extraColorOffset: v5.extraColorOffset,
+    },
+    {
+      effectOffset: 219,
+      colorOffset: 220,
+      speedOffset: 223,
+      brightnessOffset: 225,
+      extraColorOffset: 226,
+    },
+  );
+  assert.ok(normalizer.layouts.some((layout) => layout.default === true));
 });
 
 test('logitech-hidpp root-get-feature discovers feature indices via be-u16 featureId', async () => {

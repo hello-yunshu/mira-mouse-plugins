@@ -122,6 +122,7 @@ async function main() {
 
   // Build deterministic zip with sorted entries and no extra fields.
   const entries = files.concat(['checksums.json', 'META-INF/signature.ed25519']).sort();
+  await rm(outPath, { force: true });
   execFileSync('zip', ['-X', '-q', outPath, ...entries], { cwd: stage });
 
   const sha256 = await sha256File(outPath);
