@@ -18,6 +18,7 @@ on:
         type: string
 permissions:
   contents: read
+  actions: write
   id-token: write
   attestations: write
 concurrency:
@@ -122,6 +123,7 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write
+      actions: write
       id-token: write
       attestations: write
     steps:
@@ -175,3 +177,13 @@ jobs:
           Each plugin asset is individually signed with the Ed25519 production key.
           SHA-256 checksums and build provenance attestations are attached."
           fi
+      - name: Dispatch downstream metadata sync
+        env:
+          GH_TOKEN: '${{ github.token }}'
+          TAG: '${{ needs.gate.outputs.release_tag }}'
+        run: |
+          set -euo pipefail
+          gh workflow run publish-registry.yml --repo "$GITHUB_REPOSITORY" \
+            -f release_tag="$TAG"
+          gh workflow run sync-mira.yml --repo "$GITHUB_REPOSITORY" \
+            -f release_tag="$TAG"
