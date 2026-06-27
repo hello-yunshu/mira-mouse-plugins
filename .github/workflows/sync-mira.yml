@@ -1,4 +1,4 @@
-name: Propose Mira Lock Update
+name: Sync Mira Lock
 on:
   release:
     types: [published]
@@ -10,7 +10,7 @@ concurrency:
   group: mira-lock-sync-${{ github.event.release.tag_name || inputs.release_tag }}
   cancel-in-progress: false
 jobs:
-  lock-pr:
+  lock-sync:
     if: |
       github.event_name == 'workflow_dispatch' ||
       startsWith(github.event.release.tag_name, 'plugin/') ||
@@ -41,6 +41,7 @@ jobs:
           repository: '${{ env.MIRA_REPOSITORY }}'
           token: '${{ env.MIRA_APP_TOKEN }}'
           path: mira-app
+          ref: main
       - run: rustup toolchain install stable --profile minimal
         if: steps.credentials.outputs.has_token == 'true'
       - name: Update Mira plugin lock for all bundled plugins
@@ -61,33 +62,23 @@ jobs:
           npm run check:structured
           cargo run --package xtask -- plugins check-lock
           cargo run --package xtask -- plugins sync --locked --offline
-      - name: Open Mira update PR
+      - name: Commit Mira lock update
         if: steps.credentials.outputs.has_token == 'true'
         working-directory: mira-app
         env:
-          GH_TOKEN: '${{ env.MIRA_APP_TOKEN }}'
           RELEASE_TAG: '${{ env.RELEASE_TAG }}'
         run: |
           set -euo pipefail
-          branch="plugin-sync/${RELEASE_TAG//\//-}"
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git checkout -B "$branch"
           git add plugins.lock.json src-tauri/tauri.conf.json
           git diff --cached --quiet && {
             echo 'No changes to commit; lock is already up to date.'
             exit 0
           }
           git commit -m "chore(plugins): sync $RELEASE_TAG"
-          git push --force-with-lease origin "$branch"
-          existing="$(gh pr list --repo "$MIRA_REPOSITORY" --head "$branch" --json url --jq '.[0].url')"
-          if test -n "$existing"; then
-            echo "Updated existing PR: $existing"
-          else
-            gh pr create --repo "$MIRA_REPOSITORY" --base main --head "$branch" \
-              --title "Bundle plugins from $RELEASE_TAG" \
-              --body "Updates all locked default plugin assets from release $RELEASE_TAG and verifies SHA-256 checksums before opening this PR."
-          fi
-      - name: Skip Mira PR without token
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Skip Mira sync without token
         if: steps.credentials.outputs.has_token != 'true'
-        run: echo 'MIRA_APP_TOKEN is not configured; plugin release and registry publication remain official, but no app lock PR was opened.' >> "$GITHUB_STEP_SUMMARY"
+        run: echo 'MIRA_APP_TOKEN is not configured; plugin release and registry publication remain official, but the Mira app lock was not updated.' >> "$GITHUB_STEP_SUMMARY"
