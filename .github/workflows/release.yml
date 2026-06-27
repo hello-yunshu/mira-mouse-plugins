@@ -29,6 +29,7 @@ jobs:
     timeout-minutes: 15
     outputs:
       plugins: '${{ steps.list.outputs.plugins }}'
+      plugins_count: '${{ steps.list.outputs.plugins_count }}'
       release_tag: '${{ steps.list.outputs.release_tag }}'
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -62,6 +63,8 @@ jobs:
             console.log(JSON.stringify(result));
           ')"
           echo "plugins=$plugins_json" >> "$GITHUB_OUTPUT"
+          plugins_count=$(printf '%s' "$plugins_json" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).length))')
+          echo "plugins_count=$plugins_count" >> "$GITHUB_OUTPUT"
           if [ "$OVERWRITE" = "true" ]; then
             release_tag=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 1 --json tagName --jq '.[0].tagName' 2>/dev/null || echo "")
             test -n "$release_tag" || { echo "No existing release to overwrite"; exit 1; }
@@ -129,10 +132,18 @@ jobs:
           pattern: plugin-*
           merge-multiple: true
       - name: Verify all expected assets present
+        env:
+          EXPECTED: '${{ needs.gate.outputs.plugins_count }}'
         run: |
           set -euo pipefail
           echo "Downloaded assets:"
           ls -la dist/
+          actual=$(find dist -name '*.mira-plugin' | wc -l | tr -d ' ')
+          if [ "$actual" != "$EXPECTED" ]; then
+            echo "Asset count mismatch: expected $EXPECTED, got $actual. Refusing to touch release." >&2
+            exit 1
+          fi
+          echo "Asset count OK: $actual/$EXPECTED"
       - uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v3 peeled commit
         with:
           subject-path: 'dist/*'
@@ -144,8 +155,17 @@ jobs:
         run: |
           set -euo pipefail
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "Release $TAG already exists; uploading assets."
-            gh release upload "$TAG" dist/* --repo "$GITHUB_REPOSITORY" --clobber
+            echo "Release $TAG already exists; cleaning existing assets before upload."
+            # overwrite 模式下 gh release upload --clobber 只覆盖同名文件，删不掉改了版本的旧产物（如 0.7.0→0.7.2）
+            # 先删掉 release 现有所有资产，再上传本次构建结果，保证 release 永远只反映最新一次构建
+            existing_assets=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name')
+            if [ -n "$existing_assets" ]; then
+              while IFS= read -r asset_name; do
+                [ -n "$asset_name" ] || continue
+                gh release delete-asset "$TAG" "$asset_name" --repo "$GITHUB_REPOSITORY" --yes
+              done <<< "$existing_assets"
+            fi
+            gh release upload "$TAG" dist/* --repo "$GITHUB_REPOSITORY"
           else
             gh release create "$TAG" dist/* --target "$TARGET" \
               --title "Mira Plugins $TAG" \

@@ -1,6 +1,19 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Changelog
 
+## [1.0.1] - 2026-06-28
+
+- Hardened the plugin release workflow: gate now exports `plugins_count` and
+  the publish job verifies the downloaded `.mira-plugin` asset count matches
+  before touching the GitHub release, refusing to upload on mismatch.
+- In overwrite mode, the publish job now deletes every existing release asset
+  before uploading the new build, so renamed-version artifacts (e.g.
+  `0.7.0 → 0.7.2`) no longer leave stale files behind `--clobber`.
+- Added defensive `min`/`max`/`step` metadata to the AMaster and Logitech
+  HID++ DPI capabilities. The Mira host already enriches these from
+  `protocol/workflows.json` mutation inputs, so this is a static fallback for
+  hosts that do not perform workflow-based enrichment.
+
 ## [Unreleased]
 
 - Added complete declarative UI metadata for AMaster performance, sleep,
