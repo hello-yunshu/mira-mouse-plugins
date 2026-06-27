@@ -33,6 +33,9 @@
         "label": "DPI",
         "section": "control",
         "source": "dpiStages",
+        "min": 50,
+        "max": 30000,
+        "step": 50,
         "mutations": { "select": "set-dpi-stage", "value": "set-dpi-value" }
       }
     },
