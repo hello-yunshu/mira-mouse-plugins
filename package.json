@@ -1,10 +1,9 @@
 {
   "name": "mira-mouse-plugins",
-  "version": "1.0.1",
   "private": true,
   "description": "Declarative device plugins for Mira",
   "scripts": {
-    "validate": "node scripts/validate.mjs && node scripts/protocol-inventory.mjs --check-docs",
+    "validate": "node scripts/check-version-sources.mjs && node scripts/validate.mjs && node scripts/protocol-inventory.mjs --check-docs",
     "test": "node --test tests/*.test.mjs",
     "pack": "node scripts/pack-sign.mjs",
     "inventory:protocol": "node scripts/protocol-inventory.mjs",
