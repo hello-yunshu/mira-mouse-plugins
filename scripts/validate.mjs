@@ -230,7 +230,7 @@ for (const [name, data] of Object.entries(pluginData)) {
     for (const byte of bytes) {
       if (byte.offset < 0 || byte.offset >= length) fail(`${name}/${id}: byte offset out of range`);
       if ((byte.value === undefined) === (byte.param === undefined)) fail(`${name}/${id}: byte must have exactly one source`);
-      if (byte.encoding && !['u8', 'bool', 'le-u16', 'be-u16', 'rgb', 'bytes', 'lookup-u8', 'bool-lookup-u8'].includes(byte.encoding)) fail(`${name}/${id}: unsupported encoding`);
+      if (byte.encoding && !['u8', 'bool', 'le-u16', 'be-u16', 'rgb', 'bytes', 'lookup-u8', 'bool-lookup-u8', 'hue-index-be-u16'].includes(byte.encoding)) fail(`${name}/${id}: unsupported encoding`);
       if (byte.indexedBy && (!Number.isInteger(byte.stride) || byte.stride < 1)) fail(`${name}/${id}: invalid indexed stride`);
     }
     if (command.request.base && command.request.base !== 'read-response') fail(`${name}/${id}: invalid request base`);
