@@ -1,7 +1,9 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Plugin Versioning
 
-Use SemVer and keep manifest version, filename, and release metadata aligned.
+Use SemVer and change only the plugin manifest version line:
+`plugins/<plugin>/plugin.json` -> `version`. Filenames, registry metadata, and
+Mira's `plugins.lock.json` are derived from the signed release workflow.
 Breaking API or DSL changes require a new Plugin API major version.
 
 Per-plugin tags such as `plugin/<plugin-id>/v<semver>` are immutable and must
