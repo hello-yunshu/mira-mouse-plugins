@@ -161,6 +161,26 @@
       { "offset": 4, "value": "0x0E" },
       { "offset": 5, "value": "0x30" }
     ], "checksum": null } }
+    ,"am35-receiver-light-write": { "request": { "length": 19, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x0F" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0x0D" },
+      { "offset": 5, "value": "0x30" },
+      { "offset": 6, "value": "0x01" },
+      { "offset": 7, "param": "effect" },
+      { "offset": 8, "param": "color", "encoding": "hue-index-be-u16" },
+      { "offset": 10, "value": "0x00" },
+      { "offset": 11, "value": "0x00" },
+      { "offset": 12, "value": "0x00" },
+      { "offset": 13, "value": "0x00" },
+      { "offset": 14, "value": "0x00" },
+      { "offset": 15, "value": "0x00" },
+      { "offset": 16, "value": "0x00" },
+      { "offset": 17, "param": "speed" },
+      { "offset": 18, "param": "brightness" }
+    ], "checksum": null } }
     ,"am35-debounce": { "request": { "length": 6, "bytes": [
       { "offset": 0, "value": "0x05" },
       { "offset": 1, "value": "0x5A" },
