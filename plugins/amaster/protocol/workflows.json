@@ -201,6 +201,21 @@
       "settleMs": 30,
       "verify": { "command": "lighting", "parser": "lighting", "assertions": [{ "field": "effect", "param": "effect" }, { "field": "speed", "param": "speed" }, { "field": "brightness", "param": "brightness" }, { "field": "option", "param": "option" }, { "field": "color", "param": "color" }] }
     },
+    "am35-receiver-set-receiver-lighting": {
+      "transport": "am35-receiver",
+      "inputs": {
+        "effect": { "kind": "integer", "min": 0, "max": 8 },
+        "speed": { "kind": "integer", "min": 0, "max": 4 },
+        "brightness": { "kind": "integer", "min": 0, "max": 4 },
+        "option": { "kind": "integer", "min": 0, "max": 8 },
+        "color": { "kind": "color" }
+      },
+      "read": { "command": "am35-receiver-light", "parser": "am35-receiver-light" },
+      "writeCommand": "am35-receiver-light-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-receiver-light", "parser": "am35-receiver-light", "assertions": [{ "field": "type", "param": "effect" }, { "field": "speed", "param": "speed" }, { "field": "brightness", "param": "brightness" }] }
+    },
     "am35-direct-set-profile": {
       "transport": "am35-direct",
       "inputs": { "profile": { "kind": "integer", "min": 1, "max": 8 } },
