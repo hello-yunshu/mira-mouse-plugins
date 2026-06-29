@@ -20,6 +20,15 @@ if (/^version:/m.test(citation) || /^date-released:/m.test(citation)) {
   throw new Error('CITATION.cff must not define a repository-wide release version; cite plugin release tags instead');
 }
 
+const workflow = await readFile('.github/workflows/release.yml', 'utf8');
+if (!workflow.includes('version: manifest.version')) {
+  throw new Error('.github/workflows/release.yml must enumerate release versions from plugin manifests');
+}
+if (!workflow.includes('version="${{ matrix.plugin.version }}"')) {
+  throw new Error('.github/workflows/release.yml must package each plugin using matrix.plugin.version');
+}
+
+let manifestCount = 0;
 for (const name of await readdir('plugins')) {
   const manifestPath = join('plugins', name, 'plugin.json');
   let manifest;
@@ -31,6 +40,7 @@ for (const name of await readdir('plugins')) {
   if (typeof manifest.version !== 'string' || !/^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/.test(manifest.version)) {
     throw new Error(`${manifestPath} has invalid SemVer version`);
   }
+  manifestCount += 1;
 }
 
-console.log('version sources: plugin manifests only');
+console.log(`version sources: ${manifestCount} plugin manifests only`);
