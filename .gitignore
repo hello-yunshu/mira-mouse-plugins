@@ -8,4 +8,8 @@
 *.mira-plugin
 TEST-ONLY-*.pub
 .DS_Store
+node_modules/
+.env
+.env.*
+*.log
 
