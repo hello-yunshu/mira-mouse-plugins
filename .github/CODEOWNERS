@@ -1,3 +1,8 @@
-# Maintainer identity is blocked until verified project metadata is supplied.
-# Protect workflows, registry, SDK version, manifests, protocol files, and release configuration before publication.
+# SPDX-License-Identifier: CC0-1.0
+# Default owner for all paths
+* @hello-yunshu
 
+# Sensitive paths require explicit review
+/.github/workflows/ @hello-yunshu
+/registry/ @hello-yunshu
+/mira-plugins.pub @hello-yunshu

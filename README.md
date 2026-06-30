@@ -39,7 +39,7 @@
 | [`mira.example-mock`](plugins/example-mock/) | 运行时示例 | fixture-verified | disabled | 用于测试主应用和插件运行时。 |
 | [`mira.razer-viper`](plugins/razer-viper/) | Razer Viper 研究草案 | inferred | disabled | 研究笔记和窄范围 bring-up 占位。 |
 
-当前 `registry/index.json` 仍处于 blocked 状态，生产发布 key 和稳定发布流程就绪前不会声明正式插件市场。
+当前 `registry/index.json` 已处于 active 状态，正式插件已通过签名发布。
 
 ## 插件包结构
 
