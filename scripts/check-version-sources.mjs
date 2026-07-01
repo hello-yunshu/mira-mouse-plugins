@@ -9,22 +9,27 @@ function assertNoRootVersion(name, json) {
   }
 }
 
-assertNoRootVersion('package.json', JSON.parse(await readFile('package.json', 'utf8')));
+const [packageJsonRaw, packageLockJsonRaw, citationRaw, releaseYmlRaw] = await Promise.all([
+  readFile('package.json', 'utf8'),
+  readFile('package-lock.json', 'utf8'),
+  readFile('CITATION.cff', 'utf8'),
+  readFile('.github/workflows/release.yml', 'utf8'),
+]);
 
-const lock = JSON.parse(await readFile('package-lock.json', 'utf8'));
+assertNoRootVersion('package.json', JSON.parse(packageJsonRaw));
+
+const lock = JSON.parse(packageLockJsonRaw);
 assertNoRootVersion('package-lock.json', lock);
 if (lock.packages?.['']) assertNoRootVersion('package-lock.json packages[""]', lock.packages['']);
 
-const citation = await readFile('CITATION.cff', 'utf8');
-if (/^version:/m.test(citation) || /^date-released:/m.test(citation)) {
+if (/^version:/m.test(citationRaw) || /^date-released:/m.test(citationRaw)) {
   throw new Error('CITATION.cff must not define a repository-wide release version; cite plugin release tags instead');
 }
 
-const workflow = await readFile('.github/workflows/release.yml', 'utf8');
-if (!workflow.includes('version: manifest.version')) {
+if (!releaseYmlRaw.includes('version: manifest.version')) {
   throw new Error('.github/workflows/release.yml must enumerate release versions from plugin manifests');
 }
-if (!workflow.includes('version="${{ matrix.plugin.version }}"')) {
+if (!releaseYmlRaw.includes('version="${{ matrix.plugin.version }}"')) {
   throw new Error('.github/workflows/release.yml must package each plugin using matrix.plugin.version');
 }
 

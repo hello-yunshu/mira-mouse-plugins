@@ -7,22 +7,11 @@ import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
+import { sortJson, canonicalJson } from './lib/canonical.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const zipPath = process.argv[2] || join(root, 'dist', 'mira-example-mock-1.0.0.mira-plugin');
 const pubPath = process.argv[3] || join(root, 'TEST-ONLY-mira-plugins.pub');
-
-function sortJson(value) {
-  if (value && typeof value === 'object' && !Array.isArray(value)) {
-    return Object.fromEntries(
-      Object.keys(value)
-        .sort()
-        .map((k) => [k, sortJson(value[k])])
-    );
-  }
-  if (Array.isArray(value)) return value.map(sortJson);
-  return value;
-}
 
 async function sha256File(path) {
   const hash = createHash('sha256');
@@ -79,9 +68,9 @@ async function main() {
   }
 
   const message = Buffer.concat([
-    Buffer.from(JSON.stringify(sortJson(manifest))),
+    Buffer.from(canonicalJson(manifest)),
     Buffer.from('\n'),
-    Buffer.from(JSON.stringify(sortJson(checksums))),
+    Buffer.from(canonicalJson(checksums)),
   ]);
   const ok = verify(null, message, publicKey, signature);
   if (!ok) throw new Error('signature verification failed');

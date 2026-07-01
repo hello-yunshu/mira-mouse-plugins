@@ -44,6 +44,11 @@ jobs:
           ref: main
       - run: rustup toolchain install stable --profile minimal
         if: steps.credentials.outputs.has_token == 'true'
+      - name: Cache Rust dependencies
+        if: steps.credentials.outputs.has_token == 'true'
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ${{ github.workspace }}/mira-app
       - name: Update Mira plugin lock for all bundled plugins
         if: steps.credentials.outputs.has_token == 'true'
         id: update
