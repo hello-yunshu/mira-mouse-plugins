@@ -162,10 +162,7 @@ jobs:
             # 先删掉 release 现有所有资产，再上传本次构建结果，保证 release 永远只反映最新一次构建
             existing_assets=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name')
             if [ -n "$existing_assets" ]; then
-              while IFS= read -r asset_name; do
-                [ -n "$asset_name" ] || continue
-                gh release delete-asset "$TAG" "$asset_name" --repo "$GITHUB_REPOSITORY" --yes
-              done <<< "$existing_assets"
+              printf '%s\n' "$existing_assets" | xargs -P 4 -I {} gh release delete-asset "$TAG" {} --repo "$GITHUB_REPOSITORY" --yes
             fi
             gh release upload "$TAG" dist/* --repo "$GITHUB_REPOSITORY"
           else
