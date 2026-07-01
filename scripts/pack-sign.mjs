@@ -9,28 +9,12 @@ import { tmpdir } from 'node:os';
 import { join, relative, dirname, basename, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
+import { sortJson, canonicalJson } from './lib/canonical.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const keyId = process.env.PLUGIN_KEY_ID || 'TEST-ONLY-mira-plugins';
 const testPrivPath = join(root, 'TEST-ONLY-mira-plugins.key.pem');
 const testPubPath = join(root, 'TEST-ONLY-mira-plugins.pub');
-
-function sortJson(value) {
-  if (value && typeof value === 'object' && !Array.isArray(value)) {
-    return Object.fromEntries(
-      Object.keys(value)
-        .sort()
-        .map((k) => [k, sortJson(value[k])])
-    );
-  }
-  if (Array.isArray(value)) return value.map(sortJson);
-  return value;
-}
-
-async function canonicalJson(path) {
-  const raw = await readFile(path, 'utf8');
-  return Buffer.from(JSON.stringify(sortJson(JSON.parse(raw))));
-}
 
 async function sha256File(path) {
   const hash = createHash('sha256');
@@ -39,11 +23,16 @@ async function sha256File(path) {
 }
 
 async function walkFiles(dir, callback) {
-  for (const entry of await readdir(dir, { withFileTypes: true })) {
-    const p = join(dir, entry.name);
-    if (entry.isDirectory()) await walkFiles(p, callback);
-    else await callback(p);
+  const paths = [];
+  async function collect(d) {
+    for (const entry of await readdir(d, { withFileTypes: true })) {
+      const p = join(d, entry.name);
+      if (entry.isDirectory()) await collect(p);
+      else paths.push(p);
+    }
   }
+  await collect(dir);
+  await Promise.all(paths.map((p) => callback(p)));
 }
 
 async function loadOrCreateKeys() {
@@ -100,16 +89,19 @@ async function main() {
 
   // Compute checksums for all payload files (excluding checksums.json and signature).
   const checksums = { schemaVersion: 1, files: {} };
-  for (const rel of files.sort()) {
-    checksums.files[rel] = await sha256File(join(stage, rel));
-  }
+  const checksumEntries = await Promise.all(files.sort().map(async (rel) => [rel, await sha256File(join(stage, rel))]));
+  for (const [rel, hash] of checksumEntries) checksums.files[rel] = hash;
   await writeFile(join(stage, 'checksums.json'), JSON.stringify(checksums, null, 2) + '\n');
 
   // Sign canonical manifest + checksums.
+  const [manifestCanonical, checksumsCanonical] = await Promise.all([
+    readFile(join(stage, 'plugin.json'), 'utf8').then((raw) => canonicalJson(JSON.parse(raw))),
+    readFile(join(stage, 'checksums.json'), 'utf8').then((raw) => canonicalJson(JSON.parse(raw))),
+  ]);
   const message = Buffer.concat([
-    await canonicalJson(join(stage, 'plugin.json')),
+    Buffer.from(manifestCanonical),
     Buffer.from('\n'),
-    await canonicalJson(join(stage, 'checksums.json')),
+    Buffer.from(checksumsCanonical),
   ]);
   const signature = sign(null, message, privatePem);
   const sigPath = join(stage, 'META-INF', 'signature.ed25519');

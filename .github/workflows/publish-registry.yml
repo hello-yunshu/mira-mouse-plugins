@@ -58,13 +58,19 @@ jobs:
           RELEASE_TAG: '${{ github.event.release.tag_name || inputs.release_tag }}'
         run: |
           set -euo pipefail
-          while IFS=' ' read -r url name; do
-            asset="release-asset/$name"
-            manifest="$asset.plugin.json"
-            echo "Updating registry for $name ..."
-            ASSET_URL="$url" SHA256="$(cat "$asset.sha256" | tr -d '[:space:]')" \
-              node scripts/update-registry.mjs registry/index.json "$manifest"
-          done < release-asset/asset-urls.txt
+          batch=$(node -e '
+            const fs = require("fs");
+            const lines = fs.readFileSync("release-asset/asset-urls.txt", "utf8").trim().split("\n").filter(Boolean);
+            const items = lines.map(line => {
+              const [url, name] = line.split(" ");
+              const asset = "release-asset/" + name;
+              const sha256 = fs.readFileSync(asset + ".sha256", "utf8").replace(/\s/g, "");
+              console.error("Collecting " + name + " ...");
+              return { url, manifest: asset + ".plugin.json", sha256 };
+            });
+            process.stdout.write(JSON.stringify(items));
+          ')
+          node scripts/update-registry.mjs registry/index.json --batch "$batch"
       - run: npm run validate && npm test
       - name: Commit immutable registry metadata
         env:

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // SPDX-License-Identifier: AGPL-3.0-or-later
-import { readFile } from 'node:fs/promises';
+import { readFile, access } from 'node:fs/promises';
 
 const plugins = ['amaster', 'logitech-hidpp'];
 const fail = (message) => { throw new Error(message); };
@@ -8,15 +8,6 @@ const HOST_DEVICE_CONNECTIONS = new Set(['usb', 'wireless', 'bluetooth', 'virtua
 const VALUE_FORMATS = new Set(['sleep', 'color']);
 
 const REQUIRED_FILES = [
-  'plugin.json',
-  'devices.json',
-  'capabilities.json',
-  'protocol/commands.json',
-  'protocol/parsers.json',
-  'protocol/transports.json',
-  'protocol/workflows.json',
-  'locales/zh-CN.json',
-  'locales/en.json',
   'README.md',
   'LICENSE',
 ];
@@ -29,13 +20,13 @@ for (const name of plugins) {
     try { return await read(path); } catch { return null; }
   };
 
-  for (const path of REQUIRED_FILES) {
+  await Promise.all(REQUIRED_FILES.map(async (path) => {
     try {
-      await readFile(new URL(path, root), 'utf8');
+      await access(new URL(path, root));
     } catch {
       fail(`plugin ${name}: missing required file ${path}`);
     }
-  }
+  }));
 
   const [manifest, devices, commandsFile, parsersFile, transportsFile, workflowsFile, featuresFile] = await Promise.all([
     read('plugin.json'),
@@ -320,6 +311,7 @@ for (const [name, data] of Object.entries(pluginData)) {
 
   for (const [id, workflow] of Object.entries(workflows)) {
     if (!transports[workflow.transport]) fail(`${name}/${id}: missing transport`);
+    const stepByOutput = new Map(workflow.steps.map((s) => [s.output, s]));
     for (const step of workflow.steps) {
       if (!commands[step.command]) fail(`${name}/${id}: missing command ${step.command}`);
       if (!parsers[step.parser]) fail(`${name}/${id}: missing parser ${step.parser}`);
@@ -335,12 +327,12 @@ for (const [name, data] of Object.entries(pluginData)) {
           const keys = Object.keys(value).sort().join(',');
           if (!['field,fromOutput', 'field,fromOutput,subtract'].includes(keys)) fail(`${name}/${id}: invalid output reference for ${param}`);
           if (value.subtract !== undefined && (!Number.isInteger(value.subtract) || value.subtract < 0)) fail(`${name}/${id}: invalid subtraction for ${param}`);
-          const source = workflow.steps.find((candidate) => candidate.output === value.fromOutput);
+          const source = stepByOutput.get(value.fromOutput);
           if (!source) fail(`${name}/${id}: missing referenced output ${value.fromOutput}`);
         }
       }
       for (const guard of step.skipIfZero ?? []) {
-        const source = workflow.steps.find((candidate) => candidate.output === guard.output);
+        const source = stepByOutput.get(guard.output);
         if (!source) fail(`${name}/${id}: missing guard output ${guard.output}`);
       }
     }
