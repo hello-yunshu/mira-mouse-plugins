@@ -12,9 +12,9 @@
 <p align="center">
   <a href="README.md">中文</a> ·
   <a href="#plugin-matrix">Plugin Matrix</a> ·
+  <a href="#adding-a-new-device">Adding a Device</a> ·
   <a href="#package-layout">Package Layout</a> ·
-  <a href="#development">Development</a> ·
-  <a href="#protocol-reserves">Protocol Reserves</a>
+  <a href="#development">Development</a>
 </p>
 
 <p align="center">
@@ -26,11 +26,9 @@
 
 ## Overview
 
-This repository contains declarative device plugins for [Mira](https://github.com/hello-yunshu/mira-mouse).
+This repository contains declarative device plugins for [Mira](https://github.com/hello-yunshu/mira-mouse). Each plugin is a signed `.mira-plugin` package made only of declarative files: device matching, capability metadata, protocol commands, parsers, transports, workflows, and tests.
 
-Each plugin is a signed `.mira-plugin` ZIP container made only of declarative files: device matching, capability metadata, protocol commands, parsers, transports, workflows, tests, and documentation.
-
-Plugins do not contain native code, scripts, web pages, or WASM. The Mira host app owns HID handles, permissions, runtime validation, the UI shell, theming, diagnostics, and updates. Plugins declare what a device supports; the host decides how to present it safely and consistently.
+Plugins never contain native code, scripts, web pages, or WASM. Plugins declare what a device supports; the Mira host decides how to present it safely and consistently.
 
 ## Plugin Matrix
 
@@ -41,7 +39,14 @@ Plugins do not contain native code, scripts, web pages, or WASM. The Mira host a
 | [`mira.example-mock`](plugins/example-mock/) | Runtime sample | fixture-verified | disabled | Test plugin for the host app and runtime. |
 | [`mira.razer-viper`](plugins/razer-viper/) | Razer Viper research draft | inferred | disabled | Research notes and narrow bring-up placeholder. |
 
-`registry/index.json` is still blocked until a production publisher key and stable release process exist.
+## Adding a New Device
+
+Want your mouse supported by Mira? Two paths:
+
+1. **Open a device-support request**: file an issue on [Mira Issues](https://github.com/hello-yunshu/mira-mouse/issues) with the device info (VID/PID, connection, testable features). Maintainers will evaluate adaptation.
+2. **Write a plugin yourself**: read the [Plugin SDK](docs/plugin-sdk.md) for the contract, then start from the `example-mock` plugin.
+
+Plugins match by **protocol family** first, not per-model whitelists. For example, the Logitech HID++ plugin uses `0x046D` + HID++ collection + runtime feature discovery to decide capabilities; the G705 is just one validation sample. Use a single-model plugin only when the protocol is not ready for family-wide support — start read-only, then promote writes one by one.
 
 ## Package Layout
 
@@ -63,29 +68,12 @@ plugins/<plugin-id>/
 └── LICENSE
 ```
 
-Rules of the road:
+Key rules:
 
-- `commands`, `parsers`, and feature registries may contain future reserves.
-- Only entries referenced by `workflows.steps` or `mutations` are enabled today.
+- Only entries referenced by `workflows.steps` or `mutations` are enabled today; unreferenced primitives are reserves.
 - Only capabilities declared in `plugin.json` may surface in the host UI.
-- Plugin-specific capability labels, effect names, and option copy belong in
-  `locales/*.json`; common host labels may use the host fallback, while
-  `plugin.json` keeps `labelKey` plus only necessary fallback labels.
+- Plugin-specific copy belongs in `locales/*.json`; `plugin.json` keeps `labelKey` plus only necessary fallback labels.
 - Writes must have bounded inputs, pre-read state, unknown-field preservation where needed, and readback assertions.
-
-## Models And Protocol Families
-
-Mira plugins should describe protocol families before they describe individual
-models. For example, the Logitech HID++ plugin uses `0x046D`, the HID++
-collection, and runtime feature discovery to decide what the device supports;
-the G705 is a hardware validation sample, not a runtime whitelist.
-
-Use a single-model plugin only when one exact model has enough evidence to be
-useful but the protocol is not ready for family-wide support. Start read-only,
-match the tested VID/PID, usage page, usage, connection type, and evidence
-scope exactly, then promote writes one by one after bounded inputs,
-unknown-field preservation, and readback verification. See the
-[Plugin SDK](docs/plugin-sdk.md#single-model-plugins) for the full checklist.
 
 ## Development
 
@@ -95,47 +83,30 @@ npm run validate
 npm test
 ```
 
-Protocol inventory:
+Common commands:
 
 ```bash
-npm run inventory:protocol
-```
-
-Sync Logitech HID++ public feature IDs:
-
-```bash
-npm run sync:hidpp
-npm run sync:hidpp:check
-```
-
-Package a plugin:
-
-```bash
-npm run pack -- plugins/amaster dist/mira-amaster.mira-plugin
+npm run inventory:protocol     # protocol inventory
+npm run sync:hidpp             # sync Logitech HID++ feature registry
+npm run pack -- plugins/amaster dist/mira-amaster.mira-plugin  # package a plugin
 ```
 
 ## Protocol Reserves
 
-Plugins may keep source-confirmed or public-reference protocol primitives for future work, but reserves must be documented before they can remain in-tree:
+Plugins may keep source-confirmed or public-reference protocol primitives for future work, but reserves must be documented. `npm run validate` checks the reserve inventory so reserved material does not silently become current capability.
 
 - [Protocol reserve inventory](docs/protocol-reserve-inventory.md)
 - [AMaster protocol evidence](docs/amaster-protocol-evidence.md)
 - [Hardware evidence matrix](docs/hardware-evidence-matrix.md)
 - [Plugin review checklist](docs/plugin-review-checklist.md)
 
-`npm run validate` checks the reserve inventory so reserved protocol material does not silently become current capability.
-
 ## Working With The Host App
 
 Mira keeps a stable host-rendered UI framework. Plugins provide labels, data sources, mutation IDs, options, summaries, and placement hints. Placement is a constrained declaration, not arbitrary HTML, CSS, or scripts.
 
-Related docs:
+Host app: [Mira Mouse](https://github.com/hello-yunshu/mira-mouse)
 
-- [Mira Mouse](https://github.com/hello-yunshu/mira-mouse)
-- [Plugin SDK](docs/plugin-sdk.md)
-- [Plugin testing](docs/plugin-testing.md)
-- [Plugin signing and release](docs/plugin-signing-and-release.md)
-- [Plugin versioning](docs/plugin-versioning.md)
+Further docs: [Plugin SDK](docs/plugin-sdk.md) · [Plugin testing](docs/plugin-testing.md)
 
 ## License
 

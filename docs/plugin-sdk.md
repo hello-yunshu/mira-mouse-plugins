@@ -1,67 +1,38 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Plugin SDK
 
-Use the version in `plugin-sdk-version.toml`. A plugin owns matching, topology,
-protocol, parsing, capabilities, ranges, label keys, localized copy, narrow
-permission declarations, and fixtures. Mira owns HID handles, timing,
-cancellation, rollback, standard controls, themes, settings, diagnostics, and
-updates. Plugins contain no executable or presentation code.
+使用 `plugin-sdk-version.toml` 中的版本。插件拥有 matching、topology、protocol、parsing、capabilities、ranges、label keys、localized copy、narrow permission declarations 和 fixtures。Mira 主应用拥有 HID handles、timing、cancellation、rollback、standard controls、themes、settings、diagnostics 和 updates。插件不包含可执行代码或展示层代码。
 
-## Family, model, and evidence boundaries
+## 协议族、型号与证据边界
 
-Prefer a protocol-family plugin when the match and workflow can be expressed by
-stable interface properties and runtime discovery. A validation model is
-evidence, not a compatibility gate. For example, a HID++ device that exposes the
-same feature indices should be governed by workflow output, not by a G705-only
-branch in `plugin.json`.
+当匹配和工作流可以用稳定的接口属性和运行时发现来表达时，优先使用协议族插件。验证模型是一种证据，而不是兼容性门禁。例如，暴露相同 feature index 的 HID++ 设备应由工作流输出来治理，而不是由 `plugin.json` 中仅针对 G705 的分支来治理。
 
-Use these files for different jobs:
+不同文件承担不同职责：
 
-- `devices.json` describes HID/interface matching and evidence scope. Use
-  precise VID/PID, usage page, usage, connection, and family names. Keep
-  `hardwareVerifiedModels` as evidence notes only.
-- `protocol/workflows.json` proves which outputs exist and which mutations are
-  allowed. Optional features should be skipped by guards instead of becoming
-  model-specific UI branches.
-- `plugin.json` declares host-rendered capabilities, placement hints,
-  data-source paths, mutation ids, bounded options, lighting roles, and
-  capability metadata.
-- `locales/*.json` owns plugin-specific labels, effect names, and option text.
-  Common controls such as DPI or battery may use host translation fallback.
-  `metadata.label` is only a fallback for older hosts.
-- `tests/fixtures` records the exact reports that justify a parser, workflow,
-  or promoted write.
+- `devices.json` 描述 HID/接口匹配和证据范围。使用精确的 VID/PID、usage page、usage、connection 和 family name。`hardwareVerifiedModels` 仅作为证据说明保留。
+- `protocol/workflows.json` 证明存在哪些输出、允许哪些 mutation。可选 feature 应由 guard 跳过，而不是变成型号特定的 UI 分支。
+- `plugin.json` 声明 host 渲染的能力、placement hint、data-source 路径、mutation id、有界选项、lighting role 和能力元数据。
+- `locales/*.json` 拥有插件特有的标签、灯效名和选项文案。DPI、电量等通用控件可使用 host 翻译 fallback。`metadata.label` 仅作为旧 host 的 fallback。
+- `tests/fixtures` 记录证明某个 parser、workflow 或 promoted write 合理性的精确 report。
 
-Add a new model-specific file or plugin only when the physical model changes the
-protocol layout in a way that cannot be represented by workflow guards,
-feature discovery, or declarative capability metadata.
+只有当物理型号以无法通过 workflow guard、feature discovery 或声明式能力元数据表达的方式改变了协议布局时，才新增型号特定的文件或插件。
 
-## Single-model plugins
+## 单型号插件
 
-Use a single-model plugin when one exact mouse model has enough evidence to be
-useful, but the protocol is not ready for broad brand or family support. Start
-read-only, match only the tested VID/PID, usage page, usage, connection type,
-and model/evidence string, and keep `writesEnabled: false` until each write has
-bounded inputs, preserves unrelated bytes, verifies readback, and can restore
-the original value during smoke testing.
+当某个具体鼠标型号有足够证据可用，但协议尚未准备好支持广泛品牌或协议族时，使用单型号插件。从只读开始，仅匹配已测试的 VID/PID、usage page、usage、connection type 和 model/evidence string，保持 `writesEnabled: false`，直到每个写入都具备有界输入、保留无关字节、验证回读，并能在冒烟测试中恢复原始值。
 
-Minimal bring-up order:
+最小化 bring-up 顺序：
 
-1. Capture device identity and one report fixture per visible field.
-2. Add exact `devices.json` matching before any broad vendor match.
-3. Add parser fields and read workflows before UI metadata.
-4. Add localized labels in `locales/zh-CN.json` and `locales/en.json` before
-   exposing plugin-specific capability labels, effect names, or option labels.
-5. Declare capabilities only when workflow output proves support.
-6. Promote one write at a time, only with input limits and verification
-   assertions.
+1. 捕获设备标识和每个可见字段的一份 report fixture。
+2. 在任何广泛厂商匹配之前，先添加精确的 `devices.json` 匹配。
+3. 在 UI 元数据之前，先添加 parser 字段和读取 workflow。
+4. 在暴露插件特有的能力标签、灯效名或选项标签之前，先在 `locales/zh-CN.json` 和 `locales/en.json` 中添加本地化标签。
+5. 仅当 workflow 输出证明支持时，才声明能力。
+6. 每次只提升一个写入，且必须带有输入限制和验证断言。
 
-Before generalizing a single-model plugin into a family plugin, prove at least
-one other model or interface path, remove model assumptions from
-`protocol/*.json`, and update the README so the verified model is described as a
-sample rather than a whitelist.
+在将单型号插件推广为协议族插件之前，至少证明另一个型号或接口路径，从 `protocol/*.json` 中移除型号假设，并更新 README，使已验证型号被描述为样本而非白名单。
 
-For AI IDE work, keep prompts scoped to one contract layer:
+对于 AI IDE 协作，请将 prompt 限定在单个契约层：
 
 ```text
 Build a narrow Mira single-model mouse plugin from local files only.

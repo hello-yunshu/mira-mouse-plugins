@@ -1,13 +1,13 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
-# Plugin Review Checklist
+# 插件审查清单
 
-- [ ] Exact interface-qualified matches and conflict scan pass.
-- [ ] Validation samples are documented as evidence, not hard runtime model whitelists.
-- [ ] Capabilities, localization, permissions, risk, and evidence agree.
-- [ ] `locales/zh-CN.json` and `locales/en.json` cover plugin-specific capability labels, effect names, and option labels exposed by `plugin.json`.
-- [ ] Capability metadata uses host-rendered controls, bounded placement hints, data-source paths, and mutation ids instead of brand-specific UI assumptions.
-- [ ] Writes preserve unknown fields, read back, compare, and fail visibly.
-- [ ] Stable writes link exact hardware records.
-- [ ] Adversarial and fault Fixtures pass.
-- [ ] Two clean packages have the same SHA-256.
-- [ ] No code, remote content, secret, research material, or manufacturer asset exists.
+- [ ] 接口限定符精确匹配与冲突扫描通过。
+- [ ] 验证样本作为证据记录在案，而非硬编码的运行时型号白名单。
+- [ ] 能力、本地化、权限、风险与证据保持一致。
+- [ ] `locales/zh-CN.json` 与 `locales/en.json` 已覆盖 `plugin.json` 暴露的插件专属能力标签、效果名称与选项标签。
+- [ ] 能力元数据使用宿主渲染控件、有界布局提示、数据源路径与 mutation id，而非品牌特定的 UI 假设。
+- [ ] 写入保留未知字段、回读、比较，并在失败时显式报错。
+- [ ] 稳定写入关联精确的硬件记录。
+- [ ] 对抗性与故障 Fixtures 通过。
+- [ ] 两次干净打包的 SHA-256 一致。
+- [ ] 不存在任何代码、远程内容、密钥、研究资料或厂商资产。
