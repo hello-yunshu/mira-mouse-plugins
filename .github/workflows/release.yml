@@ -146,7 +146,7 @@ jobs:
             exit 1
           fi
           echo "Asset count OK: $actual/$EXPECTED"
-      - uses: actions/attest-build-provenance@v3
+      - uses: actions/attest-build-provenance@v4
         with:
           subject-path: 'dist/*'
       - name: Create unified release
