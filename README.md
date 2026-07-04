@@ -11,9 +11,9 @@
 
 <p align="center">
   <a href="#插件矩阵">插件矩阵</a> ·
+  <a href="#适配新设备">适配新设备</a> ·
   <a href="#插件包结构">插件包结构</a> ·
   <a href="#开发">开发</a> ·
-  <a href="#协议储备">协议储备</a> ·
   <a href="README.en.md">English</a>
 </p>
 
@@ -26,9 +26,9 @@
 
 ## 简介
 
-这个仓库保存 [Mira](https://github.com/hello-yunshu/mira-mouse) 的设备插件。每个插件都是一个签名的 `.mira-plugin` ZIP 容器，只包含声明式文件：设备匹配、能力元数据、协议命令、解析器、传输、工作流、测试和文档。
+这个仓库保存 [Mira](https://github.com/hello-yunshu/mira-mouse) 的设备插件。每个插件都是一个签名的 `.mira-plugin` 包，只包含声明式文件：设备匹配、能力元数据、协议命令、解析器、传输、工作流和测试。
 
-插件不包含原生代码、脚本、网页或 WASM。Mira 主应用读取插件声明，负责 HID 句柄、权限、运行时校验、界面骨架、主题、诊断和更新。插件决定“支持什么设备、读写什么字段”；主应用决定“如何安全一致地呈现”。
+插件不包含原生代码、脚本、网页或 WASM。插件决定"支持什么设备、读写什么字段"；Mira 主应用决定"如何安全一致地呈现"。
 
 ## 插件矩阵
 
@@ -39,15 +39,20 @@
 | [`mira.example-mock`](plugins/example-mock/) | 运行时示例 | fixture-verified | disabled | 用于测试主应用和插件运行时。 |
 | [`mira.razer-viper`](plugins/razer-viper/) | Razer Viper 研究草案 | inferred | disabled | 研究笔记和窄范围 bring-up 占位。 |
 
-当前 `registry/index.json` 已处于 active 状态，正式插件已通过签名发布。
+## 适配新设备
+
+想让你手中的鼠标被 Mira 支持？有两种方式：
+
+1. **提交设备支持请求**：到 [Mira Issues](https://github.com/hello-yunshu/mira-mouse/issues) 提交设备信息（VID/PID、连接方式、可测功能），由维护者评估适配。
+2. **自行编写插件**：参考 [插件 SDK](docs/plugin-sdk.md) 了解插件契约，从 `example-mock` 插件复制起步。
+
+插件优先按**协议族**匹配，而非逐型号白名单。例如 Logitech HID++ 插件按 `0x046D` + HID++ collection + 运行时 feature discovery 判断能力，G705 只是验证样本之一。仅当某型号协议无法安全推广到协议族时，才使用单型号插件（从只读开始，逐步开放写入）。
 
 ## 插件包结构
 
-典型插件目录：
-
 ```text
 plugins/<plugin-id>/
-├── plugin.json              # 插件元数据、权限、能力、UI placement
+├── plugin.json              # 元数据、权限、能力、UI placement
 ├── devices.json             # 设备匹配：VID/PID、usage、连接方式、证据
 ├── capabilities.json        # 导出字段和能力分组
 ├── locales/
@@ -63,26 +68,12 @@ plugins/<plugin-id>/
 └── LICENSE
 ```
 
-核心边界：
+关键约定：
 
-- `commands/parsers/features` 可以包含未来储备。
-- 只有被 `workflows.steps` 或 `mutations` 引用的内容，才是当前启用能力。
-- 只有插件 `plugin.json` 声明的 capability metadata，才会进入主应用 UI。
-- 面向用户的插件特有 capability 标签、灯效名和选项文案应放在
-  `locales/*.json`；通用 Host 标签可走主应用 fallback，`plugin.json`
-  只保留 `labelKey` 和必要 fallback。
-- 写入必须是有界输入、预读、必要时保留未知字段，并通过回读断言验证。
-
-## 型号与协议族
-
-Mira 插件优先描述协议族，而不是把每个已验证型号做成运行时白名单。
-例如 Logitech HID++ 插件按 `0x046D`、HID++ collection 和运行时 feature
-discovery 判断能力；G705 只是硬件验证样本，不是唯一允许的型号。
-
-只有当一个型号的协议尚不能安全推广到协议族时，才使用“单型号插件”。
-这种插件应从只读开始，用精确 VID/PID、usage page、usage、连接类型和
-证据说明收窄匹配；写入必须逐项通过有界输入、未知字段保留和回读验证后
-再开放。详细规则见 [插件 SDK](docs/plugin-sdk.md#单型号插件)。
+- 只有被 `workflows.steps` 或 `mutations` 引用的内容才是当前启用能力；未引用的原语属于储备。
+- 只有 `plugin.json` 声明的 capability metadata 才会进入主应用 UI。
+- 面向用户的插件文案应放在 `locales/*.json`，`plugin.json` 只保留 `labelKey` 和必要 fallback。
+- 写入必须有界输入、预读、必要时保留未知字段，并通过回读断言验证。
 
 ## 开发
 
@@ -92,47 +83,30 @@ npm run validate
 npm test
 ```
 
-查看协议启用/预留库存：
+常用命令：
 
 ```bash
-npm run inventory:protocol
-```
-
-同步 Logitech HID++ 公共特性 registry：
-
-```bash
-npm run sync:hidpp
-npm run sync:hidpp:check
-```
-
-打包插件：
-
-```bash
-npm run pack -- plugins/amaster dist/mira-amaster.mira-plugin
+npm run inventory:protocol     # 查看协议启用/预留库存
+npm run sync:hidpp             # 同步 Logitech HID++ 特性 registry
+npm run pack -- plugins/amaster dist/mira-amaster.mira-plugin  # 打包插件
 ```
 
 ## 协议储备
 
-为了支持未来开发，插件可以保留 source-confirmed 或 public-reference 的协议原语，但必须明确标注为储备。当前库存见：
+插件可保留 source-confirmed 或 public-reference 的协议原语用于未来开发，但必须明确标注为储备。`npm run validate` 会检查储备项是否写入库存文档，避免"预留协议"悄悄变成"当前能力"。
 
 - [协议储备库存](docs/protocol-reserve-inventory.md)
 - [AMaster 协议证据](docs/amaster-protocol-evidence.md)
 - [硬件证据矩阵](docs/hardware-evidence-matrix.md)
 - [插件评审清单](docs/plugin-review-checklist.md)
 
-`npm run validate` 会检查储备项是否写入库存文档，避免“预留协议”悄悄变成“当前能力”。
-
 ## 与主应用协作
 
 Mira 主应用保持稳定 UI 框架；插件提供 labels、data source、mutation id、选项、summary 和 placement hints。Placement 是受限声明，不是任意 HTML/CSS/脚本。
 
-主应用仓库：
+主应用仓库：[Mira Mouse](https://github.com/hello-yunshu/mira-mouse)
 
-- [Mira Mouse](https://github.com/hello-yunshu/mira-mouse)
-- [插件 SDK](docs/plugin-sdk.md)
-- [插件测试](docs/plugin-testing.md)
-- [插件签名与发布](docs/plugin-signing-and-release.md)
-- [插件版本策略](docs/plugin-versioning.md)
+更多文档：[插件 SDK](docs/plugin-sdk.md) · [插件测试](docs/plugin-testing.md)
 
 ## 许可证
 
