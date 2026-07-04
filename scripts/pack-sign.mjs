@@ -72,7 +72,6 @@ async function main() {
   const stage = join(tmpdir(), `mira-pack-${Date.now()}`);
   await mkdir(stage, { recursive: true });
 
-  // Copy plugin source into staging area.
   const files = [];
   await walkFiles(pluginDir, async (srcPath) => {
     const rel = relative(pluginDir, srcPath).replace(/\\/g, '/');
@@ -83,17 +82,14 @@ async function main() {
     files.push(rel);
   });
 
-  // Inject publisher key id into the staged manifest.
   manifest.publisherKeyId = keyId;
   await writeFile(join(stage, 'plugin.json'), JSON.stringify(manifest, null, 2) + '\n');
 
-  // Compute checksums for all payload files (excluding checksums.json and signature).
   const checksums = { schemaVersion: 1, files: {} };
   const checksumEntries = await Promise.all(files.sort().map(async (rel) => [rel, await sha256File(join(stage, rel))]));
   for (const [rel, hash] of checksumEntries) checksums.files[rel] = hash;
   await writeFile(join(stage, 'checksums.json'), JSON.stringify(checksums, null, 2) + '\n');
 
-  // Sign canonical manifest + checksums.
   const [manifestCanonical, checksumsCanonical] = await Promise.all([
     readFile(join(stage, 'plugin.json'), 'utf8').then((raw) => canonicalJson(JSON.parse(raw))),
     readFile(join(stage, 'checksums.json'), 'utf8').then((raw) => canonicalJson(JSON.parse(raw))),
