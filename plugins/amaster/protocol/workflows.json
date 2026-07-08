@@ -18,6 +18,7 @@
     "protocol-a-receiver-read": {
       "transport": "protocol-a-receiver",
       "steps": [
+        { "command": "receiver-poll", "parser": "receiver-status", "output": "receiverIdle", "transport": "protocol-a" },
         { "command": "receiver-firmware-usb", "parser": "firmware", "output": "receiverFirmwareUsb", "transport": "protocol-a" },
         { "command": "receiver-firmware-soc", "parser": "receiver-firmware-soc", "output": "receiverFirmwareSoc", "transport": "protocol-a" },
         { "command": "receiver-firmware-led", "parser": "firmware", "output": "receiverFirmwareLed", "transport": "protocol-a" },
