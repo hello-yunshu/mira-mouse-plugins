@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "pluginId": "mira.logitech-hidpp",
   "name": "Logitech HID++",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "pluginApi": ">=1.0.0, <2.0.0",
   "publisherKeyId": null,
   "evidence": "hardware-verified",
@@ -113,6 +113,7 @@
         "format": "color",
         "mutations": { "mouse": "set-mouse-lighting", "receiver": "set-receiver-lighting" },
         "lightingRole": { "mouse": "set-mouse-lighting", "receiver": "set-receiver-lighting" },
+        "switchSource": "effect",
         "effectOptions": {
           "offValue": 0,
           "effect": [
