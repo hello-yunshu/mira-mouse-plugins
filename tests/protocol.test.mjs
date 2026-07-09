@@ -140,6 +140,18 @@ test('AMaster declares complete host-rendered capability metadata', async () => 
   });
 });
 
+test('AMaster declares plugin-owned identity for Protocol A connection aliases', async () => {
+  const devices = await read('plugins/amaster/devices.json');
+  const protocolADevices = devices.devices.filter((device) => device.family.startsWith('protocol-a-'));
+  assert.equal(protocolADevices.length, 4);
+  for (const device of protocolADevices) {
+    assert.equal(device.identity.group, 'am-infinity-8k-mouse', device.family);
+    assert.equal(device.identity.displayName, 'AM INFINITY 8K MOUSE', device.family);
+    assert.ok(device.identity.aliases.includes('amaster protocol-a-direct'), device.family);
+    assert.ok(device.identity.aliases.includes('amaster protocol-a-receiver'), device.family);
+  }
+});
+
 test('logitech-hidpp exposes a read workflow per device family and writable mutations', async () => {
   const manifest = await read('plugins/logitech-hidpp/plugin.json');
   const workflows = await read('plugins/logitech-hidpp/protocol/workflows.json');
