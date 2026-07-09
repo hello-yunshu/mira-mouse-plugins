@@ -8,7 +8,12 @@
       "usagePage": 65535,
       "usage": 2,
       "connection": "usb",
-      "evidence": "source-confirmed"
+      "evidence": "source-confirmed",
+      "identity": {
+        "group": "am-infinity-8k-mouse",
+        "displayName": "AM INFINITY 8K MOUSE",
+        "aliases": ["amaster protocol-a-direct", "amaster protocol-a-receiver", "AM INFINITY 8K MOUSE"]
+      }
     },
     {
       "family": "protocol-a-direct",
@@ -17,7 +22,12 @@
       "usagePage": 65281,
       "usage": 1,
       "connection": "usb",
-      "evidence": "source-confirmed"
+      "evidence": "source-confirmed",
+      "identity": {
+        "group": "am-infinity-8k-mouse",
+        "displayName": "AM INFINITY 8K MOUSE",
+        "aliases": ["amaster protocol-a-direct", "amaster protocol-a-receiver", "AM INFINITY 8K MOUSE"]
+      }
     },
     {
       "family": "protocol-a-receiver",
@@ -26,7 +36,12 @@
       "usagePage": 65535,
       "usage": 2,
       "connection": "wireless-receiver",
-      "evidence": "hardware-verified"
+      "evidence": "hardware-verified",
+      "identity": {
+        "group": "am-infinity-8k-mouse",
+        "displayName": "AM INFINITY 8K MOUSE",
+        "aliases": ["amaster protocol-a-direct", "amaster protocol-a-receiver", "AM INFINITY 8K MOUSE"]
+      }
     },
     {
       "family": "protocol-a-receiver",
@@ -35,7 +50,12 @@
       "usagePage": 65281,
       "usage": 1,
       "connection": "wireless-receiver",
-      "evidence": "source-confirmed"
+      "evidence": "source-confirmed",
+      "identity": {
+        "group": "am-infinity-8k-mouse",
+        "displayName": "AM INFINITY 8K MOUSE",
+        "aliases": ["amaster protocol-a-direct", "amaster protocol-a-receiver", "AM INFINITY 8K MOUSE"]
+      }
     },
     {
       "family": "am35-direct",

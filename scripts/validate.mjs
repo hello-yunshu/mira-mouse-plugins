@@ -172,6 +172,28 @@ function validatePresentationContract(name, capability) {
   }
 }
 
+function validateDeviceIdentity(name, device) {
+  if (device.identity === undefined) return;
+  const { identity } = device;
+  if (!identity || typeof identity !== 'object' || Array.isArray(identity)) {
+    fail(`${name}/${device.family}: identity must be an object`);
+  }
+  if (typeof identity.group !== 'string' || identity.group.trim().length === 0) {
+    fail(`${name}/${device.family}: identity.group is required`);
+  }
+  if (identity.displayName !== undefined && (typeof identity.displayName !== 'string' || identity.displayName.trim().length === 0)) {
+    fail(`${name}/${device.family}: identity.displayName must be non-empty`);
+  }
+  if (identity.aliases !== undefined) {
+    if (!Array.isArray(identity.aliases)) fail(`${name}/${device.family}: identity.aliases must be an array`);
+    for (const alias of identity.aliases) {
+      if (typeof alias !== 'string' || alias.trim().length === 0) {
+        fail(`${name}/${device.family}: identity.aliases must contain non-empty strings`);
+      }
+    }
+  }
+}
+
 function expandFeatureRefs(pluginName, features, workflowsFile) {
   function resolve(name, context) {
     const entry = features[name];
@@ -340,6 +362,7 @@ for (const [name, data] of Object.entries(pluginData)) {
 
   const familyPrefixes = name === 'amaster' ? ['protocol-a-', 'am35-'] : ['hidpp2-'];
   for (const device of devices.devices) {
+    validateDeviceIdentity(name, device);
     for (const prefix of familyPrefixes) {
       if (device.family.startsWith(prefix) && !workflows[`${device.family}-read`]) {
         fail(`${name}/${device.family}: missing read workflow`);
