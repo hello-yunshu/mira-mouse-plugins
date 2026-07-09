@@ -8,7 +8,7 @@
       "usagePage": 65535,
       "usage": 2,
       "connection": "usb",
-      "evidence": "source-confirmed",
+      "evidence": "hardware-verified",
       "identity": {
         "group": "am-infinity-8k-mouse",
         "displayName": "AM INFINITY 8K MOUSE",
@@ -22,7 +22,7 @@
       "usagePage": 65281,
       "usage": 1,
       "connection": "usb",
-      "evidence": "source-confirmed",
+      "evidence": "hardware-verified",
       "identity": {
         "group": "am-infinity-8k-mouse",
         "displayName": "AM INFINITY 8K MOUSE",
