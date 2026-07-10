@@ -6,6 +6,10 @@ const plugins = ['amaster', 'logitech-hidpp'];
 const fail = (message) => { throw new Error(message); };
 const HOST_DEVICE_CONNECTIONS = new Set(['usb', 'wireless', 'bluetooth', 'virtual']);
 const VALUE_FORMATS = new Set(['sleep', 'color']);
+const DECLARATIVE_CONTROLS = new Set(['Toggle', 'Segmented', 'Select', 'Slider', 'Number', 'Color', 'GradientStops', 'DpiStages', 'LightingZone', 'ReadOnlyValue', 'Action']);
+const DECLARATIVE_METADATA = new Set(['fields', 'zones', 'stageLayout', 'statusDisplay', 'stateMapping', 'batteryHistory', 'visibleWhen']);
+const EDITORS = new Set(['inline-toggle', 'inline-segmented', 'inline-value', 'inline-action', 'modal-select', 'modal-color', 'modal-range', 'modal-number', 'modal-dpi-stage', 'modal-gradient', 'static-readonly']);
+const FORMATS = new Set(['sleep', 'percent', 'hertz', 'connection', 'color', 'default']);
 
 const REQUIRED_FILES = [
   'README.md',
@@ -59,43 +63,7 @@ for (const name of plugins) {
       if (placement.region === 'control') controlGroups.add(placement.group ?? capability.id);
       if (placement.region === 'status') statusItems += 1;
     }
-    const options = capability.metadata?.options;
-    if (options !== undefined && (!Array.isArray(options) || options.length > 8)) {
-      fail(`${name}/${capability.id}: invalid control option count`);
-    }
-    const bindings = capability.metadata?.bindings;
-    if (bindings !== undefined) {
-      if (!Array.isArray(bindings)) fail(`${name}/${capability.id}: invalid capability bindings`);
-      for (const [index, binding] of bindings.entries()) {
-        if (!binding || typeof binding !== 'object' || Array.isArray(binding)) {
-          fail(`${name}/${capability.id}: binding ${index} must be an object`);
-        }
-        const when = binding.when;
-        if (when !== undefined && (!when || typeof when !== 'object' || Array.isArray(when))) {
-          fail(`${name}/${capability.id}: binding ${index} has invalid condition`);
-        }
-        if (when?.path === 'connection' && !HOST_DEVICE_CONNECTIONS.has(when.eq)) {
-          fail(`${name}/${capability.id}: binding ${index} uses unknown host connection ${JSON.stringify(when.eq)}`);
-        }
-      }
-    }
-    const summary = capability.metadata?.summary;
-    if (summary !== undefined) {
-      if (!Array.isArray(summary) || summary.length > 4) fail(`${name}/${capability.id}: invalid summary count`);
-      for (const item of summary) {
-        if (!item || typeof item !== 'object' || typeof item.label !== 'string' || item.label.length === 0
-          || typeof item.source !== 'string' || item.source.length === 0) {
-          fail(`${name}/${capability.id}: invalid summary item`);
-        }
-        if (item.options !== undefined && (!Array.isArray(item.options) || item.options.length > 32)) {
-          fail(`${name}/${capability.id}: invalid summary options`);
-        }
-        if (item.format !== undefined && !VALUE_FORMATS.has(item.format)) {
-          fail(`${name}/${capability.id}: invalid summary format ${JSON.stringify(item.format)}`);
-        }
-      }
-    }
-    validatePresentationContract(name, capability);
+    validateDeclarativeCapability(name, capability);
   }
   if (controlGroups.size > 6 || statusItems > 6) fail(`${name}: dashboard layout exceeds host limits`);
 }
@@ -103,6 +71,61 @@ for (const name of plugins) {
 function validMutationRef(value) {
   if (typeof value === 'string') return value.length > 0;
   return Array.isArray(value) && value.length > 0 && value.every((item) => typeof item === 'string' && item.length > 0);
+}
+
+function validPath(value) { return typeof value === 'string' && value.length > 0 && value.length <= 160; }
+function validOptions(value, max = 32) {
+  return Array.isArray(value) && value.length <= max && value.every((item) => item && typeof item === 'object'
+    && ['string', 'number', 'boolean'].includes(typeof item.value) && typeof item.labelKey === 'string' && item.labelKey.length > 0);
+}
+function validRange(value) {
+  return value && typeof value === 'object' && typeof value.min === 'number' && typeof value.max === 'number'
+    && value.min <= value.max && (value.step === undefined || (typeof value.step === 'number' && value.step > 0));
+}
+function validWhen(value) {
+  return value === undefined || (value && typeof value === 'object' && validPath(value.path));
+}
+function validBatteryHistory(value) {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    && Object.keys(value).length === 1
+    && Array.isArray(value.validConnections) && value.validConnections.length > 0 && value.validConnections.length <= 4
+    && value.validConnections.every((connection) => HOST_DEVICE_CONNECTIONS.has(connection))
+    && new Set(value.validConnections).size === value.validConnections.length;
+}
+function validField(field) {
+  if (!field || typeof field !== 'object' || !validPath(field.id) || !validPath(field.source) || !EDITORS.has(field.editor)) return false;
+  if (field.mutation !== undefined && !validMutationRef(field.mutation)) return false;
+  if (field.param !== undefined && !validPath(field.param)) return false;
+  if (field.params !== undefined && (!field.params || typeof field.params !== 'object' || Array.isArray(field.params))) return false;
+  if (field.options !== undefined && !validOptions(field.options)) return false;
+  if (field.optionSource !== undefined && !validPath(field.optionSource)) return false;
+  if (field.range !== undefined && !validRange(field.range)) return false;
+  if (field.format !== undefined && !FORMATS.has(field.format)) return false;
+  if (!validWhen(field.visibleWhen)) return false;
+  return field.switch === undefined || (field.switch && typeof field.switch === 'object' && validPath(field.switch.source) && Object.hasOwn(field.switch, 'offValue'));
+}
+function validStageLayout(value) {
+  return value && typeof value === 'object' && validPath(value.dotsSource) && validPath(value.valueSource)
+    && validMutationRef(value.selectMutation) && validMutationRef(value.setMutation) && validRange(value.range)
+    && ['selectParam', 'stageParam', 'valueParam'].every((key) => value[key] === undefined || validPath(value[key]));
+}
+function validateDeclarativeCapability(name, capability) {
+  if (!DECLARATIVE_CONTROLS.has(capability.control)) fail(`${name}/${capability.id}: unsupported legacy control ${capability.control}`);
+  const metadata = capability.metadata ?? {};
+  if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) fail(`${name}/${capability.id}: metadata must be an object`);
+  for (const key of Object.keys(metadata)) if (!DECLARATIVE_METADATA.has(key)) fail(`${name}/${capability.id}: legacy metadata.${key} is not supported`);
+  if (metadata.fields !== undefined && (!Array.isArray(metadata.fields) || metadata.fields.length > 32 || !metadata.fields.every(validField))) fail(`${name}/${capability.id}: invalid declarative fields`);
+  if (metadata.zones !== undefined && (!Array.isArray(metadata.zones) || metadata.zones.length > 8 || !metadata.zones.every((zone) => zone && typeof zone === 'object' && validPath(zone.id) && typeof zone.labelKey === 'string' && Array.isArray(zone.fields) && zone.fields.length <= 32 && zone.fields.every(validField) && validWhen(zone.visibleWhen)))) fail(`${name}/${capability.id}: invalid declarative zones`);
+  if (metadata.stageLayout !== undefined && !validStageLayout(metadata.stageLayout)) fail(`${name}/${capability.id}: invalid stageLayout`);
+  if (metadata.statusDisplay !== undefined && (!metadata.statusDisplay || typeof metadata.statusDisplay !== 'object' || !validPath(metadata.statusDisplay.valueSource) || (metadata.statusDisplay.valueOptions !== undefined && !validOptions(metadata.statusDisplay.valueOptions)) || (metadata.statusDisplay.valueFormat !== undefined && !FORMATS.has(metadata.statusDisplay.valueFormat)))) fail(`${name}/${capability.id}: invalid statusDisplay`);
+  if (metadata.stateMapping !== undefined && (!metadata.stateMapping || typeof metadata.stateMapping !== 'object' || Object.values(metadata.stateMapping).some((value) => !validPath(value)))) fail(`${name}/${capability.id}: invalid stateMapping`);
+  if (capability.id === 'battery' && !validBatteryHistory(metadata.batteryHistory)) fail(`${name}/${capability.id}: battery requires batteryHistory.validConnections`);
+  if (capability.id !== 'battery' && metadata.batteryHistory !== undefined) fail(`${name}/${capability.id}: batteryHistory is only valid on the battery capability`);
+  if (!validWhen(metadata.visibleWhen)) fail(`${name}/${capability.id}: invalid visibleWhen`);
+  if (capability.readOnly) return;
+  if (capability.control === 'DpiStages' && !validStageLayout(metadata.stageLayout)) fail(`${name}/${capability.id}: writable DpiStages requires stageLayout`);
+  if (capability.control === 'LightingZone' && !metadata.zones?.some((zone) => zone.fields.some((field) => field.mutation !== undefined))) fail(`${name}/${capability.id}: writable LightingZone requires writable zone fields`);
+  if (!['DpiStages', 'LightingZone'].includes(capability.control) && !metadata.fields?.some((field) => field.mutation !== undefined)) fail(`${name}/${capability.id}: writable capability requires a mutation field`);
 }
 
 function validBindingSources(bindings) {

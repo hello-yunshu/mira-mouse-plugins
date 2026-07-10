@@ -16,4 +16,6 @@
   "plugin.label.capability.device-info": "设备信息",
   "plugin.label.capability.feature-index": "功能索引",
   "plugin.label.capability.onboard-profile": "板载配置"
+  ,"controlMode.onboard": "板载"
+  ,"controlMode.software": "软件"
 }
