@@ -15,5 +15,7 @@
   "plugin.label.capability.pointer-speed": "Pointer speed",
   "plugin.label.capability.device-info": "Device info",
   "plugin.label.capability.feature-index": "Feature index",
-  "plugin.label.capability.onboard-profile": "Onboard profile"
+  "plugin.label.capability.onboard-profile": "Onboard profile",
+  "controlMode.onboard": "Onboard",
+  "controlMode.software": "Software"
 }

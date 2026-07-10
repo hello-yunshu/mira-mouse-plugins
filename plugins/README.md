@@ -64,6 +64,8 @@ Host UI 从声明式元数据渲染插件能力。插件必须声明语义契约
 - `min`、`max` 和 `step` 声明数值编辑器的边界。
 - `unit` 和 `format` 声明值呈现方式；支持的 format 有 `sleep` 和 `color`。
 - `summary` 声明控件下方的紧凑次要信息。
+- `battery` capability 必须声明 `metadata.batteryHistory.validConnections`；仅这些连接
+  方式的读数会被 host 记录和分析。不要让 host 根据 USB、品牌或固定百分比猜测可信度。
 - `DpiStages` 必须声明 `metadata.mutations.select` 和 `metadata.mutations.value`。
 - `LightingZone` 必须声明 `metadata.lightingRole`，可添加 `effectOptions`
   或 `receiverLightingOptions` 供 host 准备的 lighting 编辑器使用。

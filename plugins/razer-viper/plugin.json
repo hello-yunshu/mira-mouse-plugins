@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "pluginId": "mira.razer-viper",
   "name": "Razer Viper Research",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "pluginApi": ">=1.0.0, <2.0.0",
   "publisherKeyId": null,
   "evidence": "inferred",
   "permissions": [],
-  "capabilities": [{ "id": "research-status", "control": "Info", "labelKey": "researchStatus", "readOnly": true }],
+  "capabilities": [{ "id": "research-status", "control": "ReadOnlyValue", "labelKey": "researchStatus", "readOnly": true, "metadata": { "fields": [{ "id": "value", "source": "name", "editor": "static-readonly", "labelKey": "researchStatus" }] } }],
   "writesEnabled": false
 }
