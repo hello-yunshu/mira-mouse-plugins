@@ -1,267 +1,31 @@
 {
   "schemaVersion": 1,
   "pluginId": "mira.amaster",
-  "name": "AMaster / Angry Miao compatible devices",
-  "version": "1.5.0",
-  "pluginApi": ">=1.0.0,<2.0.0",
-  "publisherKeyId": "mira-plugins-2026-001",
+  "name": "AMaster Protocol A",
+  "version": "1.6.0",
+  "pluginApi": ">=1.0.0, <2.0.0",
+  "publisherKeyId": null,
   "evidence": "hardware-verified",
-  "permissions": [
-    {
-      "kind": "hid",
-      "report_types": ["feature", "input", "output"],
-      "max_report_length": 65,
-      "max_reports_per_second": 60
-    }
-  ],
+  "permissions": [{ "kind": "hid", "report_types": ["feature", "input", "output"], "max_report_length": 64, "max_reports_per_second": 60 }],
   "capabilities": [
-    {
-      "id": "battery",
-      "control": "ReadOnlyValue",
-      "labelKey": "capability.battery",
-      "readOnly": true,
-      "placements": [{ "region": "hero", "order": 10, "span": 1, "icon": "battery" }],
-      "metadata": { "label": "电量", "source": "battery", "section": "hero" }
-    },
-    {
-      "id": "dpi",
-      "control": "DpiStages",
-      "labelKey": "capability.dpi",
-      "readOnly": false,
-      "placements": [{ "region": "control", "group": "performance", "order": 10, "span": 1, "icon": "gauge" }],
-      "metadata": {
-        "label": "DPI",
-        "section": "control",
-        "source": "dpiStages",
-        "min": 50,
-        "max": 30000,
-        "step": 50,
-        "mutations": { "select": "set-dpi-stage", "value": "set-dpi-value" }
-      }
-    },
-    {
-      "id": "polling-rate",
-      "control": "Select",
-      "labelKey": "capability.polling-rate",
-      "readOnly": false,
-      "placements": [{ "region": "control", "group": "polling", "order": 20, "span": 1, "icon": "wave" }],
-      "metadata": {
-        "label": "回报率",
-        "section": "control",
-        "source": "pollingRate",
-        "mutation": "set-polling-rate",
-        "param": "rate",
-        "unit": "Hz",
-        "options": [
-          { "value": 125, "label": "125 Hz" },
-          { "value": 250, "label": "250 Hz" },
-          { "value": 500, "label": "500 Hz" },
-          { "value": 1000, "label": "1000 Hz" },
-          { "value": 2000, "label": "2000 Hz" },
-          { "value": 4000, "label": "4000 Hz" },
-          { "value": 8000, "label": "8000 Hz" }
-        ],
-        "summary": [
-          { "label": "运动同步", "source": "capabilities.settings.motionSync" },
-          { "label": "角度吸附", "source": "capabilities.settings.angleSnap" },
-          { "label": "抬升高度", "source": "capabilities.settings.liftCutOff" }
-        ]
-      }
-    },
-    {
-      "id": "sleep-time",
-      "control": "Number",
-      "labelKey": "capability.sleep-time",
-      "readOnly": false,
-      "placements": [{ "region": "status", "order": 10, "span": 1, "icon": "timer" }],
-      "metadata": {
-        "label": "休眠时间",
-        "section": "status",
-        "status": true,
-        "format": "sleep",
-        "min": 10,
-        "max": 65535,
-        "step": 10,
-        "bindings": [
-          {
-            "when": { "path": "connection", "eq": "bluetooth" },
-            "label": "蓝牙休眠",
-            "source": "capabilities.settings.bluetoothSleepValue",
-            "mutation": "set-bluetooth-sleep-time",
-            "param": "seconds"
-          },
-          {
-            "when": { "path": "connection", "eq": "wireless" },
-            "label": "2.4G 休眠",
-            "source": "capabilities.settings.wirelessSleepValue",
-            "mutation": "set-wireless-sleep-time",
-            "param": "seconds"
-          },
-          {
-            "when": { "path": "connection", "eq": "virtual" },
-            "label": "2.4G 休眠",
-            "source": "capabilities.settings.wirelessSleepValue",
-            "mutation": "set-wireless-sleep-time",
-            "param": "seconds"
-          }
-        ]
-      }
-    },
-    {
-      "id": "profile",
-      "control": "ReadOnlyValue",
-      "labelKey": "capability.profile",
-      "readOnly": true,
-      "placements": [{ "region": "status", "order": 20, "span": 1, "icon": "profile" }],
-      "metadata": { "label": "配置文件", "section": "status", "status": true, "source": "profile" }
-    },
-    {
-      "id": "firmware",
-      "control": "ReadOnlyValue",
-      "labelKey": "capability.firmware",
-      "readOnly": true,
-      "placements": [{ "region": "details", "order": 10, "span": 1, "icon": "info" }],
-      "metadata": { "label": "固件", "section": "details" }
-    },
-    {
-      "id": "lighting",
-      "control": "LightingZone",
-      "labelKey": "capability.lighting",
-      "readOnly": false,
-      "placements": [
-        { "region": "control", "group": "lighting", "order": 30, "span": 1, "icon": "lightbulb" },
-        { "region": "status", "order": 30, "span": 1, "icon": "lightbulb" }
-      ],
-      "metadata": {
-        "label": "灯光",
-        "section": "control",
-        "status": true,
-        "source": "capabilities.mouseLighting.color",
-        "format": "color",
-        "mutations": { "mouse": "set-mouse-lighting", "receiver": "set-receiver-lighting" },
-        "lightingRole": { "mouse": "set-mouse-lighting", "receiver": "set-receiver-lighting" },
-        "switchSource": "enabled",
-        "receiverLightingOptions": {
-          "effect": [
-            { "value": 0, "labelKey": "receiverLighting.effect.off" },
-            { "value": 1, "labelKey": "receiverLighting.effect.fixed" },
-            { "value": 2, "labelKey": "receiverLighting.effect.breathing" },
-            { "value": 3, "labelKey": "receiverLighting.effect.neon" },
-            { "value": 4, "labelKey": "receiverLighting.effect.wave" },
-            { "value": 5, "labelKey": "receiverLighting.effect.running" },
-            { "value": 6, "labelKey": "receiverLighting.effect.ring" },
-            { "value": 7, "labelKey": "receiverLighting.effect.buffer" },
-            { "value": 8, "labelKey": "receiverLighting.effect.chase" }
-          ],
-          "speed": [
-            { "value": 0, "labelKey": "receiverLighting.speed.fastest" },
-            { "value": 1, "labelKey": "receiverLighting.speed.fast" },
-            { "value": 2, "labelKey": "receiverLighting.speed.medium" },
-            { "value": 3, "labelKey": "receiverLighting.speed.slow" },
-            { "value": 4, "labelKey": "receiverLighting.speed.slowest" }
-          ],
-          "brightness": [
-            { "value": 0, "labelKey": "receiverLighting.brightness.dimmest" },
-            { "value": 1, "labelKey": "receiverLighting.brightness.dark" },
-            { "value": 2, "labelKey": "receiverLighting.brightness.medium" },
-            { "value": 3, "labelKey": "receiverLighting.brightness.bright" },
-            { "value": 4, "labelKey": "receiverLighting.brightness.brightest" }
-          ],
-          "option": [
-            { "value": 0, "labelKey": "receiverLighting.colorMode.red" },
-            { "value": 1, "labelKey": "receiverLighting.colorMode.orange" },
-            { "value": 2, "labelKey": "receiverLighting.colorMode.yellow" },
-            { "value": 3, "labelKey": "receiverLighting.colorMode.green" },
-            { "value": 4, "labelKey": "receiverLighting.colorMode.cyan" },
-            { "value": 5, "labelKey": "receiverLighting.colorMode.blue" },
-            { "value": 6, "labelKey": "receiverLighting.colorMode.purple" },
-            { "value": 7, "labelKey": "receiverLighting.colorMode.custom" },
-            { "value": 8, "labelKey": "receiverLighting.colorMode.colorful" }
-          ]
-        }
-      }
-    },
-    {
-      "id": "device-settings",
-      "control": "Info",
-      "labelKey": "capability.device-settings",
-      "readOnly": true,
-      "placements": [{ "region": "details", "order": 20, "span": 1, "icon": "info" }],
-      "metadata": { "label": "设备设置", "section": "details", "source": "capabilities.settings" }
-    },
-    {
-      "id": "receiver-status",
-      "control": "Info",
-      "labelKey": "capability.receiver-status",
-      "readOnly": true,
-      "placements": [{ "region": "details", "order": 30, "span": 1, "icon": "info" }],
-      "metadata": { "label": "接收器状态", "section": "details", "source": "capabilities.receiverLighting" }
-    },
-    {
-      "id": "button-mappings",
-      "control": "Info",
-      "labelKey": "capability.button-mappings",
-      "readOnly": true,
-      "placements": [{ "region": "details", "order": 40, "span": 1, "icon": "info" }],
-      "metadata": { "label": "按键映射", "section": "details", "source": "capabilities.buttonMappings" }
-    }
+    { "id": "battery", "control": "ReadOnlyValue", "labelKey": "capability.battery", "readOnly": true, "placements": [{ "region": "hero", "order": 10, "span": 1, "icon": "battery" }], "metadata": { "fields": [{ "id": "value", "source": "battery", "editor": "static-readonly", "format": "percent", "labelKey": "capability.battery" }], "batteryHistory": { "validConnections": ["wireless", "bluetooth"] } } },
+    { "id": "dpi", "control": "DpiStages", "labelKey": "capability.dpi", "readOnly": false, "placements": [{ "region": "control", "group": "performance", "order": 10, "span": 1, "icon": "gauge" }], "metadata": { "stageLayout": { "dotsSource": "state.dpiStages", "selectMutation": "set-dpi-stage", "setMutation": "set-dpi-value", "valueSource": "state.dpiStages", "range": { "min": 50, "max": 30000, "step": 50 }, "selectParam": "stage", "stageParam": "stage", "valueParam": "dpi" }, "stateMapping": { "dpiStages": "dpiStages" } } },
+    { "id": "polling-rate", "control": "Select", "labelKey": "capability.polling-rate", "readOnly": false, "placements": [{ "region": "control", "group": "polling", "order": 20, "span": 1, "icon": "wave" }], "metadata": { "fields": [{ "id": "value", "source": "state.pollingRate", "mutation": "set-polling-rate", "param": "rate", "editor": "modal-select", "optionSource": "state.supportedPollingRates", "format": "hertz", "labelKey": "capability.polling-rate" }], "stateMapping": { "pollingRate": "pollingRateHz", "supportedPollingRates": "supportedPollingRatesHz" } } },
+    { "id": "sleep-time", "control": "Number", "labelKey": "capability.sleep-time", "readOnly": false, "placements": [{ "region": "status", "order": 10, "span": 1, "icon": "timer" }], "metadata": { "fields": [{ "id": "bluetooth", "source": "capabilities.settings.bluetoothSleepValue", "mutation": "set-bluetooth-sleep-time", "param": "seconds", "editor": "modal-range", "format": "sleep", "range": { "min": 10, "max": 65535, "step": 10 }, "labelKey": "capability.sleep-time", "visibleWhen": { "path": "connection", "eq": "bluetooth" } }, { "id": "wireless", "source": "capabilities.settings.wirelessSleepValue", "mutation": "set-wireless-sleep-time", "param": "seconds", "editor": "modal-range", "format": "sleep", "range": { "min": 10, "max": 65535, "step": 10 }, "labelKey": "capability.sleep-time", "visibleWhen": { "path": "connection", "ne": "bluetooth" } }], "statusDisplay": { "valueSource": "capabilities.settings.wirelessSleepValue", "valueFormat": "sleep", "onClickField": "wireless" } } },
+    { "id": "profile", "control": "ReadOnlyValue", "labelKey": "capability.profile", "readOnly": true, "placements": [{ "region": "status", "order": 20, "span": 1, "icon": "profile" }], "metadata": { "fields": [{ "id": "value", "source": "state.profile", "editor": "static-readonly", "labelKey": "capability.profile" }], "statusDisplay": { "valueSource": "state.profile" }, "stateMapping": { "profile": "profile" } } },
+    { "id": "lighting", "control": "LightingZone", "labelKey": "capability.lighting", "readOnly": false, "placements": [{ "region": "control", "group": "lighting", "order": 30, "span": 1, "icon": "lightbulb" }, { "region": "status", "order": 30, "span": 1, "icon": "lightbulb" }], "metadata": { "zones": [{ "id": "mouse", "labelKey": "lighting.mouse", "fields": [{ "id": "enabled", "source": "capabilities.settings.mouseLightEnabled", "mutation": "set-mouse-lighting", "param": "enabled", "editor": "inline-toggle", "switch": { "source": "capabilities.settings.mouseLightEnabled", "offValue": false }, "labelKey": "dashboard.status" }, { "id": "color", "source": "capabilities.mouseLighting.color", "mutation": "set-mouse-lighting", "param": "color", "editor": "modal-color", "format": "color", "labelKey": "receiverLighting.field.color", "visibleWhen": { "path": "capabilities.settings.mouseLightEnabled", "eq": true } }] }, { "id": "receiver", "labelKey": "lighting.receiver", "visibleWhen": { "path": "capabilities.receiverLighting" }, "fields": [{ "id": "effect", "source": "capabilities.receiverLighting.effect", "mutation": "set-receiver-lighting", "param": "effect", "editor": "modal-select", "labelKey": "receiverLighting.field.effect", "options": [{ "value": 0, "labelKey": "receiverLighting.effect.off" }, { "value": 1, "labelKey": "receiverLighting.effect.fixed" }, { "value": 2, "labelKey": "receiverLighting.effect.breathing" }, { "value": 3, "labelKey": "receiverLighting.effect.neon" }, { "value": 4, "labelKey": "receiverLighting.effect.wave" }, { "value": 5, "labelKey": "receiverLighting.effect.running" }, { "value": 6, "labelKey": "receiverLighting.effect.ring" }, { "value": 7, "labelKey": "receiverLighting.effect.buffer" }, { "value": 8, "labelKey": "receiverLighting.effect.chase" }] }, { "id": "speed", "source": "capabilities.receiverLighting.speed", "mutation": "set-receiver-lighting", "param": "speed", "editor": "modal-select", "labelKey": "receiverLighting.field.speed", "options": [{ "value": 0, "labelKey": "receiverLighting.speed.fastest" }, { "value": 1, "labelKey": "receiverLighting.speed.fast" }, { "value": 2, "labelKey": "receiverLighting.speed.medium" }, { "value": 3, "labelKey": "receiverLighting.speed.slow" }, { "value": 4, "labelKey": "receiverLighting.speed.slowest" }] }, { "id": "brightness", "source": "capabilities.receiverLighting.brightness", "mutation": "set-receiver-lighting", "param": "brightness", "editor": "modal-select", "labelKey": "receiverLighting.field.brightness", "options": [{ "value": 0, "labelKey": "receiverLighting.brightness.dimmest" }, { "value": 1, "labelKey": "receiverLighting.brightness.dark" }, { "value": 2, "labelKey": "receiverLighting.brightness.medium" }, { "value": 3, "labelKey": "receiverLighting.brightness.bright" }, { "value": 4, "labelKey": "receiverLighting.brightness.brightest" }] }, { "id": "color", "source": "capabilities.receiverLighting.color", "mutation": "set-receiver-lighting", "param": "color", "editor": "modal-color", "format": "color", "labelKey": "receiverLighting.field.color" }] }], "statusDisplay": { "valueSource": "capabilities.mouseLighting.color", "valueFormat": "color", "onClickField": "color" } } },
+    { "id": "firmware", "control": "ReadOnlyValue", "labelKey": "capability.firmware", "readOnly": true, "placements": [{ "region": "details", "order": 10, "span": 1, "icon": "info" }], "metadata": { "fields": [{ "id": "value", "source": "capabilities.firmwareUsb", "editor": "static-readonly", "labelKey": "capability.firmware" }] } },
+    { "id": "device-settings", "control": "ReadOnlyValue", "labelKey": "plugin.label.capability.device-settings", "readOnly": true, "placements": [{ "region": "details", "order": 20, "span": 1, "icon": "info" }], "metadata": { "fields": [{ "id": "value", "source": "capabilities.settings", "editor": "static-readonly", "labelKey": "plugin.label.capability.device-settings" }] } },
+    { "id": "receiver-status", "control": "ReadOnlyValue", "labelKey": "plugin.label.capability.receiver-status", "readOnly": true, "placements": [{ "region": "details", "order": 30, "span": 1, "icon": "info" }], "metadata": { "fields": [{ "id": "value", "source": "capabilities.receiverLighting", "editor": "static-readonly", "labelKey": "plugin.label.capability.receiver-status" }] } },
+    { "id": "button-mappings", "control": "ReadOnlyValue", "labelKey": "plugin.label.capability.button-mappings", "readOnly": true, "placements": [{ "region": "details", "order": 40, "span": 1, "icon": "info" }], "metadata": { "fields": [{ "id": "value", "source": "capabilities.buttonMappings", "editor": "static-readonly", "labelKey": "plugin.label.capability.button-mappings" }] } }
   ],
   "writesEnabled": true,
   "exportableFields": [
-    {
-      "id": "current-dpi-stage",
-      "exportKey": "currentDpiStage",
-      "kind": "number",
-      "mutation": "set-dpi-stage",
-      "param": "stage",
-      "source": "capabilities.dpi.currentStage"
-    },
-    {
-      "id": "polling-rate",
-      "exportKey": "pollingRate",
-      "kind": "number",
-      "mutation": "set-polling-rate",
-      "param": "rate",
-      "source": "capabilities.settings.pollingRate"
-    },
-    {
-      "id": "bluetooth-sleep-time",
-      "exportKey": "bluetoothSleepSeconds",
-      "kind": "number",
-      "mutation": "set-bluetooth-sleep-time",
-      "param": "seconds",
-      "source": "capabilities.settings.bluetoothSleepValue"
-    },
-    {
-      "id": "wireless-sleep-time",
-      "exportKey": "wirelessSleepSeconds",
-      "kind": "number",
-      "mutation": "set-wireless-sleep-time",
-      "param": "seconds",
-      "source": "capabilities.settings.wirelessSleepValue"
-    },
-    {
-      "id": "mouse-lighting",
-      "exportKey": "mouseLighting",
-      "kind": "object",
-      "mutation": "set-mouse-lighting",
-      "sources": {
-        "color": "capabilities.mouseLighting.color",
-        "enabled": "capabilities.mouseLighting.enabled"
-      }
-    },
-    {
-      "id": "receiver-lighting",
-      "exportKey": "receiverLighting",
-      "kind": "object",
-      "mutation": "set-receiver-lighting",
-      "sources": {
-        "effect": "capabilities.receiverLighting.effect",
-        "speed": "capabilities.receiverLighting.speed",
-        "brightness": "capabilities.receiverLighting.brightness",
-        "option": "capabilities.receiverLighting.option",
-        "color": "capabilities.receiverLighting.color"
-      }
-    }
+    { "id": "current-dpi-stage", "exportKey": "currentDpiStage", "kind": "number", "mutation": "set-dpi-stage", "param": "stage", "source": "capabilities.dpi.currentStage" },
+    { "id": "polling-rate", "exportKey": "pollingRate", "kind": "number", "mutation": "set-polling-rate", "param": "rate", "source": "capabilities.settings.pollingRate" },
+    { "id": "bluetooth-sleep", "exportKey": "bluetoothSleepSeconds", "kind": "number", "mutation": "set-bluetooth-sleep-time", "param": "seconds", "source": "capabilities.settings.bluetoothSleepValue" },
+    { "id": "wireless-sleep", "exportKey": "wirelessSleepSeconds", "kind": "number", "mutation": "set-wireless-sleep-time", "param": "seconds", "source": "capabilities.settings.wirelessSleepValue" },
+    { "id": "mouse-lighting", "exportKey": "mouseLighting", "kind": "object", "mutation": "set-mouse-lighting", "sources": { "color": "capabilities.mouseLighting.color", "enabled": "capabilities.settings.mouseLightEnabled" } },
+    { "id": "receiver-lighting", "exportKey": "receiverLighting", "kind": "object", "mutation": "set-receiver-lighting", "sources": { "effect": "capabilities.receiverLighting.effect", "speed": "capabilities.receiverLighting.speed", "brightness": "capabilities.receiverLighting.brightness", "option": "capabilities.receiverLighting.option", "color": "capabilities.receiverLighting.color" } }
   ]
 }
