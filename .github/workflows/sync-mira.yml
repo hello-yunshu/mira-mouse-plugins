@@ -73,6 +73,10 @@ jobs:
         working-directory: mira-app
         env:
           RELEASE_TAG: '${{ env.RELEASE_TAG }}'
+          # 锁文件同步是机械变更，且上游已有独立验证步骤（check:structured、
+          # check-lock、sync、check:plugin-contract）。跳过 mira 仓库的
+          # pre-push hook，避免本地工具链兼容性问题阻塞自动同步。
+          MIRA_SKIP_HOOKS: '1'
         run: |
           set -euo pipefail
           git config user.name github-actions
