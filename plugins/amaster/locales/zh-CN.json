@@ -34,5 +34,10 @@
   "receiverLighting.colorMode.blue": "蓝",
   "receiverLighting.colorMode.purple": "紫",
   "receiverLighting.colorMode.custom": "自定义",
-  "receiverLighting.colorMode.colorful": "炫彩"
+  "receiverLighting.colorMode.colorful": "炫彩",
+  "summary.motionSync": "运动同步",
+  "summary.angleSnap": "角度吸附",
+  "summary.liftCutOff": "抬升高度",
+  "sleep.bluetooth": "蓝牙休眠",
+  "sleep.wireless": "2.4G 休眠"
 }

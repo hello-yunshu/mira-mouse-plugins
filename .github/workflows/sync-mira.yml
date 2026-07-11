@@ -63,10 +63,11 @@ jobs:
         working-directory: mira-app
         run: |
           set -euo pipefail
-          npm ci
+          npm ci --legacy-peer-deps
           npm run check:structured
           cargo run --package xtask -- plugins check-lock
           cargo run --package xtask -- plugins sync --locked --offline
+          npm run check:plugin-contract
       - name: Commit Mira lock update
         if: steps.credentials.outputs.has_token == 'true'
         working-directory: mira-app

@@ -106,11 +106,26 @@ test('AMaster declares complete declarative host capability metadata', async () 
   assert.equal(capabilities['polling-rate'].metadata.fields[0].mutation, 'set-polling-rate');
   assert.equal(capabilities['polling-rate'].metadata.fields[0].optionSource, 'state.supportedPollingRates');
   assert.equal(capabilities.lighting.control, 'LightingZone');
-  assert.equal(capabilities.lighting.metadata.statusDisplay.valueFormat, 'color');
+  assert.equal(capabilities.lighting.metadata.statusDisplay.labelKey, 'capability.lighting');
+  assert.equal(capabilities.lighting.metadata.statusDisplay.valueSource, 'capabilities.settings.mouseLightEnabled');
+  assert.equal(capabilities.dpi.metadata.summary, undefined);
+  assert.deepEqual(capabilities['polling-rate'].metadata.summary.map((item) => item.source), [
+    'capabilities.settings.motionSync',
+    'capabilities.settings.angleSnap',
+    'capabilities.settings.liftCutOff',
+  ]);
   assert.deepEqual(capabilities.lighting.metadata.zones.map((zone) => zone.id), ['mouse', 'receiver']);
   assert.equal(capabilities.lighting.metadata.zones[0].fields[0].mutation, 'set-mouse-lighting');
+  assert.deepEqual(Object.keys(capabilities.lighting.metadata.zones[0].fields[0].paramSources).sort(), ['color', 'enabled']);
+  assert.equal(capabilities.lighting.metadata.zones[0].fields[1].visibleWhen, undefined);
+  assert.equal(capabilities.lighting.metadata.zones[1].fields.length, 5);
+  assert.deepEqual(Object.keys(capabilities.lighting.metadata.zones[1].fields[0].paramSources).sort(), ['brightness', 'color', 'effect', 'option', 'speed']);
   assert.equal(capabilities.profile.metadata.statusDisplay.valueSource, 'state.profile');
   assert.equal(capabilities.firmware.metadata.fields[0].editor, 'static-readonly');
+  assert.deepEqual(
+    capabilities['sleep-time'].metadata.fields.map((field) => [field.id, field.visibleWhen.eq]),
+    [['bluetooth', 'bluetooth'], ['wireless', 'wireless'], ['virtual', 'virtual']],
+  );
   for (const field of capabilities['sleep-time'].metadata.fields) {
     assert.ok(
       Object.keys(mutations).some((id) => id.endsWith(`-${field.mutation}`)),
@@ -132,7 +147,7 @@ test('battery history eligibility is declared by each plugin', async () => {
   const batteryPolicy = (manifest) => manifest.capabilities.find((capability) => capability.id === 'battery')?.metadata?.batteryHistory;
 
   assert.deepEqual(batteryPolicy(amaster).validConnections, ['wireless', 'bluetooth']);
-  assert.deepEqual(batteryPolicy(logitech).validConnections, ['wireless']);
+  assert.deepEqual(batteryPolicy(logitech).validConnections, ['wireless', 'usb']);
 });
 
 test('AMaster declares plugin-owned identity for Protocol A connection aliases', async () => {
@@ -162,7 +177,8 @@ test('logitech-hidpp exposes a read workflow per device family and writable muta
   assert.equal(pointerSpeed.metadata.fields[0].mutation, 'set-pointer-speed');
   assert.equal(profileCurrent.metadata.fields[0].mutation, 'set-profile-mgmt-current');
   assert.equal(lighting.metadata.zones[0].fields[0].mutation, 'set-mouse-lighting');
-  assert.equal(lighting.metadata.statusDisplay.valueFormat, 'color');
+  assert.equal(lighting.metadata.statusDisplay.valueSource, 'capabilities.mouseLighting.effect');
+  assert.deepEqual(Object.keys(lighting.metadata.zones[0].fields[0].paramSources).sort(), ['brightness', 'color', 'effect', 'enabled', 'extraColor', 'speed']);
   assert.equal(lighting.placements.find((placement) => placement.region === 'status').span, 1);
   const families = new Set(devices.devices.map((device) => device.family));
   for (const family of families) {
