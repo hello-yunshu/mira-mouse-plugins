@@ -34,5 +34,10 @@
   "receiverLighting.colorMode.blue": "Blue",
   "receiverLighting.colorMode.purple": "Purple",
   "receiverLighting.colorMode.custom": "Custom",
-  "receiverLighting.colorMode.colorful": "Colorful"
+  "receiverLighting.colorMode.colorful": "Colorful",
+  "summary.motionSync": "Motion sync",
+  "summary.angleSnap": "Angle snap",
+  "summary.liftCutOff": "Lift-off distance",
+  "sleep.bluetooth": "Bluetooth sleep",
+  "sleep.wireless": "2.4G sleep"
 }

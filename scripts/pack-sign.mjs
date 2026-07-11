@@ -3,7 +3,7 @@
 // For production, set PLUGIN_SIGNING_KEY (PEM private key) and PLUGIN_KEY_ID.
 // For local testing, leave them unset and a TEST-ONLY key pair will be generated.
 import { createHash, generateKeyPairSync, createPublicKey, sign } from 'node:crypto';
-import { readFile, writeFile, mkdir, readdir, rm, copyFile, utimes } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, mkdtemp, readdir, rm, copyFile, utimes } from 'node:fs/promises';
 import { createReadStream } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, relative, dirname, basename, resolve } from 'node:path';
@@ -69,8 +69,10 @@ async function main() {
 
   const { privatePem, publicRaw, source } = await loadOrCreateKeys();
 
-  const stage = join(tmpdir(), `mira-pack-${Date.now()}`);
-  await mkdir(stage, { recursive: true });
+  // Multiple plugins are commonly packed together. A timestamp-only staging
+  // path can collide within the same millisecond and cross-contaminate signed
+  // archives, so let the OS allocate a unique directory for every pack.
+  const stage = await mkdtemp(join(tmpdir(), 'mira-pack-'));
 
   const files = [];
   await walkFiles(pluginDir, async (srcPath) => {

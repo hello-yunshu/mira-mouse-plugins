@@ -7,7 +7,7 @@ const fail = (message) => { throw new Error(message); };
 const HOST_DEVICE_CONNECTIONS = new Set(['usb', 'wireless', 'bluetooth', 'virtual']);
 const VALUE_FORMATS = new Set(['sleep', 'color']);
 const DECLARATIVE_CONTROLS = new Set(['Toggle', 'Segmented', 'Select', 'Slider', 'Number', 'Color', 'GradientStops', 'DpiStages', 'LightingZone', 'ReadOnlyValue', 'Action']);
-const DECLARATIVE_METADATA = new Set(['fields', 'zones', 'stageLayout', 'statusDisplay', 'stateMapping', 'batteryHistory', 'visibleWhen']);
+const DECLARATIVE_METADATA = new Set(['accentSource', 'fields', 'zones', 'stageLayout', 'statusDisplay', 'stateMapping', 'batteryHistory', 'visibleWhen', 'summary']);
 const EDITORS = new Set(['inline-toggle', 'inline-segmented', 'inline-value', 'inline-action', 'modal-select', 'modal-color', 'modal-range', 'modal-number', 'modal-dpi-stage', 'modal-gradient', 'static-readonly']);
 const FORMATS = new Set(['sleep', 'percent', 'hertz', 'connection', 'color', 'default']);
 
@@ -65,6 +65,7 @@ for (const name of plugins) {
     }
     validateDeclarativeCapability(name, capability);
   }
+  validateExportableFields(name, manifest.exportableFields ?? []);
   if (controlGroups.size > 6 || statusItems > 6) fail(`${name}: dashboard layout exceeds host limits`);
 }
 
@@ -97,6 +98,10 @@ function validField(field) {
   if (field.mutation !== undefined && !validMutationRef(field.mutation)) return false;
   if (field.param !== undefined && !validPath(field.param)) return false;
   if (field.params !== undefined && (!field.params || typeof field.params !== 'object' || Array.isArray(field.params))) return false;
+  if (field.paramSources !== undefined && (!field.paramSources || typeof field.paramSources !== 'object' || Array.isArray(field.paramSources)
+    || Object.keys(field.paramSources).length === 0 || !Object.entries(field.paramSources).every(([param, source]) => validPath(param) && validPath(source)))) return false;
+  if (field.editTitleKey !== undefined && !validPath(field.editTitleKey)) return false;
+  if (field.editLabelKey !== undefined && !validPath(field.editLabelKey)) return false;
   if (field.options !== undefined && !validOptions(field.options)) return false;
   if (field.optionSource !== undefined && !validPath(field.optionSource)) return false;
   if (field.range !== undefined && !validRange(field.range)) return false;
@@ -109,6 +114,59 @@ function validStageLayout(value) {
     && validMutationRef(value.selectMutation) && validMutationRef(value.setMutation) && validRange(value.range)
     && ['selectParam', 'stageParam', 'valueParam'].every((key) => value[key] === undefined || validPath(value[key]));
 }
+function validSummary(value) {
+  return Array.isArray(value) && value.length <= 4 && value.every((item) => item && typeof item === 'object'
+    && (validPath(item.labelKey) || (typeof item.label === 'string' && item.label.length > 0 && item.label.length <= 24))
+    && validPath(item.source)
+    && (item.unit === undefined || (typeof item.unit === 'string' && item.unit.length <= 12))
+    && (item.format === undefined || FORMATS.has(item.format))
+    && (item.options === undefined || validOptions(item.options)));
+}
+function validateExportableFields(name, fields) {
+  const allowed = new Set(['id', 'exportKey', 'kind', 'mutation', 'param', 'source', 'sources']);
+  if (!Array.isArray(fields)) fail(`${name}: exportableFields must be an array`);
+  const exportKeys = new Set();
+  for (const field of fields) {
+    if (!field || typeof field !== 'object' || Array.isArray(field)
+      || !validPath(field.id) || !validPath(field.exportKey)
+      || Object.keys(field).some((key) => !allowed.has(key))) {
+      fail(`${name}: invalid exportable field declaration`);
+    }
+    if (exportKeys.has(field.exportKey)) fail(`${name}: duplicate exportable key ${field.exportKey}`);
+    exportKeys.add(field.exportKey);
+    if (field.kind !== undefined && !validPath(field.kind)) fail(`${name}/${field.id}: invalid export kind`);
+    if (field.mutation !== undefined && (typeof field.mutation !== 'string' || !validPath(field.mutation))) fail(`${name}/${field.id}: invalid export mutation`);
+    if (field.param !== undefined && !validPath(field.param)) fail(`${name}/${field.id}: invalid export param`);
+    if (field.source !== undefined && !validPath(field.source)) fail(`${name}/${field.id}: invalid export source`);
+    if (field.sources !== undefined && (!field.sources || typeof field.sources !== 'object' || Array.isArray(field.sources)
+      || Object.keys(field.sources).length === 0 || !Object.entries(field.sources).every(([param, source]) => validPath(param) && validPath(source)))) {
+      fail(`${name}/${field.id}: invalid export sources`);
+    }
+  }
+}
+function mutationRefs(value) {
+  return typeof value === 'string' ? [value] : Array.isArray(value) ? value : [];
+}
+function validateFieldMutationCoverage(name, capabilityId, field) {
+  if (field.mutation === undefined) return;
+  const covered = new Set([
+    ...Object.keys(field.params ?? {}),
+    ...Object.keys(field.paramSources ?? {}),
+  ]);
+  if (field.editor !== 'inline-action') covered.add(field.param ?? 'value');
+  for (const mutationRef of mutationRefs(field.mutation)) {
+    const definitions = Object.entries(pluginData[name].mutations)
+      .filter(([id]) => id === mutationRef || id.endsWith(`-${mutationRef}`))
+      .map(([, mutation]) => mutation);
+    if (definitions.length === 0) fail(`${name}/${capabilityId}/${field.id}: unknown mutation ${mutationRef}`);
+    for (const definition of definitions) {
+      const missing = Object.keys(definition.inputs ?? {}).filter((param) => !covered.has(param));
+      if (missing.length > 0) {
+        fail(`${name}/${capabilityId}/${field.id}: mutation ${mutationRef} is missing declared params ${missing.join(', ')}`);
+      }
+    }
+  }
+}
 function validateDeclarativeCapability(name, capability) {
   if (!DECLARATIVE_CONTROLS.has(capability.control)) fail(`${name}/${capability.id}: unsupported legacy control ${capability.control}`);
   const metadata = capability.metadata ?? {};
@@ -117,7 +175,11 @@ function validateDeclarativeCapability(name, capability) {
   if (metadata.fields !== undefined && (!Array.isArray(metadata.fields) || metadata.fields.length > 32 || !metadata.fields.every(validField))) fail(`${name}/${capability.id}: invalid declarative fields`);
   if (metadata.zones !== undefined && (!Array.isArray(metadata.zones) || metadata.zones.length > 8 || !metadata.zones.every((zone) => zone && typeof zone === 'object' && validPath(zone.id) && typeof zone.labelKey === 'string' && Array.isArray(zone.fields) && zone.fields.length <= 32 && zone.fields.every(validField) && validWhen(zone.visibleWhen)))) fail(`${name}/${capability.id}: invalid declarative zones`);
   if (metadata.stageLayout !== undefined && !validStageLayout(metadata.stageLayout)) fail(`${name}/${capability.id}: invalid stageLayout`);
-  if (metadata.statusDisplay !== undefined && (!metadata.statusDisplay || typeof metadata.statusDisplay !== 'object' || !validPath(metadata.statusDisplay.valueSource) || (metadata.statusDisplay.valueOptions !== undefined && !validOptions(metadata.statusDisplay.valueOptions)) || (metadata.statusDisplay.valueFormat !== undefined && !FORMATS.has(metadata.statusDisplay.valueFormat)))) fail(`${name}/${capability.id}: invalid statusDisplay`);
+  if (metadata.statusDisplay !== undefined && (!metadata.statusDisplay || typeof metadata.statusDisplay !== 'object' || !validPath(metadata.statusDisplay.valueSource) || (metadata.statusDisplay.labelKey !== undefined && !validPath(metadata.statusDisplay.labelKey)) || (metadata.statusDisplay.valueOptions !== undefined && !validOptions(metadata.statusDisplay.valueOptions)) || (metadata.statusDisplay.valueFormat !== undefined && !FORMATS.has(metadata.statusDisplay.valueFormat)))) fail(`${name}/${capability.id}: invalid statusDisplay`);
+  if (metadata.summary !== undefined && !validSummary(metadata.summary)) fail(`${name}/${capability.id}: invalid summary`);
+  if (metadata.accentSource !== undefined && !validPath(metadata.accentSource)) fail(`${name}/${capability.id}: invalid accentSource`);
+  for (const field of metadata.fields ?? []) validateFieldMutationCoverage(name, capability.id, field);
+  for (const zone of metadata.zones ?? []) for (const field of zone.fields) validateFieldMutationCoverage(name, capability.id, field);
   if (metadata.stateMapping !== undefined && (!metadata.stateMapping || typeof metadata.stateMapping !== 'object' || Object.values(metadata.stateMapping).some((value) => !validPath(value)))) fail(`${name}/${capability.id}: invalid stateMapping`);
   if (capability.id === 'battery' && !validBatteryHistory(metadata.batteryHistory)) fail(`${name}/${capability.id}: battery requires batteryHistory.validConnections`);
   if (capability.id !== 'battery' && metadata.batteryHistory !== undefined) fail(`${name}/${capability.id}: batteryHistory is only valid on the battery capability`);
