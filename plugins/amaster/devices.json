@@ -64,7 +64,12 @@
       "usagePage": 65299,
       "usage": 1,
       "connection": "usb",
-      "evidence": "source-confirmed"
+      "evidence": "source-confirmed",
+      "identity": {
+        "group": "am-infinity-97-mouse",
+        "displayName": "AM INFINITY MOUSE .97",
+        "aliases": ["amaster am35-direct", "amaster am35-receiver", "AM Infinity .97"]
+      }
     },
     {
       "family": "am35-receiver",
@@ -73,7 +78,12 @@
       "usagePage": 65299,
       "usage": 1,
       "connection": "wireless-receiver",
-      "evidence": "source-confirmed"
+      "evidence": "source-confirmed",
+      "identity": {
+        "group": "am-infinity-97-mouse",
+        "displayName": "AM INFINITY MOUSE .97",
+        "aliases": ["amaster am35-direct", "amaster am35-receiver", "AM Infinity .97"]
+      }
     }
   ],
   "hardwareVerifiedModels": ["AM INFINITY 8K MOUSE"]

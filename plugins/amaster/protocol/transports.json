@@ -31,8 +31,10 @@
       "readLength": 62,
       "raceType": 0,
       "stripReportIdOnRead": true,
+      "readMode": "input-report",
+      "readDelayMs": 50,
       "readTimeoutMs": 1000,
-      "readRetries": 3
+      "readRetries": 20
     },
     "am35-receiver": {
       "kind": "hid-race",
@@ -42,8 +44,10 @@
       "readLength": 62,
       "raceType": 128,
       "stripReportIdOnRead": true,
+      "readMode": "input-report",
+      "readDelayMs": 50,
       "readTimeoutMs": 1000,
-      "readRetries": 3
+      "readRetries": 20
     }
   }
 }

@@ -162,6 +162,22 @@ test('AMaster declares plugin-owned identity for Protocol A connection aliases',
   }
 });
 
+test('AMaster .97 uses the official input-report RACE transport and shared identity', async () => {
+  const devices = await read('plugins/amaster/devices.json');
+  const transports = await read('plugins/amaster/protocol/transports.json');
+  const am97Devices = devices.devices.filter((device) => device.family.startsWith('am35-'));
+  assert.equal(am97Devices.length, 2);
+  for (const device of am97Devices) {
+    assert.equal(device.identity.group, 'am-infinity-97-mouse', device.family);
+    assert.equal(device.identity.displayName, 'AM INFINITY MOUSE .97', device.family);
+  }
+  for (const id of ['am35-direct', 'am35-receiver']) {
+    assert.equal(transports.transports[id].readMode, 'input-report', id);
+    assert.equal(transports.transports[id].readDelayMs, 50, id);
+    assert.equal(transports.transports[id].readRetries, 20, id);
+  }
+});
+
 test('logitech-hidpp exposes a read workflow per device family and writable mutations', async () => {
   const manifest = await read('plugins/logitech-hidpp/plugin.json');
   const workflows = await read('plugins/logitech-hidpp/protocol/workflows.json');
