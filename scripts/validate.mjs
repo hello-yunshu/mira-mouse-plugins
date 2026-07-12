@@ -412,7 +412,10 @@ for (const [name, data] of Object.entries(pluginData)) {
       if (![0x06, 0x07].includes(transport.readReportId)) fail(`${name}/${id}: invalid race read report id`);
       if (transport.writeLength < 2 || transport.readLength < 2) fail(`${name}/${id}: invalid race report length`);
       if (![0, 128].includes(transport.raceType)) fail(`${name}/${id}: invalid race type`);
+      if (!['interrupt', 'input-report'].includes(transport.readMode ?? 'interrupt')) fail(`${name}/${id}: invalid race read mode`);
+      if (!Number.isInteger(transport.readDelayMs ?? 0) || (transport.readDelayMs ?? 0) < 0 || (transport.readDelayMs ?? 0) > 500) fail(`${name}/${id}: invalid race read delay`);
       if (!Number.isInteger(transport.readTimeoutMs) || transport.readTimeoutMs < 1 || transport.readTimeoutMs > 5000) fail(`${name}/${id}: invalid read timeout`);
+      if (!Number.isInteger(transport.readRetries) || transport.readRetries < 1 || transport.readRetries > 100) fail(`${name}/${id}: invalid race read retries`);
     }
   }
 

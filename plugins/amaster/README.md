@@ -6,7 +6,8 @@ This plugin is a declarative `.mira-plugin` package. It contains device
 descriptors and protocol definitions for:
 
 - Protocol A (VID `0x3151`) over USB and 2.4 GHz receiver.
-- AM35 (VID `0x0E8D`) over USB and 2.4 GHz receiver.
+- AM Infinity Mouse .97 / internal AM35 family (VID `0x0E8D`) over USB and
+  2.4 GHz receiver.
 
 Bluetooth support is pending hardware evidence and is marked `blocked` in the
 plugin capabilities.
@@ -29,10 +30,13 @@ reports remain unavailable.
 
 ## AM35 Protocol (Preparatory)
 
-AM35 (VID `0x0E8D`) protocol definitions are collected from
-AMasterDriver v1.0.6 reverse analysis. The protocol uses HID Output
-Report (ID `0x06`) for writes and Input Report (ID `0x07`) for reads,
-with a RACE-style inner protocol (`05 5A ...`).
+AM35 (VID `0x0E8D`) protocol definitions were first collected from
+AMasterDriver v1.0.6 reverse analysis and rechecked against the official
+AM Master v1.3.6 macOS package. The current official UI maps `am35` and
+`am35_d` to AM Infinity Mouse .97. The protocol uses HID Output Report
+(ID `0x06`) for writes and `get_input_report` on Input Report (ID `0x07`)
+for reads, with a RACE-style inner protocol (`05 5A ...`). Responses are
+matched to the request's RACE command ID so stale reports are ignored.
 
 The runtime engine includes a `hid-race` transport kind that frames
 RACE payloads with a 3-byte header (`[reportId, length, type]`) and
