@@ -4,18 +4,18 @@
   "plugins": [
     {
       "pluginId": "mira.amaster",
-      "version": "1.6.1",
-      "releaseTag": "release/v2026-07-11",
-      "url": "https://github.com/hello-yunshu/mira-mouse-plugins/releases/download/release/v2026-07-11/mira-amaster-1.6.1.mira-plugin",
-      "sha256": "72eeb4e1cfb5ccb4744ca34914310a0ae60ce3a143605befab80bd2bc7be39b1",
+      "version": "1.6.2",
+      "releaseTag": "release/v2026-07-12",
+      "url": "https://github.com/hello-yunshu/mira-mouse-plugins/releases/download/release/v2026-07-12/mira-amaster-1.6.2.mira-plugin",
+      "sha256": "16140f9ffe5c202064107620c7b68574121d85098b7c09bc0a1d6097a841bf1e",
       "publisherKeyId": "mira-plugins-2026-001",
-      "notes": "Mira plugin mira.amaster 1.6.1"
+      "notes": "Mira plugin mira.amaster 1.6.2"
     },
     {
       "pluginId": "mira.logitech-hidpp",
       "version": "0.8.1",
-      "releaseTag": "release/v2026-07-11",
-      "url": "https://github.com/hello-yunshu/mira-mouse-plugins/releases/download/release/v2026-07-11/mira-logitech-hidpp-0.8.1.mira-plugin",
+      "releaseTag": "release/v2026-07-12",
+      "url": "https://github.com/hello-yunshu/mira-mouse-plugins/releases/download/release/v2026-07-12/mira-logitech-hidpp-0.8.1.mira-plugin",
       "sha256": "9123214463d35b47ecc94d797f00e02fee8c0cf33028cce72b70d946c58b307d",
       "publisherKeyId": "mira-plugins-2026-001",
       "notes": "Mira plugin mira.logitech-hidpp 0.8.1"
