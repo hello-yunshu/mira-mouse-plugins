@@ -50,8 +50,9 @@ and firmware. Write mutations are not yet declared; they will be added
 after hardware validation of the RACE write framing.
 
 All AM35 field offsets are source-confirmed from static analysis but
-not yet hardware-verified. The `am35.receiverLightingType` named-values
-table remains `unknown` pending real device testing.
+not yet hardware-verified. Receiver-lighting named values remain
+documented as unknown pending real device testing; inert research metadata
+must not be placed inside executable protocol JSON files.
 
 ## Adding a specific AMaster-compatible model
 

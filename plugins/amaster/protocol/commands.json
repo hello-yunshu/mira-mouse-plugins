@@ -221,11 +221,5 @@
       { "offset": 4, "value": "0xD7" },
       { "offset": 5, "value": "0x30" }
     ], "checksum": null } }
-  },
-  "am35": {
-    "receiverLightingType": {
-      "status": "unknown",
-      "namedValues": {}
-    }
   }
 }

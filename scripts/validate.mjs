@@ -42,6 +42,15 @@ for (const name of plugins) {
     readOptional('protocol/features.json'),
   ]);
 
+  const assertTopLevelKeys = (file, value, allowed) => {
+    const unexpected = Object.keys(value).filter((key) => !allowed.has(key));
+    if (unexpected.length > 0) fail(`${name}/${file}: unexpected top-level keys: ${unexpected.join(', ')}`);
+  };
+  assertTopLevelKeys('protocol/commands.json', commandsFile, new Set(['schemaVersion', 'commands']));
+  assertTopLevelKeys('protocol/parsers.json', parsersFile, new Set(['schemaVersion', 'parsers']));
+  assertTopLevelKeys('protocol/transports.json', transportsFile, new Set(['schemaVersion', 'transports']));
+  assertTopLevelKeys('protocol/workflows.json', workflowsFile, new Set(['schemaVersion', 'workflows', 'mutations', 'transactions']));
+
   if (featuresFile) {
     expandFeatureRefs(name, featuresFile.features ?? {}, workflowsFile);
   }
