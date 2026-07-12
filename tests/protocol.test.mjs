@@ -49,10 +49,10 @@ test('research plugins stay read-only and expose evidence-scoped descriptors', a
   }
   assert.ok(logitechDevices.hardwareVerifiedModels.length > 0, 'logitech-hidpp should list hardware-verified models');
 });
-test('receiver lighting type remains unnamed', async () => {
+test('research metadata stays out of executable command schema', async () => {
   const commands = await read('plugins/amaster/protocol/commands.json');
-  assert.equal(commands.am35.receiverLightingType.status, 'unknown');
-  assert.deepEqual(commands.am35.receiverLightingType.namedValues, {});
+  assert.deepEqual(Object.keys(commands).sort(), ['commands', 'schemaVersion']);
+  assert.equal(commands.am35, undefined);
 });
 test('receiver workflow reads mouse color from settings and receiver light locally', async () => {
   const workflows = await read('plugins/amaster/protocol/workflows.json');
