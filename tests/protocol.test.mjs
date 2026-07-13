@@ -150,15 +150,16 @@ test('battery history eligibility is declared by each plugin', async () => {
   assert.deepEqual(batteryPolicy(logitech).validConnections, ['wireless', 'usb']);
 });
 
-test('AMaster declares plugin-owned identity for Protocol A connection aliases', async () => {
+test('AMaster declares plugin-owned identity for the .100 connection aliases', async () => {
   const devices = await read('plugins/amaster/devices.json');
   const protocolADevices = devices.devices.filter((device) => device.family.startsWith('protocol-a-'));
   assert.equal(protocolADevices.length, 4);
   for (const device of protocolADevices) {
     assert.equal(device.identity.group, 'am-infinity-8k-mouse', device.family);
-    assert.equal(device.identity.displayName, 'AM INFINITY 8K MOUSE', device.family);
+    assert.equal(device.identity.displayName, 'AM INFINITY MOUSE .100', device.family);
     assert.ok(device.identity.aliases.includes('amaster protocol-a-direct'), device.family);
     assert.ok(device.identity.aliases.includes('amaster protocol-a-receiver'), device.family);
+    assert.ok(device.identity.aliases.includes('AM INFINITY 8K MOUSE'), device.family);
   }
 });
 
