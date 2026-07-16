@@ -22,15 +22,15 @@
         { "command": "receiver-firmware-usb", "parser": "firmware", "output": "receiverFirmwareUsb", "transport": "protocol-a" },
         { "command": "receiver-firmware-soc", "parser": "receiver-firmware-soc", "output": "receiverFirmwareSoc", "transport": "protocol-a" },
         { "command": "receiver-firmware-led", "parser": "firmware", "output": "receiverFirmwareLed", "transport": "protocol-a" },
-        { "command": "battery", "parser": "battery", "output": "battery" },
-        { "command": "dpi", "parser": "dpi", "output": "dpi" },
-        { "command": "settings", "parser": "settings", "output": "settings" },
+        { "command": "battery", "parser": "battery", "output": "battery", "skipIfZero": [{ "output": "receiverIdle", "field": "mouseOnline" }] },
+        { "command": "dpi", "parser": "dpi", "output": "dpi", "skipIfZero": [{ "output": "receiverIdle", "field": "mouseOnline" }] },
+        { "command": "settings", "parser": "settings", "output": "settings", "skipIfZero": [{ "output": "receiverIdle", "field": "mouseOnline" }] },
         { "command": "lighting", "parser": "lighting", "output": "receiverLighting", "transport": "protocol-a" },
-        { "command": "fps", "parser": "fps", "output": "fps" },
-        { "command": "dpi-button", "parser": "dpi-button", "output": "dpiButton" },
-        { "command": "firmware-usb", "parser": "firmware", "output": "firmwareUsb" },
-        { "command": "firmware-soc", "parser": "firmware", "output": "firmwareSoc" },
-        { "command": "button-mappings", "parser": "button-mappings", "output": "buttonMappings", "params": { "layer": 0 } }
+        { "command": "fps", "parser": "fps", "output": "fps", "skipIfZero": [{ "output": "receiverIdle", "field": "mouseOnline" }] },
+        { "command": "dpi-button", "parser": "dpi-button", "output": "dpiButton", "skipIfZero": [{ "output": "receiverIdle", "field": "mouseOnline" }] },
+        { "command": "firmware-usb", "parser": "firmware", "output": "firmwareUsb", "skipIfZero": [{ "output": "receiverIdle", "field": "mouseOnline" }] },
+        { "command": "firmware-soc", "parser": "firmware", "output": "firmwareSoc", "skipIfZero": [{ "output": "receiverIdle", "field": "mouseOnline" }] },
+        { "command": "button-mappings", "parser": "button-mappings", "output": "buttonMappings", "params": { "layer": 0 }, "skipIfZero": [{ "output": "receiverIdle", "field": "mouseOnline" }] }
       ]
     },
     "am35-direct-read": {

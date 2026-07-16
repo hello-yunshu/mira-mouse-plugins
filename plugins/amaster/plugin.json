@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "pluginId": "mira.amaster",
   "name": "AMaster Protocol A",
-  "version": "1.6.3",
+  "version": "1.6.5",
   "pluginApi": ">=1.0.0, <2.0.0",
   "publisherKeyId": null,
   "evidence": "hardware-verified",
