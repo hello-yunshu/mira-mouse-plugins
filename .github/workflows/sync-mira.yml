@@ -23,7 +23,7 @@ jobs:
       MIRA_REPOSITORY: "${{ vars.MIRA_REPOSITORY || 'hello-yunshu/mira-mouse' }}"
       MIRA_APP_TOKEN: "${{ secrets.MIRA_APP_TOKEN }}"
     steps:
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with: { node-version: 22 }
       - name: Verify credentials
         id: credentials

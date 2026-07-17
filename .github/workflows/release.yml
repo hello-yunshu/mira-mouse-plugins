@@ -34,7 +34,7 @@ jobs:
       release_tag: '${{ steps.list.outputs.release_tag }}'
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - run: npm run validate && npm test
@@ -94,7 +94,7 @@ jobs:
         plugin: '${{ fromJson(needs.gate.outputs.plugins) }}'
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Pack and sign plugin
