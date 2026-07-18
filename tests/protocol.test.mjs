@@ -108,6 +108,12 @@ test('AMaster declares complete declarative host capability metadata', async () 
   assert.equal(capabilities.lighting.control, 'LightingZone');
   assert.equal(capabilities.lighting.metadata.statusDisplay.labelKey, 'capability.lighting');
   assert.equal(capabilities.lighting.metadata.statusDisplay.valueSource, 'capabilities.settings.mouseLightEnabled');
+  assert.equal(capabilities.lighting.metadata.statusDisplay.onClickField, 'enabled');
+  assert.equal(
+    capabilities.lighting.metadata.zones.flatMap((zone) => zone.fields)
+      .find((field) => field.id === capabilities.lighting.metadata.statusDisplay.onClickField).editor,
+    'inline-toggle',
+  );
   assert.equal(capabilities.dpi.metadata.summary, undefined);
   assert.deepEqual(capabilities['polling-rate'].metadata.summary.map((item) => item.source), [
     'capabilities.settings.motionSync',
