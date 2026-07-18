@@ -116,7 +116,10 @@ function validField(field) {
   if (field.range !== undefined && !validRange(field.range)) return false;
   if (field.format !== undefined && !FORMATS.has(field.format)) return false;
   if (!validWhen(field.visibleWhen)) return false;
-  return field.switch === undefined || (field.switch && typeof field.switch === 'object' && validPath(field.switch.source) && Object.hasOwn(field.switch, 'offValue'));
+  return field.switch === undefined || (field.switch && typeof field.switch === 'object'
+    && validPath(field.switch.source)
+    && Object.hasOwn(field.switch, 'offValue')
+    && (field.switch.restoreField === undefined || validPath(field.switch.restoreField)));
 }
 function validStageLayout(value) {
   return value && typeof value === 'object' && validPath(value.dotsSource) && validPath(value.valueSource)
@@ -184,7 +187,22 @@ function validateDeclarativeCapability(name, capability) {
   if (metadata.fields !== undefined && (!Array.isArray(metadata.fields) || metadata.fields.length > 32 || !metadata.fields.every(validField))) fail(`${name}/${capability.id}: invalid declarative fields`);
   if (metadata.zones !== undefined && (!Array.isArray(metadata.zones) || metadata.zones.length > 8 || !metadata.zones.every((zone) => zone && typeof zone === 'object' && validPath(zone.id) && typeof zone.labelKey === 'string' && Array.isArray(zone.fields) && zone.fields.length <= 32 && zone.fields.every(validField) && validWhen(zone.visibleWhen)))) fail(`${name}/${capability.id}: invalid declarative zones`);
   if (metadata.stageLayout !== undefined && !validStageLayout(metadata.stageLayout)) fail(`${name}/${capability.id}: invalid stageLayout`);
-  if (metadata.statusDisplay !== undefined && (!metadata.statusDisplay || typeof metadata.statusDisplay !== 'object' || !validPath(metadata.statusDisplay.valueSource) || (metadata.statusDisplay.labelKey !== undefined && !validPath(metadata.statusDisplay.labelKey)) || (metadata.statusDisplay.valueOptions !== undefined && !validOptions(metadata.statusDisplay.valueOptions)) || (metadata.statusDisplay.valueFormat !== undefined && !FORMATS.has(metadata.statusDisplay.valueFormat)))) fail(`${name}/${capability.id}: invalid statusDisplay`);
+  const declaredFields = [
+    ...(metadata.fields ?? []),
+    ...(metadata.zones ?? []).flatMap((zone) => zone.fields ?? []),
+  ];
+  if (metadata.statusDisplay !== undefined && (
+    !metadata.statusDisplay
+    || typeof metadata.statusDisplay !== 'object'
+    || !validPath(metadata.statusDisplay.valueSource)
+    || (metadata.statusDisplay.labelKey !== undefined && !validPath(metadata.statusDisplay.labelKey))
+    || (metadata.statusDisplay.valueOptions !== undefined && !validOptions(metadata.statusDisplay.valueOptions))
+    || (metadata.statusDisplay.valueFormat !== undefined && !FORMATS.has(metadata.statusDisplay.valueFormat))
+    || (metadata.statusDisplay.onClickField !== undefined && (
+      !validPath(metadata.statusDisplay.onClickField)
+      || !declaredFields.some((field) => field.id === metadata.statusDisplay.onClickField)
+    ))
+  )) fail(`${name}/${capability.id}: invalid statusDisplay`);
   if (metadata.summary !== undefined && !validSummary(metadata.summary)) fail(`${name}/${capability.id}: invalid summary`);
   if (metadata.accentSource !== undefined && !validPath(metadata.accentSource)) fail(`${name}/${capability.id}: invalid accentSource`);
   for (const field of metadata.fields ?? []) validateFieldMutationCoverage(name, capability.id, field);
