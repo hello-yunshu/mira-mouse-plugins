@@ -9,6 +9,7 @@
       "usage": 2,
       "connection": "usb",
       "evidence": "hardware-verified",
+      "selectionPriority": 100,
       "identity": {
         "group": "am-infinity-8k-mouse",
         "displayName": "AM INFINITY MOUSE .100",
@@ -23,6 +24,7 @@
       "usage": 1,
       "connection": "usb",
       "evidence": "hardware-verified",
+      "selectionPriority": 100,
       "identity": {
         "group": "am-infinity-8k-mouse",
         "displayName": "AM INFINITY MOUSE .100",
@@ -37,6 +39,7 @@
       "usage": 2,
       "connection": "wireless-receiver",
       "evidence": "hardware-verified",
+      "selectionPriority": 0,
       "identity": {
         "group": "am-infinity-8k-mouse",
         "displayName": "AM INFINITY MOUSE .100",
@@ -51,6 +54,7 @@
       "usage": 1,
       "connection": "wireless-receiver",
       "evidence": "source-confirmed",
+      "selectionPriority": 0,
       "identity": {
         "group": "am-infinity-8k-mouse",
         "displayName": "AM INFINITY MOUSE .100",
@@ -65,6 +69,7 @@
       "usage": 1,
       "connection": "usb",
       "evidence": "source-confirmed",
+      "selectionPriority": 100,
       "identity": {
         "group": "am-infinity-97-mouse",
         "displayName": "AM INFINITY MOUSE .97",
@@ -79,6 +84,7 @@
       "usage": 1,
       "connection": "wireless-receiver",
       "evidence": "source-confirmed",
+      "selectionPriority": 0,
       "identity": {
         "group": "am-infinity-97-mouse",
         "displayName": "AM INFINITY MOUSE .97",

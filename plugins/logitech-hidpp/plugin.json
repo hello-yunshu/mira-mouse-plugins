@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "pluginId": "mira.logitech-hidpp",
   "name": "Logitech HID++",
-  "version": "0.8.2",
+  "version": "0.9.0",
   "pluginApi": ">=1.0.0, <2.0.0",
   "publisherKeyId": null,
   "evidence": "hardware-verified",
