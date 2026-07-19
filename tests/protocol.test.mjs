@@ -167,6 +167,13 @@ test('AMaster declares plugin-owned identity for the .100 connection aliases', a
     assert.ok(device.identity.aliases.includes('amaster protocol-a-receiver'), device.family);
     assert.ok(device.identity.aliases.includes('AM INFINITY 8K MOUSE'), device.family);
   }
+  const directPriorities = protocolADevices
+    .filter((device) => device.family === 'protocol-a-direct')
+    .map((device) => device.selectionPriority);
+  const receiverPriorities = protocolADevices
+    .filter((device) => device.family === 'protocol-a-receiver')
+    .map((device) => device.selectionPriority);
+  assert.ok(directPriorities.every((priority) => priority > Math.max(...receiverPriorities)));
 });
 
 test('AMaster .97 uses the official input-report RACE transport and shared identity', async () => {
@@ -178,6 +185,10 @@ test('AMaster .97 uses the official input-report RACE transport and shared ident
     assert.equal(device.identity.group, 'am-infinity-97-mouse', device.family);
     assert.equal(device.identity.displayName, 'AM INFINITY MOUSE .97', device.family);
   }
+  assert.ok(
+    am97Devices.find((device) => device.family === 'am35-direct').selectionPriority
+      > am97Devices.find((device) => device.family === 'am35-receiver').selectionPriority,
+  );
   for (const id of ['am35-direct', 'am35-receiver']) {
     assert.equal(transports.transports[id].readMode, 'input-report', id);
     assert.equal(transports.transports[id].readDelayMs, 50, id);
@@ -194,6 +205,10 @@ test('logitech-hidpp exposes a read workflow per device family and writable muta
   const dpi = manifest.capabilities.find((capability) => capability.id === 'dpi');
   const pointerSpeed = manifest.capabilities.find((capability) => capability.id === 'pointer-speed');
   const profileCurrent = manifest.capabilities.find((capability) => capability.id === 'profile-mgmt-current');
+  assert.ok(
+    devices.devices[0].selectionPriorityByConnection.usb
+      > devices.devices[0].selectionPriorityByConnection.wireless,
+  );
   assert.equal(manifest.capabilities.some((capability) => capability.metadata?.description), false);
   assert.deepEqual(polling.metadata.fields[0].mutation, ['set-polling-rate', 'set-polling-rate-extended']);
   assert.deepEqual(dpi.metadata.stageLayout.setMutation, ['set-dpi-value', 'set-dpi-value-extended']);

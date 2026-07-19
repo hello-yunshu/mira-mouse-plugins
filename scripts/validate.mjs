@@ -306,6 +306,29 @@ function validateDeviceIdentity(name, device) {
   }
 }
 
+function validateDeviceSelection(name, device) {
+  const validatePriority = (path, value) => {
+    if (!Number.isInteger(value) || value < -1000 || value > 1000) {
+      fail(`${name}/${device.family}: ${path} must be an integer between -1000 and 1000`);
+    }
+  };
+  if (device.selectionPriority !== undefined) {
+    validatePriority('selectionPriority', device.selectionPriority);
+  }
+  if (device.selectionPriorityByConnection === undefined) return;
+  const priorities = device.selectionPriorityByConnection;
+  if (!priorities || typeof priorities !== 'object' || Array.isArray(priorities)) {
+    fail(`${name}/${device.family}: selectionPriorityByConnection must be an object`);
+  }
+  const validConnections = new Set(['usb', 'wireless', 'bluetooth', 'virtual']);
+  for (const [connection, priority] of Object.entries(priorities)) {
+    if (!validConnections.has(connection)) {
+      fail(`${name}/${device.family}: selectionPriorityByConnection has unknown connection ${connection}`);
+    }
+    validatePriority(`selectionPriorityByConnection.${connection}`, priority);
+  }
+}
+
 function expandFeatureRefs(pluginName, features, workflowsFile) {
   function resolve(name, context) {
     const entry = features[name];
@@ -478,6 +501,7 @@ for (const [name, data] of Object.entries(pluginData)) {
   const familyPrefixes = name === 'amaster' ? ['protocol-a-', 'am35-'] : ['hidpp2-'];
   for (const device of devices.devices) {
     validateDeviceIdentity(name, device);
+    validateDeviceSelection(name, device);
     for (const prefix of familyPrefixes) {
       if (device.family.startsWith(prefix) && !workflows[`${device.family}-read`]) {
         fail(`${name}/${device.family}: missing read workflow`);

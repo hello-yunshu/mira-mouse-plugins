@@ -7,7 +7,12 @@
       "usagePage": 65280,
       "usage": 2,
       "connection": "hidpp",
-      "evidence": "protocol-verified"
+      "evidence": "protocol-verified",
+      "selectionPriorityByConnection": {
+        "usb": 100,
+        "wireless": 0,
+        "bluetooth": 0
+      }
     }
   ],
   "hardwareVerifiedModels": ["G705 Mouse through 046d:c547 receiver on macOS"]
