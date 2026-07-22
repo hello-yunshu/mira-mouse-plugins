@@ -12,6 +12,7 @@
 - `devices.json` 描述 HID/接口匹配和证据范围。使用精确的 VID/PID、usage page、usage、connection 和 family name。`hardwareVerifiedModels` 仅作为证据说明保留。
 - `protocol/workflows.json` 证明存在哪些输出、允许哪些 mutation。可选 feature 应由 guard 跳过，而不是变成型号特定的 UI 分支。
 - `plugin.json` 声明 host 渲染的能力、placement hint、data-source 路径、mutation id、有界选项、lighting role 和能力元数据。
+- `plugin.json.runtime.wakeRecovery` 可声明无线组件的活动恢复契约。插件只声明 `activitySource`、稳定的 `componentId` 和适用连接；Host 拥有各平台活动监听、退避与读取时序。当前 `system-pointer` 不要求辅助功能权限，也不能被 Host 自动推断，只有明确声明的插件才会启用。
 - `locales/*.json` 拥有插件特有的标签、灯效名和选项文案。DPI、电量等通用控件可使用 host 翻译 fallback。`metadata.label` 仅作为旧 host 的 fallback。
 - `tests/fixtures` 记录证明某个 parser、workflow 或 promoted write 合理性的精确 report。
 
