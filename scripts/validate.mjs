@@ -65,6 +65,15 @@ for (const name of plugins) {
     mutations: workflowsFile.mutations ?? {},
   };
 
+  const manifestKeys = new Set([
+    'schemaVersion', 'pluginId', 'name', 'version', 'pluginApi', 'publisherKeyId',
+    'evidence', 'permissions', 'runtime', 'capabilities', 'writesEnabled',
+    'exportableFields', 'dependsOn',
+  ]);
+  const unexpectedManifestKeys = Object.keys(manifest).filter((key) => !manifestKeys.has(key));
+  if (unexpectedManifestKeys.length > 0) fail(`${name}/plugin.json: unexpected keys: ${unexpectedManifestKeys.join(', ')}`);
+  validateRuntime(name, manifest.runtime);
+
   const controlGroups = new Set();
   let statusItems = 0;
   for (const capability of manifest.capabilities ?? []) {
@@ -81,6 +90,28 @@ for (const name of plugins) {
 function validMutationRef(value) {
   if (typeof value === 'string') return value.length > 0;
   return Array.isArray(value) && value.length > 0 && value.every((item) => typeof item === 'string' && item.length > 0);
+}
+function validateRuntime(name, runtime) {
+  if (runtime === undefined) return;
+  if (!runtime || typeof runtime !== 'object' || Array.isArray(runtime)
+    || Object.keys(runtime).some((key) => key !== 'wakeRecovery')) {
+    fail(`${name}: invalid runtime contract`);
+  }
+  const recovery = runtime.wakeRecovery;
+  if (recovery === undefined) return;
+  const allowed = new Set(['activitySource', 'componentId', 'connections']);
+  if (!recovery || typeof recovery !== 'object' || Array.isArray(recovery)
+    || Object.keys(recovery).some((key) => !allowed.has(key))
+    || recovery.activitySource !== 'system-pointer'
+    || typeof recovery.componentId !== 'string'
+    || !/^[a-z][a-z0-9-]{0,31}$/.test(recovery.componentId)
+    || !Array.isArray(recovery.connections)
+    || recovery.connections.length === 0
+    || recovery.connections.length > 4
+    || new Set(recovery.connections).size !== recovery.connections.length
+    || !recovery.connections.every((connection) => HOST_DEVICE_CONNECTIONS.has(connection))) {
+    fail(`${name}: invalid runtime.wakeRecovery contract`);
+  }
 }
 
 function validPath(value) { return typeof value === 'string' && value.length > 0 && value.length <= 160; }
