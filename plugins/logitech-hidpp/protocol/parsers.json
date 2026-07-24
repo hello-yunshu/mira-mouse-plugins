@@ -4,9 +4,18 @@
     "root-get-feature": {
       "validWhen": [],
       "fields": {
-        "deviceIndex": { "offset": 0, "kind": "u8" },
-        "featureIndex": { "offset": 3, "kind": "u8" },
-        "featureVersion": { "offset": 4, "kind": "u8" }
+        "deviceIndex": {
+          "offset": 0,
+          "kind": "u8"
+        },
+        "featureIndex": {
+          "offset": 3,
+          "kind": "u8"
+        },
+        "featureVersion": {
+          "offset": 4,
+          "kind": "u8"
+        }
       },
       "derived": {
         "connection": {
@@ -27,32 +36,69 @@
     "feature-set-get-count": {
       "validWhen": [],
       "fields": {
-        "count": { "offset": 3, "kind": "u8" }
+        "count": {
+          "offset": 3,
+          "kind": "u8"
+        }
       }
     },
     "device-info-get": {
       "validWhen": [],
       "fields": {
-        "entityCount": { "offset": 3, "kind": "u8" },
-        "unitId": { "offset": 4, "kind": "bytes", "count": 4 },
-        "transport": { "offset": 8, "kind": "u8" },
-        "modelId": { "offset": 9, "kind": "bytes", "count": 6 }
+        "entityCount": {
+          "offset": 3,
+          "kind": "u8"
+        },
+        "unitId": {
+          "offset": 4,
+          "kind": "bytes",
+          "count": 4
+        },
+        "transport": {
+          "offset": 8,
+          "kind": "u8"
+        },
+        "modelId": {
+          "offset": 9,
+          "kind": "bytes",
+          "count": 6
+        }
       }
     },
     "device-name-get-count": {
       "validWhen": [],
-      "fields": { "length": { "offset": 3, "kind": "u8" } }
+      "fields": {
+        "length": {
+          "offset": 3,
+          "kind": "u8"
+        }
+      }
     },
     "device-name-get": {
       "validWhen": [],
-      "fields": { "name": { "offset": 3, "kind": "ascii", "count": 16 } }
+      "fields": {
+        "name": {
+          "offset": 3,
+          "kind": "ascii",
+          "count": 16
+        }
+      }
     },
     "battery-get-status": {
       "validWhen": [],
       "fields": {
-        "percentage": { "offset": 3, "kind": "u8" },
-        "nextPercentage": { "offset": 4, "kind": "u8" },
-        "statusRaw": { "offset": 5, "kind": "u8" }
+        "percentage": {
+          "offset": 3,
+          "kind": "u8"
+        },
+        "nextPercentage": {
+          "offset": 4,
+          "kind": "u8"
+        },
+        "statusRaw": {
+          "offset": 5,
+          "kind": "u8"
+        }
       },
       "derived": {
         "charging": {
@@ -88,24 +134,48 @@
     "battery-get-capability": {
       "validWhen": [],
       "fields": {
-        "numLevels": { "offset": 3, "kind": "u8" },
-        "capabilityFlags": { "offset": 4, "kind": "u8" }
+        "numLevels": {
+          "offset": 3,
+          "kind": "u8"
+        },
+        "capabilityFlags": {
+          "offset": 4,
+          "kind": "u8"
+        }
       }
     },
     "unified-battery-get-capabilities": {
       "validWhen": [],
       "fields": {
-        "supportedLevels": { "offset": 3, "kind": "u8" },
-        "capabilityFlags": { "offset": 4, "kind": "u8" }
+        "supportedLevels": {
+          "offset": 3,
+          "kind": "u8"
+        },
+        "capabilityFlags": {
+          "offset": 4,
+          "kind": "u8"
+        }
       }
     },
     "unified-battery-get-status": {
       "validWhen": [],
       "fields": {
-        "percentage": { "offset": 3, "kind": "u8" },
-        "levelFlags": { "offset": 4, "kind": "u8" },
-        "chargingStatus": { "offset": 5, "kind": "u8" },
-        "externalPowerStatus": { "offset": 6, "kind": "u8" }
+        "percentage": {
+          "offset": 3,
+          "kind": "u8"
+        },
+        "levelFlags": {
+          "offset": 4,
+          "kind": "u8"
+        },
+        "chargingStatus": {
+          "offset": 5,
+          "kind": "u8"
+        },
+        "externalPowerStatus": {
+          "offset": 6,
+          "kind": "u8"
+        }
       },
       "derived": {
         "charging": {
@@ -132,30 +202,100 @@
         }
       }
     },
+    "dpi-get-capability": {
+      "validWhen": [],
+      "fields": {
+        "sensorCount": {
+          "offset": 3,
+          "kind": "u8"
+        }
+      }
+    },
+    "dpi-get-list": {
+      "validWhen": [],
+      "fields": {
+        "sensorIndex": {
+          "offset": 3,
+          "kind": "u8"
+        },
+        "firstDpi": {
+          "offset": 4,
+          "kind": "be-u16"
+        },
+        "secondWord": {
+          "offset": 6,
+          "kind": "be-u16"
+        },
+        "thirdWord": {
+          "offset": 8,
+          "kind": "be-u16"
+        },
+        "fourthWord": {
+          "offset": 10,
+          "kind": "be-u16"
+        }
+      }
+    },
     "dpi-get-current": {
       "validWhen": [],
       "fields": {
-        "sensorIndex": { "offset": 3, "kind": "u8" },
-        "dpiValue": { "offset": 4, "kind": "be-u16" },
-        "defaultDpi": { "offset": 6, "kind": "be-u16" }
+        "sensorIndex": {
+          "offset": 3,
+          "kind": "u8"
+        },
+        "dpiValue": {
+          "offset": 4,
+          "kind": "be-u16"
+        },
+        "defaultDpi": {
+          "offset": 6,
+          "kind": "be-u16"
+        }
       }
     },
     "extended-dpi-get-current": {
       "validWhen": [],
       "fields": {
-        "sensorIndex": { "offset": 3, "kind": "u8" },
-        "dpiValue": { "offset": 4, "kind": "be-u16" },
-        "defaultDpi": { "offset": 6, "kind": "be-u16" }
+        "sensorIndex": {
+          "offset": 3,
+          "kind": "u8"
+        },
+        "dpiValue": {
+          "offset": 4,
+          "kind": "be-u16"
+        },
+        "defaultDpi": {
+          "offset": 6,
+          "kind": "be-u16"
+        }
       }
     },
     "mouse-pointer-get": {
       "validWhen": [],
       "fields": {
-        "dpi": { "offset": 3, "kind": "be-u16" },
-        "flags": { "offset": 5, "kind": "u8" },
-        "accelerationRaw": { "offset": 5, "kind": "u8", "mask": "0x03" },
-        "suggestOsBallistics": { "offset": 5, "kind": "bool", "mask": "0x04" },
-        "suggestVerticalOrientation": { "offset": 5, "kind": "bool", "mask": "0x08" }
+        "dpi": {
+          "offset": 3,
+          "kind": "be-u16"
+        },
+        "flags": {
+          "offset": 5,
+          "kind": "u8"
+        },
+        "accelerationRaw": {
+          "offset": 5,
+          "kind": "u8",
+          "mask": "0x03"
+        },
+        "suggestOsBallistics": {
+          "offset": 5,
+          "kind": "bool",
+          "mask": "0x04"
+        },
+        "suggestVerticalOrientation": {
+          "offset": 5,
+          "kind": "bool",
+          "mask": "0x08"
+        }
       },
       "derived": {
         "acceleration": {
@@ -173,27 +313,57 @@
     "pointer-speed-get": {
       "validWhen": [],
       "fields": {
-        "speedRaw": { "offset": 3, "kind": "be-u16" }
+        "speedRaw": {
+          "offset": 3,
+          "kind": "be-u16"
+        }
       }
     },
     "report-rate-get-list": {
       "validWhen": [],
       "fields": {
-        "rateListFlags": { "offset": 3, "kind": "u8" }
+        "rateListFlags": {
+          "offset": 3,
+          "kind": "u8"
+        }
       },
       "derived": {
         "supportedRates": {
           "kind": "bitmap",
           "source": "rateListFlags",
           "bitmap": [
-            { "bit": 0, "value": 1000 },
-            { "bit": 1, "value": 500 },
-            { "bit": 2, "value": 333 },
-            { "bit": 3, "value": 250 },
-            { "bit": 4, "value": 200 },
-            { "bit": 5, "value": 167 },
-            { "bit": 6, "value": 143 },
-            { "bit": 7, "value": 125 }
+            {
+              "bit": 0,
+              "value": 1000
+            },
+            {
+              "bit": 1,
+              "value": 500
+            },
+            {
+              "bit": 2,
+              "value": 333
+            },
+            {
+              "bit": 3,
+              "value": 250
+            },
+            {
+              "bit": 4,
+              "value": 200
+            },
+            {
+              "bit": 5,
+              "value": 167
+            },
+            {
+              "bit": 6,
+              "value": 143
+            },
+            {
+              "bit": 7,
+              "value": 125
+            }
           ]
         }
       }
@@ -201,7 +371,10 @@
     "report-rate-get": {
       "validWhen": [],
       "fields": {
-        "rateMs": { "offset": 3, "kind": "u8" }
+        "rateMs": {
+          "offset": 3,
+          "kind": "u8"
+        }
       },
       "derived": {
         "pollingRate": {
@@ -223,20 +396,44 @@
     "extended-report-rate-get-list": {
       "validWhen": [],
       "fields": {
-        "rateListFlags": { "offset": 3, "kind": "be-u16" }
+        "rateListFlags": {
+          "offset": 3,
+          "kind": "be-u16"
+        }
       },
       "derived": {
         "supportedRates": {
           "kind": "bitmap",
           "source": "rateListFlags",
           "bitmap": [
-            { "bit": 0, "value": 125 },
-            { "bit": 1, "value": 250 },
-            { "bit": 2, "value": 500 },
-            { "bit": 3, "value": 1000 },
-            { "bit": 4, "value": 2000 },
-            { "bit": 5, "value": 4000 },
-            { "bit": 6, "value": 8000 }
+            {
+              "bit": 0,
+              "value": 125
+            },
+            {
+              "bit": 1,
+              "value": 250
+            },
+            {
+              "bit": 2,
+              "value": 500
+            },
+            {
+              "bit": 3,
+              "value": 1000
+            },
+            {
+              "bit": 4,
+              "value": 2000
+            },
+            {
+              "bit": 5,
+              "value": 4000
+            },
+            {
+              "bit": 6,
+              "value": 8000
+            }
           ]
         }
       }
@@ -244,7 +441,10 @@
     "extended-report-rate-get": {
       "validWhen": [],
       "fields": {
-        "rateIndex": { "offset": 3, "kind": "u8" }
+        "rateIndex": {
+          "offset": 3,
+          "kind": "u8"
+        }
       },
       "derived": {
         "pollingRate": {
@@ -265,42 +465,95 @@
     "color-led-effects-get-info": {
       "validWhen": [],
       "fields": {
-        "zoneCount": { "offset": 3, "kind": "u8" },
-        "nvCaps": { "offset": 4, "kind": "be-u16" },
-        "extCaps": { "offset": 6, "kind": "be-u16" }
+        "zoneCount": {
+          "offset": 3,
+          "kind": "u8"
+        },
+        "nvCaps": {
+          "offset": 4,
+          "kind": "be-u16"
+        },
+        "extCaps": {
+          "offset": 6,
+          "kind": "be-u16"
+        }
       },
       "derived": {
-        "supportsFixed": { "kind": "bit", "source": "nvCaps", "bit": 0 },
-        "supportsCycle": { "kind": "bit", "source": "nvCaps", "bit": 1 },
-        "supportsWave": { "kind": "bit", "source": "nvCaps", "bit": 2 },
-        "supportsStarlight": { "kind": "bit", "source": "nvCaps", "bit": 3 },
-        "supportsBreathing": { "kind": "bit", "source": "nvCaps", "bit": 4 },
-        "supportsRipple": { "kind": "bit", "source": "nvCaps", "bit": 5 },
-        "supportsCustom": { "kind": "bit", "source": "nvCaps", "bit": 6 }
+        "supportsFixed": {
+          "kind": "bit",
+          "source": "nvCaps",
+          "bit": 0
+        },
+        "supportsCycle": {
+          "kind": "bit",
+          "source": "nvCaps",
+          "bit": 1
+        },
+        "supportsWave": {
+          "kind": "bit",
+          "source": "nvCaps",
+          "bit": 2
+        },
+        "supportsStarlight": {
+          "kind": "bit",
+          "source": "nvCaps",
+          "bit": 3
+        },
+        "supportsBreathing": {
+          "kind": "bit",
+          "source": "nvCaps",
+          "bit": 4
+        },
+        "supportsRipple": {
+          "kind": "bit",
+          "source": "nvCaps",
+          "bit": 5
+        },
+        "supportsCustom": {
+          "kind": "bit",
+          "source": "nvCaps",
+          "bit": 6
+        }
       }
     },
     "color-led-effects-get-zone-effect": {
       "validWhen": [],
       "fields": {
-        "zoneIndex": { "offset": 3, "kind": "u8" },
-        "mode": { "offset": 4, "kind": "u8" },
-        "enabled": { "offset": 4, "kind": "bool", "mask": "0xff" },
-        "color": { "offset": 5, "kind": "rgb" },
-        "effect": { "offset": 8, "kind": "u8" }
+        "zoneIndex": {
+          "offset": 3,
+          "kind": "u8"
+        },
+        "mode": {
+          "offset": 4,
+          "kind": "u8"
+        },
+        "enabled": {
+          "offset": 4,
+          "kind": "bool",
+          "mask": "0xff"
+        },
+        "color": {
+          "offset": 5,
+          "kind": "rgb"
+        },
+        "effect": {
+          "offset": 8,
+          "kind": "u8"
+        }
       },
       "derived": {
         "effectName": {
           "kind": "lookup",
           "source": "mode",
           "table": {
-            "0x00": "已关闭",
-            "0x01": "常亮",
-            "0x03": "循环",
-            "0x04": "光波",
-            "0x05": "星夜",
-            "0x0a": "呼吸",
-            "0x0b": "涟漪",
-            "0x0c": "自定义"
+            "0x00": "lighting.off",
+            "0x01": "lighting.fixed",
+            "0x03": "lighting.cycle",
+            "0x04": "lighting.wave",
+            "0x05": "lighting.starlight",
+            "0x0a": "lighting.breathing",
+            "0x0b": "lighting.ripple",
+            "0x0c": "lighting.custom"
           }
         }
       }
@@ -308,120 +561,271 @@
     "rgb-effects-get-info": {
       "validWhen": [],
       "fields": {
-        "response0": { "offset": 3, "kind": "u8" },
-        "response1": { "offset": 4, "kind": "u8" },
-        "zoneCount": { "offset": 5, "kind": "u8" },
-        "responseFlags": { "offset": 6, "kind": "be-u16" },
-        "capabilities": { "offset": 8, "kind": "be-u16" }
+        "response0": {
+          "offset": 3,
+          "kind": "u8"
+        },
+        "response1": {
+          "offset": 4,
+          "kind": "u8"
+        },
+        "zoneCount": {
+          "offset": 5,
+          "kind": "u8"
+        },
+        "responseFlags": {
+          "offset": 6,
+          "kind": "be-u16"
+        },
+        "capabilities": {
+          "offset": 8,
+          "kind": "be-u16"
+        }
       },
       "derived": {
-        "supportsFixed": { "kind": "bit", "source": "capabilities", "bit": 0 },
-        "supportsCycle": { "kind": "bit", "source": "capabilities", "bit": 1 },
-        "supportsWave": { "kind": "bit", "source": "capabilities", "bit": 2 },
-        "supportsStarlight": { "kind": "bit", "source": "capabilities", "bit": 3 },
-        "supportsBreathing": { "kind": "bit", "source": "capabilities", "bit": 4 },
-        "supportsRipple": { "kind": "bit", "source": "capabilities", "bit": 5 },
-        "supportsCustom": { "kind": "bit", "source": "capabilities", "bit": 6 }
+        "supportsFixed": {
+          "kind": "bit",
+          "source": "capabilities",
+          "bit": 0
+        },
+        "supportsCycle": {
+          "kind": "bit",
+          "source": "capabilities",
+          "bit": 1
+        },
+        "supportsWave": {
+          "kind": "bit",
+          "source": "capabilities",
+          "bit": 2
+        },
+        "supportsStarlight": {
+          "kind": "bit",
+          "source": "capabilities",
+          "bit": 3
+        },
+        "supportsBreathing": {
+          "kind": "bit",
+          "source": "capabilities",
+          "bit": 4
+        },
+        "supportsRipple": {
+          "kind": "bit",
+          "source": "capabilities",
+          "bit": 5
+        },
+        "supportsCustom": {
+          "kind": "bit",
+          "source": "capabilities",
+          "bit": 6
+        }
       }
     },
     "rgb-control-get": {
       "validWhen": [],
       "fields": {
-        "target": { "offset": 3, "kind": "u8" },
-        "mode": { "offset": 4, "kind": "u8" },
-        "flags": { "offset": 5, "kind": "u8" },
-        "enabled": { "offset": 4, "kind": "bool", "mask": "0x03" }
+        "target": {
+          "offset": 3,
+          "kind": "u8"
+        },
+        "mode": {
+          "offset": 4,
+          "kind": "u8"
+        },
+        "flags": {
+          "offset": 5,
+          "kind": "u8"
+        },
+        "enabled": {
+          "offset": 4,
+          "kind": "bool",
+          "mask": "0x03"
+        }
       }
     },
     "onboard-get-description": {
       "validWhen": [],
       "fields": {
-        "memoryModelId": { "offset": 3, "kind": "u8" },
-        "profileFormatId": { "offset": 4, "kind": "u8" },
-        "macroFormatId": { "offset": 5, "kind": "u8" },
-        "profileCount": { "offset": 6, "kind": "u8" },
-        "readOnlyProfileCount": { "offset": 7, "kind": "u8" },
-        "buttonCount": { "offset": 8, "kind": "u8" },
-        "sectorCount": { "offset": 9, "kind": "u8" },
-        "sectorSize": { "offset": 10, "kind": "be-u16" },
-        "mechanicalLayout": { "offset": 12, "kind": "u8" },
-        "variousInfo": { "offset": 13, "kind": "u8" }
+        "memoryModelId": {
+          "offset": 3,
+          "kind": "u8"
+        },
+        "profileFormatId": {
+          "offset": 4,
+          "kind": "u8"
+        },
+        "macroFormatId": {
+          "offset": 5,
+          "kind": "u8"
+        },
+        "profileCount": {
+          "offset": 6,
+          "kind": "u8"
+        },
+        "readOnlyProfileCount": {
+          "offset": 7,
+          "kind": "u8"
+        },
+        "buttonCount": {
+          "offset": 8,
+          "kind": "u8"
+        },
+        "sectorCount": {
+          "offset": 9,
+          "kind": "u8"
+        },
+        "sectorSize": {
+          "offset": 10,
+          "kind": "be-u16"
+        },
+        "mechanicalLayout": {
+          "offset": 12,
+          "kind": "u8"
+        },
+        "variousInfo": {
+          "offset": 13,
+          "kind": "u8"
+        }
       },
       "derived": {
-        "onboardFormatV5": { "kind": "lookup", "source": "profileFormatId", "table": { "5": 1 } }
+        "onboardFormatV5": {
+          "kind": "lookup",
+          "source": "profileFormatId",
+          "table": {
+            "5": 1
+          }
+        }
       }
     },
     "onboard-get-mode": {
       "validWhen": [],
       "fields": {
-        "mode": { "offset": 3, "kind": "u8" }
+        "mode": {
+          "offset": 3,
+          "kind": "u8"
+        }
       },
       "derived": {
         "modeName": {
           "kind": "lookup",
           "source": "mode",
-          "table": { "0x01": "onboard", "0x02": "host" }
+          "table": {
+            "0x01": "onboard",
+            "0x02": "host"
+          }
         },
         "hostMode": {
           "kind": "lookup",
           "source": "mode",
-          "table": { "0x01": 0, "0x02": 1 }
+          "table": {
+            "0x01": 0,
+            "0x02": 1
+          }
         },
         "onboardModeFlag": {
           "kind": "lookup",
           "source": "mode",
-          "table": { "0x01": 1, "0x02": 0 }
+          "table": {
+            "0x01": 1,
+            "0x02": 0
+          }
         }
       }
     },
     "onboard-get-current-profile": {
       "validWhen": [],
       "fields": {
-        "sector": { "offset": 3, "kind": "be-u16" }
+        "sector": {
+          "offset": 3,
+          "kind": "be-u16"
+        }
       }
     },
     "onboard-get-current-dpi-index": {
       "validWhen": [],
       "fields": {
-        "index": { "offset": 3, "kind": "u8" }
+        "index": {
+          "offset": 3,
+          "kind": "u8"
+        }
+      },
+      "derived": {
+        "stage": {
+          "kind": "lookup",
+          "source": "index",
+          "table": {
+            "0": 1,
+            "1": 2,
+            "2": 3,
+            "3": 4,
+            "4": 5,
+            "5": 6,
+            "6": 7,
+            "7": 8
+          }
+        }
       }
     },
     "onboard-memory-read": {
       "validWhen": [],
       "fields": {
-        "bytes": { "offset": 3, "kind": "bytes", "count": 16 }
+        "bytes": {
+          "offset": 3,
+          "kind": "bytes",
+          "count": 16
+        }
       }
     },
     "profile-mgmt-get-info": {
       "validWhen": [],
       "fields": {
-        "featureVersion": { "offset": 3, "kind": "u8" },
-        "maxProfileCount": { "offset": 4, "kind": "u8" },
-        "profileNameLength": { "offset": 5, "kind": "u8" }
+        "featureVersion": {
+          "offset": 3,
+          "kind": "u8"
+        },
+        "maxProfileCount": {
+          "offset": 4,
+          "kind": "u8"
+        },
+        "profileNameLength": {
+          "offset": 5,
+          "kind": "u8"
+        }
       }
     },
     "profile-mgmt-get-count": {
       "validWhen": [],
       "fields": {
-        "profileCount": { "offset": 3, "kind": "u8" }
+        "profileCount": {
+          "offset": 3,
+          "kind": "u8"
+        }
       }
     },
     "profile-mgmt-get-current": {
       "validWhen": [],
       "fields": {
-        "profileIndex": { "offset": 3, "kind": "u8" }
+        "profileIndex": {
+          "offset": 3,
+          "kind": "u8"
+        }
       }
     },
     "profile-mgmt-set-current": {
       "validWhen": [],
       "fields": {
-        "profileIndex": { "offset": 3, "kind": "u8" }
+        "profileIndex": {
+          "offset": 3,
+          "kind": "u8"
+        }
       }
     },
     "profile-mgmt-control": {
       "validWhen": [],
       "fields": {
-        "control": { "offset": 3, "kind": "u8" }
+        "control": {
+          "offset": 3,
+          "kind": "u8"
+        }
       }
     }
   }

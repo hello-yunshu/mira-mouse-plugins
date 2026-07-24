@@ -12,8 +12,19 @@
         "usb": 100,
         "wireless": 0,
         "bluetooth": 0
+      },
+      "identity": {
+        "group": "logitech-hidpp-mouse",
+        "displayName": "Logitech HID++ Mouse",
+        "aliases": [
+          "Logitech HID++ Device",
+          "Logitech HID++ 2.0 Mouse",
+          "Logitech Mouse"
+        ]
       }
     }
   ],
-  "hardwareVerifiedModels": ["G705 Mouse through 046d:c547 receiver on macOS"]
+  "hardwareVerifiedModels": [
+    "G705 Mouse through 046d:c547 receiver on macOS"
+  ]
 }

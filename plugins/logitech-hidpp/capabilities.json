@@ -1,34 +1,79 @@
 {
   "schemaVersion": 1,
-  "readOnly": ["battery", "device-info", "feature-index", "feature-set", "mouse-pointer", "surface-tuning", "sensor-stats", "color-led-info", "rgb-effects-info", "profile-mgmt-info"],
-  "enabledWrites": ["control-mode", "profile-mgmt-switch", "dpi-value", "dpi-value-extended", "pointer-speed", "polling-rate", "polling-rate-extended", "mouse-lighting", "mouse-lighting-onboard"],
-  "disabledWrites": ["onboard-profile-write", "receiver-lighting", "bluetooth-sleep-time", "wireless-sleep-time"],
-  "forbidden": ["firmware-update", "bootloader", "dfu", "flash-erase", "receiver-pairing", "macros"],
-  "pollingRatesHz": [125, 250, 500, 1000, 2000, 4000, 8000],
+  "readOnly": [
+    "battery",
+    "device-info",
+    "feature-index",
+    "feature-set",
+    "mouse-pointer",
+    "surface-tuning",
+    "sensor-stats",
+    "color-led-info",
+    "rgb-effects-info",
+    "profile-mgmt-info",
+    "dpi-capability",
+    "dpi-list"
+  ],
+  "enabledWrites": [
+    "control-mode",
+    "profile-mgmt-switch",
+    "dpi-stage",
+    "dpi-value",
+    "dpi-value-extended",
+    "pointer-speed",
+    "polling-rate",
+    "polling-rate-extended",
+    "mouse-lighting",
+    "mouse-lighting-onboard"
+  ],
+  "disabledWrites": [
+    "onboard-profile-write",
+    "receiver-lighting",
+    "bluetooth-sleep-time",
+    "wireless-sleep-time"
+  ],
+  "forbidden": [
+    "firmware-update",
+    "bootloader",
+    "dfu",
+    "flash-erase",
+    "receiver-pairing",
+    "macros"
+  ],
+  "pollingRatesHz": [
+    125,
+    250,
+    500,
+    1000,
+    2000,
+    4000,
+    8000
+  ],
   "normalizers": {
     "mouseLighting": {
       "onboardProfile": {
         "sourceWorkflow": "hidpp2-device-onboard-read",
-        "sectorSize": { "output": "onboardDescription", "field": "sectorSize" },
-        "enabledOverride": { "output": "rgbControl", "field": "enabled" },
+        "sectorSize": {
+          "output": "onboardDescription",
+          "field": "sectorSize"
+        },
+        "enabledOverride": {
+          "output": "rgbControl",
+          "field": "enabled"
+        },
         "chunkPrefix": "onboardProfileChunk",
         "chunkField": "bytes",
         "layouts": [
           {
-            "when": { "field": "profileFormatId", "eq": 5 },
+            "when": {
+              "field": "profileFormatId",
+              "eq": 5
+            },
             "effectOffset": 219,
             "colorOffset": 220,
             "speedOffset": 223,
             "brightnessOffset": 225,
             "extraColorOffset": 226
-          },
-          {
-            "default": true,
-            "effectOffset": 208,
-            "colorOffset": 209,
-            "speedOffset": 212,
-            "brightnessOffset": 214,
-            "extraColorOffset": 215
           }
         ]
       }
