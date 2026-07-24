@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "parsers": {
+    "battery-level": {
+      "validWhen": [{ "offset": 0, "eq": 2 }],
+      "fields": {
+        "level": { "offset": 9, "kind": "u8" }
+      }
+    },
+    "charging-status": {
+      "validWhen": [{ "offset": 0, "eq": 2 }],
+      "fields": {
+        "charging": { "offset": 9, "kind": "u8" }
+      }
+    },
+    "dpi": {
+      "validWhen": [{ "offset": 0, "eq": 2 }],
+      "fields": {
+        "dpiXHi": { "offset": 9, "kind": "u8" },
+        "dpiXLo": { "offset": 10, "kind": "u8" },
+        "dpiYHi": { "offset": 11, "kind": "u8" },
+        "dpiYLo": { "offset": 12, "kind": "u8" }
+      }
+    },
+    "dpi-stages": {
+      "validWhen": [{ "offset": 0, "eq": 2 }],
+      "fields": {
+        "activeStage": { "offset": 9, "kind": "u8" },
+        "stageCount": { "offset": 10, "kind": "u8" }
+      }
+    },
+    "polling-rate": {
+      "validWhen": [{ "offset": 0, "eq": 2 }],
+      "fields": {
+        "raw": { "offset": 8, "kind": "u8" }
+      }
+    },
+    "serial": {
+      "validWhen": [{ "offset": 0, "eq": 2 }],
+      "fields": {
+        "raw": { "offset": 8, "kind": "bytes", "count": 22 }
+      }
+    },
+    "firmware": {
+      "validWhen": [{ "offset": 0, "eq": 2 }],
+      "fields": {
+        "major": { "offset": 8, "kind": "u8" },
+        "minor": { "offset": 9, "kind": "u8" }
+      }
+    },
+    "device-mode": {
+      "validWhen": [{ "offset": 0, "eq": 2 }],
+      "fields": {
+        "mode": { "offset": 8, "kind": "u8" },
+        "param": { "offset": 9, "kind": "u8" }
+      }
+    }
+  }
+}

@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "commands": {
+    "battery-level": {
+      "request": {
+        "length": 90,
+        "bytes": [
+          { "offset": 0, "value": "0x00" },
+          { "offset": 1, "param": "transactionId" },
+          { "offset": 2, "value": "0x00" },
+          { "offset": 3, "value": "0x00" },
+          { "offset": 4, "value": "0x00" },
+          { "offset": 5, "value": "0x02" },
+          { "offset": 6, "value": "0x07" },
+          { "offset": 7, "value": "0x80" },
+          { "offset": 8, "value": "0x00" },
+          { "offset": 9, "value": "0x00" }
+        ],
+        "checksum": { "algorithm": "xor8", "start": 2, "endExclusive": 88, "writeOffset": 88 }
+      }
+    },
+    "charging-status": {
+      "request": {
+        "length": 90,
+        "bytes": [
+          { "offset": 0, "value": "0x00" },
+          { "offset": 1, "param": "transactionId" },
+          { "offset": 2, "value": "0x00" },
+          { "offset": 3, "value": "0x00" },
+          { "offset": 4, "value": "0x00" },
+          { "offset": 5, "value": "0x02" },
+          { "offset": 6, "value": "0x07" },
+          { "offset": 7, "value": "0x84" },
+          { "offset": 8, "value": "0x00" },
+          { "offset": 9, "value": "0x00" }
+        ],
+        "checksum": { "algorithm": "xor8", "start": 2, "endExclusive": 88, "writeOffset": 88 }
+      }
+    },
+    "dpi": {
+      "request": {
+        "length": 90,
+        "bytes": [
+          { "offset": 0, "value": "0x00" },
+          { "offset": 1, "param": "transactionId" },
+          { "offset": 2, "value": "0x00" },
+          { "offset": 3, "value": "0x00" },
+          { "offset": 4, "value": "0x00" },
+          { "offset": 5, "value": "0x07" },
+          { "offset": 6, "value": "0x04" },
+          { "offset": 7, "value": "0x85" },
+          { "offset": 8, "value": "0x01" },
+          { "offset": 9, "value": "0x00" },
+          { "offset": 10, "value": "0x00" },
+          { "offset": 11, "value": "0x00" },
+          { "offset": 12, "value": "0x00" },
+          { "offset": 13, "value": "0x00" },
+          { "offset": 14, "value": "0x00" }
+        ],
+        "checksum": { "algorithm": "xor8", "start": 2, "endExclusive": 88, "writeOffset": 88 }
+      }
+    },
+    "dpi-stages": {
+      "request": {
+        "length": 90,
+        "bytes": [
+          { "offset": 0, "value": "0x00" },
+          { "offset": 1, "param": "transactionId" },
+          { "offset": 2, "value": "0x00" },
+          { "offset": 3, "value": "0x00" },
+          { "offset": 4, "value": "0x00" },
+          { "offset": 5, "value": "0x26" },
+          { "offset": 6, "value": "0x04" },
+          { "offset": 7, "value": "0x86" },
+          { "offset": 8, "value": "0x01" }
+        ],
+        "checksum": { "algorithm": "xor8", "start": 2, "endExclusive": 88, "writeOffset": 88 }
+      }
+    },
+    "polling-rate": {
+      "request": {
+        "length": 90,
+        "bytes": [
+          { "offset": 0, "value": "0x00" },
+          { "offset": 1, "param": "transactionId" },
+          { "offset": 2, "value": "0x00" },
+          { "offset": 3, "value": "0x00" },
+          { "offset": 4, "value": "0x00" },
+          { "offset": 5, "value": "0x01" },
+          { "offset": 6, "value": "0x00" },
+          { "offset": 7, "value": "0x85" },
+          { "offset": 8, "value": "0x00" }
+        ],
+        "checksum": { "algorithm": "xor8", "start": 2, "endExclusive": 88, "writeOffset": 88 }
+      }
+    },
+    "serial": {
+      "request": {
+        "length": 90,
+        "bytes": [
+          { "offset": 0, "value": "0x00" },
+          { "offset": 1, "param": "transactionId" },
+          { "offset": 2, "value": "0x00" },
+          { "offset": 3, "value": "0x00" },
+          { "offset": 4, "value": "0x00" },
+          { "offset": 5, "value": "0x16" },
+          { "offset": 6, "value": "0x00" },
+          { "offset": 7, "value": "0x82" },
+          { "offset": 8, "value": "0x00" }
+        ],
+        "checksum": { "algorithm": "xor8", "start": 2, "endExclusive": 88, "writeOffset": 88 }
+      }
+    },
+    "firmware": {
+      "request": {
+        "length": 90,
+        "bytes": [
+          { "offset": 0, "value": "0x00" },
+          { "offset": 1, "param": "transactionId" },
+          { "offset": 2, "value": "0x00" },
+          { "offset": 3, "value": "0x00" },
+          { "offset": 4, "value": "0x00" },
+          { "offset": 5, "value": "0x02" },
+          { "offset": 6, "value": "0x00" },
+          { "offset": 7, "value": "0x81" },
+          { "offset": 8, "value": "0x00" },
+          { "offset": 9, "value": "0x00" }
+        ],
+        "checksum": { "algorithm": "xor8", "start": 2, "endExclusive": 88, "writeOffset": 88 }
+      }
+    },
+    "device-mode": {
+      "request": {
+        "length": 90,
+        "bytes": [
+          { "offset": 0, "value": "0x00" },
+          { "offset": 1, "param": "transactionId" },
+          { "offset": 2, "value": "0x00" },
+          { "offset": 3, "value": "0x00" },
+          { "offset": 4, "value": "0x00" },
+          { "offset": 5, "value": "0x02" },
+          { "offset": 6, "value": "0x00" },
+          { "offset": 7, "value": "0x84" },
+          { "offset": 8, "value": "0x00" },
+          { "offset": 9, "value": "0x00" }
+        ],
+        "checksum": { "algorithm": "xor8", "start": 2, "endExclusive": 88, "writeOffset": 88 }
+      }
+    }
+  }
+}

@@ -1,1 +1,402 @@
-{ "schemaVersion": 1, "devices": [], "reason": "No exact Viper model/firmware/connection whitelist has been verified." }
+{
+  "schemaVersion": 1,
+  "devices": [
+    {
+      "family": "razer-1f",
+      "vendorId": 5426,
+      "productId": 153,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "usb",
+      "evidence": "multi-source-confirmed",
+      "selectionPriority": 100,
+      "model": "basilisk-v3",
+      "interfaceNumber": 3,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-basilisk-v3",
+        "displayName": "Razer Basilisk V3",
+        "aliases": ["razer basilisk-v3", "Razer Basilisk V3"]
+      }
+    },
+    {
+      "family": "razer-1f",
+      "vendorId": 5426,
+      "productId": 170,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "usb",
+      "evidence": "multi-source-confirmed",
+      "selectionPriority": 100,
+      "model": "basilisk-v3-pro",
+      "interfaceNumber": 3,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-basilisk-v3-pro",
+        "displayName": "Razer Basilisk V3 Pro",
+        "aliases": ["razer basilisk-v3-pro", "Razer Basilisk V3 Pro"]
+      }
+    },
+    {
+      "family": "razer-1f",
+      "vendorId": 5426,
+      "productId": 171,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "wireless-receiver",
+      "evidence": "multi-source-confirmed",
+      "selectionPriority": 0,
+      "model": "basilisk-v3-pro",
+      "interfaceNumber": 3,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-basilisk-v3-pro",
+        "displayName": "Razer Basilisk V3 Pro",
+        "aliases": ["razer basilisk-v3-pro", "Razer Basilisk V3 Pro"]
+      }
+    },
+    {
+      "family": "razer-1f",
+      "vendorId": 5426,
+      "productId": 165,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "usb",
+      "evidence": "multi-source-confirmed",
+      "selectionPriority": 100,
+      "model": "viper-v2-pro",
+      "interfaceNumber": 0,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-viper-v2-pro",
+        "displayName": "Razer Viper V2 Pro",
+        "aliases": ["razer viper-v2-pro", "Razer Viper V2 Pro"]
+      }
+    },
+    {
+      "family": "razer-1f",
+      "vendorId": 5426,
+      "productId": 166,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "wireless-receiver",
+      "evidence": "multi-source-confirmed",
+      "selectionPriority": 0,
+      "model": "viper-v2-pro",
+      "interfaceNumber": 0,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-viper-v2-pro",
+        "displayName": "Razer Viper V2 Pro",
+        "aliases": ["razer viper-v2-pro", "Razer Viper V2 Pro"]
+      }
+    },
+    {
+      "family": "razer-1f",
+      "vendorId": 5426,
+      "productId": 184,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "wireless-receiver",
+      "evidence": "source-confirmed",
+      "selectionPriority": 0,
+      "model": "viper-v3-hyperspeed",
+      "interfaceNumber": 0,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-viper-v3-hyperspeed",
+        "displayName": "Razer Viper V3 HyperSpeed",
+        "aliases": ["razer viper-v3-hyperspeed", "Razer Viper V3 HyperSpeed"]
+      }
+    },
+    {
+      "family": "razer-1f",
+      "vendorId": 5426,
+      "productId": 192,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "usb",
+      "evidence": "source-confirmed",
+      "selectionPriority": 100,
+      "model": "viper-v3-pro",
+      "interfaceNumber": 0,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-viper-v3-pro",
+        "displayName": "Razer Viper V3 Pro",
+        "aliases": ["razer viper-v3-pro", "Razer Viper V3 Pro"]
+      }
+    },
+    {
+      "family": "razer-1f",
+      "vendorId": 5426,
+      "productId": 193,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "wireless-receiver",
+      "evidence": "source-confirmed",
+      "selectionPriority": 0,
+      "model": "viper-v3-pro",
+      "interfaceNumber": 0,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-viper-v3-pro",
+        "displayName": "Razer Viper V3 Pro",
+        "aliases": ["razer viper-v3-pro", "Razer Viper V3 Pro"]
+      }
+    },
+    {
+      "family": "razer-1f",
+      "vendorId": 5426,
+      "productId": 182,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "usb",
+      "evidence": "multi-source-confirmed",
+      "selectionPriority": 100,
+      "model": "deathadder-v3-pro",
+      "interfaceNumber": 0,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-deathadder-v3-pro",
+        "displayName": "Razer DeathAdder V3 Pro",
+        "aliases": ["razer deathadder-v3-pro", "Razer DeathAdder V3 Pro"]
+      }
+    },
+    {
+      "family": "razer-1f",
+      "vendorId": 5426,
+      "productId": 183,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "wireless-receiver",
+      "evidence": "multi-source-confirmed",
+      "selectionPriority": 0,
+      "model": "deathadder-v3-pro",
+      "interfaceNumber": 0,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-deathadder-v3-pro",
+        "displayName": "Razer DeathAdder V3 Pro",
+        "aliases": ["razer deathadder-v3-pro", "Razer DeathAdder V3 Pro"]
+      }
+    },
+    {
+      "family": "razer-1f",
+      "vendorId": 5426,
+      "productId": 218,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "usb",
+      "evidence": "hardware-verified",
+      "selectionPriority": 100,
+      "model": "cobra-hyperspeed",
+      "interfaceNumber": 0,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-cobra-hyperspeed",
+        "displayName": "Razer Cobra HyperSpeed",
+        "aliases": ["razer cobra-hyperspeed", "Razer Cobra HyperSpeed"]
+      }
+    },
+    {
+      "family": "razer-1f",
+      "vendorId": 5426,
+      "productId": 219,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "wireless-receiver",
+      "evidence": "hardware-verified",
+      "selectionPriority": 0,
+      "model": "cobra-hyperspeed",
+      "interfaceNumber": 0,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-cobra-hyperspeed",
+        "displayName": "Razer Cobra HyperSpeed",
+        "aliases": ["razer cobra-hyperspeed", "Razer Cobra HyperSpeed"]
+      }
+    },
+    {
+      "family": "razer-1f",
+      "vendorId": 5426,
+      "productId": 175,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "usb",
+      "evidence": "multi-source-confirmed",
+      "selectionPriority": 100,
+      "model": "cobra-pro",
+      "interfaceNumber": 0,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-cobra-pro",
+        "displayName": "Razer Cobra Pro",
+        "aliases": ["razer cobra-pro", "Razer Cobra Pro"]
+      }
+    },
+    {
+      "family": "razer-1f",
+      "vendorId": 5426,
+      "productId": 176,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "wireless-receiver",
+      "evidence": "multi-source-confirmed",
+      "selectionPriority": 0,
+      "model": "cobra-pro",
+      "interfaceNumber": 0,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-cobra-pro",
+        "displayName": "Razer Cobra Pro",
+        "aliases": ["razer cobra-pro", "Razer Cobra Pro"]
+      }
+    },
+    {
+      "family": "razer-1f",
+      "vendorId": 5426,
+      "productId": 98,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "wireless-receiver",
+      "evidence": "hardware-verified",
+      "selectionPriority": 0,
+      "model": "atheris",
+      "interfaceNumber": 0,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-atheris",
+        "displayName": "Razer Atheris",
+        "aliases": ["razer atheris", "Razer Atheris"]
+      }
+    },
+    {
+      "family": "razer-1f",
+      "vendorId": 5426,
+      "productId": 148,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "wireless-receiver",
+      "evidence": "source-confirmed",
+      "selectionPriority": 0,
+      "model": "orochi-v2",
+      "interfaceNumber": 0,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-orochi-v2",
+        "displayName": "Razer Orochi V2",
+        "aliases": ["razer orochi-v2", "Razer Orochi V2"]
+      }
+    },
+    {
+      "family": "razer-1f",
+      "vendorId": 5426,
+      "productId": 143,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "usb",
+      "evidence": "multi-source-confirmed",
+      "selectionPriority": 100,
+      "model": "naga-pro",
+      "interfaceNumber": 0,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-naga-pro",
+        "displayName": "Razer Naga Pro",
+        "aliases": ["razer naga-pro", "Razer Naga Pro"]
+      }
+    },
+    {
+      "family": "razer-1f",
+      "vendorId": 5426,
+      "productId": 144,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "wireless-receiver",
+      "evidence": "multi-source-confirmed",
+      "selectionPriority": 0,
+      "model": "naga-pro",
+      "interfaceNumber": 0,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-naga-pro",
+        "displayName": "Razer Naga Pro",
+        "aliases": ["razer naga-pro", "Razer Naga Pro"]
+      }
+    },
+    {
+      "family": "razer-3f",
+      "vendorId": 5426,
+      "productId": 122,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "usb",
+      "evidence": "multi-source-confirmed",
+      "selectionPriority": 100,
+      "model": "viper-ultimate",
+      "interfaceNumber": 0,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-viper-ultimate",
+        "displayName": "Razer Viper Ultimate",
+        "aliases": ["razer viper-ultimate", "Razer Viper Ultimate"]
+      }
+    },
+    {
+      "family": "razer-3f",
+      "vendorId": 5426,
+      "productId": 123,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "wireless-receiver",
+      "evidence": "multi-source-confirmed",
+      "selectionPriority": 0,
+      "model": "viper-ultimate",
+      "interfaceNumber": 0,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-viper-ultimate",
+        "displayName": "Razer Viper Ultimate",
+        "aliases": ["razer viper-ultimate", "Razer Viper Ultimate"]
+      }
+    },
+    {
+      "family": "razer-3f",
+      "vendorId": 5426,
+      "productId": 124,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "usb",
+      "evidence": "multi-source-confirmed",
+      "selectionPriority": 100,
+      "model": "deathadder-v2-pro",
+      "interfaceNumber": 0,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-deathadder-v2-pro",
+        "displayName": "Razer DeathAdder V2 Pro",
+        "aliases": ["razer deathadder-v2-pro", "Razer DeathAdder V2 Pro"]
+      }
+    },
+    {
+      "family": "razer-3f",
+      "vendorId": 5426,
+      "productId": 125,
+      "usagePage": 65280,
+      "usage": 1,
+      "connection": "wireless-receiver",
+      "evidence": "multi-source-confirmed",
+      "selectionPriority": 0,
+      "model": "deathadder-v2-pro",
+      "interfaceNumber": 0,
+      "minFeatureReportSize": 90,
+      "identity": {
+        "group": "razer-deathadder-v2-pro",
+        "displayName": "Razer DeathAdder V2 Pro",
+        "aliases": ["razer deathadder-v2-pro", "Razer DeathAdder V2 Pro"]
+      }
+    }
+  ],
+  "hardwareVerifiedModels": ["Razer Cobra HyperSpeed", "Razer Atheris"]
+}

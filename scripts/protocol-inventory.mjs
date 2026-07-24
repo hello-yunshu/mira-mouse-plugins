@@ -4,7 +4,7 @@ import { join } from "node:path";
 
 const ROOT = new URL("..", import.meta.url).pathname;
 const DOC_PATH = join(ROOT, "docs/protocol-reserve-inventory.md");
-const PLUGINS = ["amaster", "logitech-hidpp"];
+const PLUGINS = ["amaster", "logitech-hidpp", "razer-viper"];
 
 const checkDocs = process.argv.includes("--check-docs");
 

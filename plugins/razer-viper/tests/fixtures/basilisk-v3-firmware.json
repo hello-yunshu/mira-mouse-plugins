@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "description": "Basilisk V3 firmware response (90-byte payload, report_id stripped by transport)",
+  "response": [
+    2, 31, 0, 0, 0, 2, 0, 129, 2, 1,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 128, 0
+  ],
+  "expected": {
+    "status": 2,
+    "transactionId": 31,
+    "commandClass": 0,
+    "commandId": 129,
+    "major": 2,
+    "minor": 1,
+    "version": "2.1",
+    "checksum": 128
+  }
+}

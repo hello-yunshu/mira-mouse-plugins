@@ -32,7 +32,7 @@ test('AM35 fixture validates little-endian command id', async () => {
   assert.equal(fixture.payload[4] | (fixture.payload[5] << 8), fixture.expectedCommandIdLittleEndian);
 });
 test('research plugins stay read-only and expose evidence-scoped descriptors', async () => {
-  const emptyWhitelist = ['razer-viper'];
+  const emptyWhitelist = []
   for (const name of emptyWhitelist) {
     const manifest = await read(`plugins/${name}/plugin.json`);
     const devices = await read(`plugins/${name}/devices.json`);

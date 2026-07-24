@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import { readFile, access } from 'node:fs/promises';
 
-const plugins = ['amaster', 'logitech-hidpp'];
+const plugins = ['amaster', 'logitech-hidpp', 'razer-viper'];
 const fail = (message) => { throw new Error(message); };
 const HOST_DEVICE_CONNECTIONS = new Set(['usb', 'wireless', 'bluetooth', 'virtual']);
 const VALUE_FORMATS = new Set(['sleep', 'color']);
@@ -94,7 +94,7 @@ function validMutationRef(value) {
 function validateRuntime(name, runtime) {
   if (runtime === undefined) return;
   if (!runtime || typeof runtime !== 'object' || Array.isArray(runtime)
-    || Object.keys(runtime).some((key) => key !== 'wakeRecovery')) {
+    || Object.keys(runtime).some((key) => key !== 'wakeRecovery' && key !== 'inventory')) {
     fail(`${name}: invalid runtime contract`);
   }
   const recovery = runtime.wakeRecovery;
@@ -414,7 +414,7 @@ for (const [name, data] of Object.entries(pluginData)) {
     }
     if (command.request.base && command.request.base !== 'read-response') fail(`${name}/${id}: invalid request base`);
     if (checksum) {
-      if (checksum.algorithm !== 'ff-minus-sum8') fail(`${name}/${id}: unsupported checksum`);
+      if (!['ff-minus-sum8', 'xor8'].includes(checksum.algorithm)) fail(`${name}/${id}: unsupported checksum`);
       if (checksum.start < 0 || checksum.endExclusive > length || checksum.start >= checksum.endExclusive) fail(`${name}/${id}: invalid checksum range`);
       if (checksum.writeOffset < 0 || checksum.writeOffset >= length) fail(`${name}/${id}: invalid checksum output`);
     }
@@ -529,7 +529,7 @@ for (const [name, data] of Object.entries(pluginData)) {
     }
   }
 
-  const familyPrefixes = name === 'amaster' ? ['protocol-a-', 'am35-'] : ['hidpp2-'];
+  const familyPrefixes = name === 'amaster' ? ['protocol-a-', 'am35-'] : name === 'razer-viper' ? ['razer-'] : ['hidpp2-'];
   for (const device of devices.devices) {
     validateDeviceIdentity(name, device);
     validateDeviceSelection(name, device);
