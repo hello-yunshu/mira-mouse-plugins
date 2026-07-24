@@ -76,7 +76,7 @@ const crossRepoPatterns = [
   { pattern: /MIRA_APP_TOKEN/, label: '跨仓库 token MIRA_APP_TOKEN（插件发布不得依赖主仓库 token）' },
   { pattern: /MIRA_REPOSITORY/, label: '跨仓库变量 MIRA_REPOSITORY' },
   { pattern: /hello-yunshu\/mira-mouse/, label: '硬编码主仓库 hello-yunshu/mira-mouse（跨仓库写入）' },
-  { pattern: /plugins\.lock\.json/, label: '插件 workflow 修改主仓库 plugins.lock.json' },
+  { pattern: /plugins\.lock\.json|bundled-plugins\.lock\.json/, label: '插件 workflow 修改主仓库 bundled-plugins.lock.json' },
   { pattern: /tauri\.conf\.json/, label: '插件 workflow 修改主仓库 tauri.conf.json' },
   { pattern: /cargo\s+run\s+--package\s+xtask/, label: '插件 workflow 调用主仓库 xtask（跨仓库依赖）' },
 ];

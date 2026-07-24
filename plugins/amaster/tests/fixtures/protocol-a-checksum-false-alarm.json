@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "case": "protocol-a-checksum-false-alarm",
+  "description": "Regression fixture: 用户在 AM INFINITY MOUSE .100 接收器路径捕获的真实假告警样本。根因是宿主错误地把 request.checksum 复用于响应校验。3.4 节修复后，Protocol A 命令不声明 response.checksum，这些假告警必须消失。",
+  "device": {
+    "vid": "0x3151",
+    "pid": "0x5007",
+    "usagePage": "0xffff",
+    "usage": "0x0002",
+    "family": "protocol-a-receiver",
+    "plugin": "mira.amaster",
+    "pluginVersion": "1.8.0"
+  },
+  "falseAlarms": [
+    { "command": "receiver-firmware-usb", "expectedFromRequestChecksum": "0x18", "actualResponseByte": "0x0f" },
+    { "command": "receiver-firmware-soc", "expectedFromRequestChecksum": "0xfc", "actualResponseByte": "0x0f" },
+    { "command": "receiver-firmware-led", "expectedFromRequestChecksum": "0x47", "actualResponseByte": "0x00" },
+    { "command": "battery", "expectedFromRequestChecksum": "0xcf", "actualResponseByte": "0x00" },
+    { "command": "dpi", "expectedFromRequestChecksum": "0xcf", "actualResponseByte": "0x00" },
+    { "command": "settings", "expectedFromRequestChecksum": "0xcf", "actualResponseByte": "0x00" },
+    { "command": "lighting", "expectedFromRequestChecksum": "0x62", "actualResponseByte": "0xb1" },
+    { "command": "fps", "expectedFromRequestChecksum": "0xcf", "actualResponseByte": "0x00" },
+    { "command": "dpi-button", "expectedFromRequestChecksum": "0xcf", "actualResponseByte": "0x00" },
+    { "command": "firmware-usb", "expectedFromRequestChecksum": "0xcf", "actualResponseByte": "0x00" },
+    { "command": "firmware-soc", "expectedFromRequestChecksum": "0xcf", "actualResponseByte": "0x00" },
+    { "command": "button-mappings", "expectedFromRequestChecksum": "0xcf", "actualResponseByte": "0x00" }
+  ],
+  "expectedBehavior": "Protocol A 命令不声明 response.checksum。宿主 verify_response_checksum 返回 None（不验证、不记录 warning、不发射 on_hid_checksum_failed 事件）。falseAlarms 数组仅作为历史回归记录，不应再出现在新日志中。",
+  "evidence": "user-reported-log"
+}
