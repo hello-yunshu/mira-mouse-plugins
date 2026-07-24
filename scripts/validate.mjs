@@ -114,7 +114,7 @@ for (const name of plugins) {
   };
 
   const manifestKeys = new Set([
-    'schemaVersion', 'pluginId', 'name', 'version', 'pluginApi', 'publisherKeyId',
+    'schemaVersion', 'packageFormatVersion', 'pluginId', 'name', 'version', 'pluginApi', 'publisherKeyId',
     'evidence', 'permissions', 'runtime', 'capabilities', 'writesEnabled',
     'exportableFields', 'dependsOn',
   ]);

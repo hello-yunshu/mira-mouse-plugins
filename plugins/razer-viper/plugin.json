@@ -1,5 +1,6 @@
 {
   "schemaVersion": 1,
+  "packageFormatVersion": 1,
   "pluginId": "mira.razer-viper",
   "name": "Razer Mice",
   "version": "0.3.0",

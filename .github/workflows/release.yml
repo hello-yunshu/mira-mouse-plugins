@@ -218,6 +218,11 @@ jobs:
           npm run check:architecture
           npm run validate:plugin -- --plugin "$PLUGIN_ID"
           npm run test:all
+      - name: Cache mira-plugin-cli
+        uses: actions/cache@v6
+        with:
+          path: .cache/mira-plugin-cli
+          key: mira-plugin-cli-${{ hashFiles('mira-plugin-cli.version.json') }}
       - name: Pack and sign plugin
         env:
           PLUGIN_SIGNING_KEY: '${{ secrets.PLUGIN_SIGNING_KEY }}'
@@ -229,6 +234,8 @@ jobs:
           version="${{ matrix.target.version }}"
           asset="${plugin_id//./-}-${version}.mira-plugin"
           mkdir -p "dist/${plugin_id}"
+          # 3.5 节：pack-sign.mjs 是 thin wrapper，自动 fetch-cli + 调用 CLI pack/sign/inspect。
+          # CLI 与主仓库 runtime 共享同一个 allowlist，确保 CLI pack 与 runtime extract 一致。
           node scripts/pack-sign.mjs "plugins/$PLUGIN_DIR" "dist/${plugin_id}/$asset"
           sha256sum "dist/${plugin_id}/$asset" | awk '{print $1}' > "dist/${plugin_id}/$asset.sha256"
           echo "asset=$asset" >> "$GITHUB_ENV"

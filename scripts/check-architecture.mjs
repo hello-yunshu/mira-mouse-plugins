@@ -91,6 +91,10 @@ const unifiedReleasePatterns = [
 //    pack-sign.mjs 必须改为调用统一 mira-plugin-cli
 const packerPatterns = [
   { pattern: /async\s+function\s+packPlugin|async\s+function\s+walkFiles.*pluginDir/, label: '插件仓库自带打包逻辑（必须改为调用已发布的 mira-plugin-cli）' },
+  // 3.5 节：pack-sign.mjs 不得维护自己的 checksum/签名/zip 逻辑。
+  { pattern: /schemaVersion\s*:\s*1.*files\s*:/, label: '插件仓库自带 checksums 构造（必须由 mira-plugin-cli 生成）' },
+  { pattern: /sign\(null,\s*message/, label: '插件仓库自带 Ed25519 签名（必须由 mira-plugin-cli sign 生成）' },
+  { pattern: /execFileSync\(['"]zip['"]/, label: '插件仓库直接调用 zip 命令打包（必须由 mira-plugin-cli pack 生成）' },
 ];
 
 // 5) registry 签名：检测 "signed": true 但无真实 detached signature
