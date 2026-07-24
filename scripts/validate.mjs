@@ -80,7 +80,7 @@ for (const name of plugins) {
     }
   }));
 
-  const [manifest, devices, commandsFile, parsersFile, transportsFile, workflowsFile, featuresFile] = await Promise.all([
+  const [manifest, devices, commandsFile, parsersFile, transportsFile, workflowsFile, featuresFile, capabilitiesFile] = await Promise.all([
     read('plugin.json'),
     read('devices.json'),
     read('protocol/commands.json'),
@@ -88,6 +88,7 @@ for (const name of plugins) {
     read('protocol/transports.json'),
     read('protocol/workflows.json'),
     readOptional('protocol/features.json'),
+    readOptional('capabilities.json'),
   ]);
 
   const assertTopLevelKeys = (file, value, allowed) => {
@@ -111,6 +112,7 @@ for (const name of plugins) {
     transports: transportsFile.transports,
     workflows: workflowsFile.workflows,
     mutations: workflowsFile.mutations ?? {},
+    capabilities: capabilitiesFile,
   };
 
   const manifestKeys = new Set([
@@ -460,8 +462,224 @@ function expandFeatureRefs(pluginName, features, workflowsFile) {
   }
 }
 
+// 3.3 节：声明式 errorMatchers 校验。
+// 校验项：
+// - errorMatchers 必须是数组，每项必须有 name/pattern/requestMatch/errorOffset/label；
+// - pattern 每项有 offset + eq（0..0xFF）；
+// - requestMatch 每项有 offset + requestOffset；
+// - errorOffset 必须是非负整数；
+// - label 必须是非空字符串。
+function validateErrorMatchers(name, id, transport) {
+  const matchers = transport.errorMatchers ?? [];
+  if (!Array.isArray(matchers)) {
+    fail(`${name}/${id}: errorMatchers must be an array`);
+    return;
+  }
+  for (const m of matchers) {
+    if (typeof m.name !== 'string' || !m.name) fail(`${name}/${id}: errorMatcher name required`);
+    if (!Array.isArray(m.pattern)) fail(`${name}/${id}: errorMatcher pattern must be an array`);
+    for (const p of m.pattern) {
+      if (!Number.isInteger(p.offset) || p.offset < 0) fail(`${name}/${id}: errorMatcher pattern offset invalid`);
+      if (!Number.isInteger(p.eq) || p.eq < 0 || p.eq > 0xFF) fail(`${name}/${id}: errorMatcher pattern eq invalid`);
+    }
+    if (!Array.isArray(m.requestMatch)) fail(`${name}/${id}: errorMatcher requestMatch must be an array`);
+    for (const r of m.requestMatch) {
+      if (!Number.isInteger(r.offset) || r.offset < 0) fail(`${name}/${id}: errorMatcher requestMatch offset invalid`);
+      if (!Number.isInteger(r.requestOffset) || r.requestOffset < 0) fail(`${name}/${id}: errorMatcher requestMatch requestOffset invalid`);
+    }
+    if (!Number.isInteger(m.errorOffset) || m.errorOffset < 0) fail(`${name}/${id}: errorMatcher errorOffset invalid`);
+    if (typeof m.label !== 'string' || !m.label) fail(`${name}/${id}: errorMatcher label required`);
+  }
+}
+
+// 3.3 节：声明式 writeFallbacks 校验。
+// 校验项：
+// - writeFallbacks 必须是数组，每项必须有 name/fromReportId/fromLength/toReportId/toLength/payloadCopy；
+// - fromReportId/toReportId 必须是合法 HID report ID（0..0xFF）；
+// - fromLength/toLength 必须 ≥ 1；
+// - payloadCopy 必须有 fromOffset/toOffset/length，且偏移+长度不超过 fromLength/toLength。
+function validateWriteFallbacks(name, id, transport) {
+  const fallbacks = transport.writeFallbacks ?? [];
+  if (!Array.isArray(fallbacks)) {
+    fail(`${name}/${id}: writeFallbacks must be an array`);
+    return;
+  }
+  for (const f of fallbacks) {
+    if (typeof f.name !== 'string' || !f.name) fail(`${name}/${id}: writeFallback name required`);
+    if (!Number.isInteger(f.fromReportId) || f.fromReportId < 0 || f.fromReportId > 0xFF) fail(`${name}/${id}: writeFallback fromReportId invalid`);
+    if (!Number.isInteger(f.toReportId) || f.toReportId < 0 || f.toReportId > 0xFF) fail(`${name}/${id}: writeFallback toReportId invalid`);
+    if (!Number.isInteger(f.fromLength) || f.fromLength < 1) fail(`${name}/${id}: writeFallback fromLength invalid`);
+    if (!Number.isInteger(f.toLength) || f.toLength < 1) fail(`${name}/${id}: writeFallback toLength invalid`);
+    const pc = f.payloadCopy;
+    if (!pc || typeof pc !== 'object') {
+      fail(`${name}/${id}: writeFallback payloadCopy required`);
+      continue;
+    }
+    if (!Number.isInteger(pc.fromOffset) || pc.fromOffset < 0) fail(`${name}/${id}: writeFallback payloadCopy fromOffset invalid`);
+    if (!Number.isInteger(pc.toOffset) || pc.toOffset < 0) fail(`${name}/${id}: writeFallback payloadCopy toOffset invalid`);
+    if (!Number.isInteger(pc.length) || pc.length < 1) fail(`${name}/${id}: writeFallback payloadCopy length invalid`);
+    if (pc.fromOffset + pc.length > f.fromLength + 1) fail(`${name}/${id}: writeFallback payloadCopy exceeds fromLength`);
+    if (pc.toOffset + pc.length > f.toLength + 1) fail(`${name}/${id}: writeFallback payloadCopy exceeds toLength`);
+  }
+}
+
+// 3.1 节：semanticMappings 校验。
+// 校验项：
+// - semanticMappings 必须是对象，键为目标 output 名，值为 source 数组；
+// - 每个 source 必须有 output 字段（非空字符串）；
+// - fieldMap 如果存在，必须是对象，键为源字段名，值为目标字段名或目标字段名数组。
+function validateSemanticMappings(name, capabilities) {
+  const mappings = capabilities.semanticMappings;
+  if (mappings === undefined) return;
+  if (typeof mappings !== 'object' || Array.isArray(mappings) || mappings === null) {
+    fail(`${name}: semanticMappings must be an object`);
+    return;
+  }
+  for (const [target, sources] of Object.entries(mappings)) {
+    if (typeof target !== 'string' || !target) fail(`${name}: semanticMappings target name required`);
+    if (!Array.isArray(sources)) {
+      fail(`${name}: semanticMappings ${target} must be an array`);
+      continue;
+    }
+    for (const source of sources) {
+      if (!source || typeof source !== 'object') {
+        fail(`${name}: semanticMappings ${target} source must be an object`);
+        continue;
+      }
+      if (typeof source.output !== 'string' || !source.output) {
+        fail(`${name}: semanticMappings ${target} source.output required`);
+      }
+      if (source.fieldMap !== undefined) {
+        if (typeof source.fieldMap !== 'object' || Array.isArray(source.fieldMap)) {
+          fail(`${name}: semanticMappings ${target} fieldMap must be an object`);
+          continue;
+        }
+        for (const [srcField, dstFields] of Object.entries(source.fieldMap)) {
+          if (typeof srcField !== 'string' || !srcField) fail(`${name}: semanticMappings ${target} fieldMap key required`);
+          if (typeof dstFields === 'string') {
+            if (!dstFields) fail(`${name}: semanticMappings ${target} fieldMap ${srcField} dst required`);
+          } else if (Array.isArray(dstFields)) {
+            if (dstFields.length === 0) fail(`${name}: semanticMappings ${target} fieldMap ${srcField} dst array empty`);
+            for (const dst of dstFields) {
+              if (typeof dst !== 'string' || !dst) fail(`${name}: semanticMappings ${target} fieldMap ${srcField} dst must be non-empty string`);
+            }
+          } else {
+            fail(`${name}: semanticMappings ${target} fieldMap ${srcField} dst must be string or array`);
+          }
+        }
+      }
+    }
+  }
+}
+
+// 3.2 节：通用 framed HID transport 校验。
+// 所有帧格式偏移由 JSON 声明，validator 不再硬编码 AM35 固定偏移。
+// 校验项：
+// - writeReportId / readReportId 必须是合法 HID report ID（0..0xFF）；
+// - writeLength / readLength 至少能容纳 reportId + frame_prefix + length_field + type_field + 1 字节 payload；
+// - framePrefix 必须是 u8 数组，长度不超过 writeLength-1；
+// - lengthFieldBytes 必须是 1 或 2（仅当 lengthFieldOffset 声明时）；
+// - typeFieldOffset 与 typeFieldValue 必须同时出现或同时缺失；
+// - requestMatchSlice / responseMatchSlice 必须同时出现或同时缺失，且 [start, end) 满足 0 <= start < end；
+// - endian 只允许 "le" / "be"；
+// - readMode 只允许 "interrupt" / "input-report"；
+// - readDelayMs / readTimeoutMs / readRetries 在合理范围内。
+function validateHidFramedTransport(name, id, transport) {
+  if (!Number.isInteger(transport.writeReportId) || transport.writeReportId < 0 || transport.writeReportId > 0xFF) {
+    fail(`${name}/${id}: invalid framed write report id`);
+  }
+  if (!Number.isInteger(transport.readReportId) || transport.readReportId < 0 || transport.readReportId > 0xFF) {
+    fail(`${name}/${id}: invalid framed read report id`);
+  }
+  if (!Number.isInteger(transport.writeLength) || transport.writeLength < 2) {
+    fail(`${name}/${id}: invalid framed write length`);
+  }
+  if (!Number.isInteger(transport.readLength) || transport.readLength < 2) {
+    fail(`${name}/${id}: invalid framed read length`);
+  }
+  // framePrefix 必须是 u8 数组
+  if (!Array.isArray(transport.framePrefix) || transport.framePrefix.some((b) => !Number.isInteger(b) || b < 0 || b > 0xFF)) {
+    fail(`${name}/${id}: framePrefix must be an array of u8`);
+  }
+  if (transport.framePrefix.length >= transport.writeLength) {
+    fail(`${name}/${id}: framePrefix exceeds write length`);
+  }
+  // lengthFieldOffset 与 lengthFieldBytes 配对
+  const hasLengthField = transport.lengthFieldOffset !== undefined && transport.lengthFieldOffset !== null;
+  if (hasLengthField) {
+    if (!Number.isInteger(transport.lengthFieldOffset) || transport.lengthFieldOffset < 0 || transport.lengthFieldOffset >= transport.writeLength) {
+      fail(`${name}/${id}: invalid lengthFieldOffset`);
+    }
+    if (![1, 2].includes(transport.lengthFieldBytes)) {
+      fail(`${name}/${id}: lengthFieldBytes must be 1 or 2`);
+    }
+  } else if (transport.lengthFieldBytes !== undefined && transport.lengthFieldBytes !== 0) {
+    fail(`${name}/${id}: lengthFieldBytes declared without lengthFieldOffset`);
+  }
+  // typeFieldOffset 与 typeFieldValue 配对
+  const hasTypeField = transport.typeFieldOffset !== undefined && transport.typeFieldOffset !== null;
+  if (hasTypeField) {
+    if (!Number.isInteger(transport.typeFieldOffset) || transport.typeFieldOffset < 0 || transport.typeFieldOffset >= transport.writeLength) {
+      fail(`${name}/${id}: invalid typeFieldOffset`);
+    }
+    if (!Number.isInteger(transport.typeFieldValue) || transport.typeFieldValue < 0 || transport.typeFieldValue > 0xFF) {
+      fail(`${name}/${id}: invalid typeFieldValue`);
+    }
+  } else if (transport.typeFieldValue !== undefined && transport.typeFieldValue !== null) {
+    fail(`${name}/${id}: typeFieldValue declared without typeFieldOffset`);
+  }
+  // payloadOffset（可选）
+  if (transport.payloadOffset !== undefined && transport.payloadOffset !== null) {
+    if (!Number.isInteger(transport.payloadOffset) || transport.payloadOffset < 0 || transport.payloadOffset >= transport.writeLength) {
+      fail(`${name}/${id}: invalid payloadOffset`);
+    }
+  }
+  // requestMatchSlice / responseMatchSlice 配对
+  const hasReqMatch = transport.requestMatchSlice !== undefined && transport.requestMatchSlice !== null;
+  const hasRespMatch = transport.responseMatchSlice !== undefined && transport.responseMatchSlice !== null;
+  if (hasReqMatch !== hasRespMatch) {
+    fail(`${name}/${id}: requestMatchSlice and responseMatchSlice must be declared together`);
+  }
+  if (hasReqMatch) {
+    const [rs, re] = transport.requestMatchSlice;
+    const [ps, pe] = transport.responseMatchSlice;
+    if (!Number.isInteger(rs) || !Number.isInteger(re) || rs < 0 || rs >= re) {
+      fail(`${name}/${id}: invalid requestMatchSlice (expected [start, end) with start < end)`);
+    }
+    if (!Number.isInteger(ps) || !Number.isInteger(pe) || ps < 0 || ps >= pe) {
+      fail(`${name}/${id}: invalid responseMatchSlice (expected [start, end) with start < end)`);
+    }
+  }
+  // endian
+  if (!['le', 'be'].includes(transport.endian ?? 'le')) {
+    fail(`${name}/${id}: invalid endian (expected "le" or "be")`);
+  }
+  // readMode
+  if (!['interrupt', 'input-report'].includes(transport.readMode ?? 'interrupt')) {
+    fail(`${name}/${id}: invalid framed read mode`);
+  }
+  // readDelayMs
+  const delayMs = transport.readDelayMs ?? 0;
+  if (!Number.isInteger(delayMs) || delayMs < 0 || delayMs > 500) {
+    fail(`${name}/${id}: invalid framed read delay`);
+  }
+  // readTimeoutMs
+  if (!Number.isInteger(transport.readTimeoutMs) || transport.readTimeoutMs < 1 || transport.readTimeoutMs > 5000) {
+    fail(`${name}/${id}: invalid read timeout`);
+  }
+  // readRetries
+  if (!Number.isInteger(transport.readRetries) || transport.readRetries < 1 || transport.readRetries > 100) {
+    fail(`${name}/${id}: invalid framed read retries`);
+  }
+}
+
 for (const [name, data] of Object.entries(pluginData)) {
   const { commands, parsers, transports, workflows, mutations, manifest, devices } = data;
+
+  // 3.1 节：校验 capabilities.json 的 semanticMappings 声明。
+  if (data.capabilities) {
+    validateSemanticMappings(name, data.capabilities);
+  }
 
   for (const [id, command] of Object.entries(commands)) {
     const { length, bytes, checksum } = command.request;
@@ -548,7 +766,9 @@ for (const [name, data] of Object.entries(pluginData)) {
   }
 
   for (const [id, transport] of Object.entries(transports)) {
-    if (!['hid-feature', 'hid-feature-proxy', 'hid-output-input', 'hid-race', 'fixture'].includes(transport.kind)) {
+    // 3.2 节：`hid-framed` 是品牌无关的通用 framed HID transport。
+    // `hid-race` 作为 schema alias 保留一个兼容周期，运行时统一按 `hid-framed` 处理。
+    if (!['hid-feature', 'hid-feature-proxy', 'hid-output-input', 'hid-framed', 'hid-race', 'fixture'].includes(transport.kind)) {
       fail(`${name}/${id}: unsupported transport kind`);
     }
     if (transport.kind === 'fixture') {
@@ -563,6 +783,9 @@ for (const [name, data] of Object.entries(pluginData)) {
       if (![0x10, 0x11, 0x12].includes(transport.reportId)) fail(`${name}/${id}: invalid HID++ report id`);
       if (transport.writeLength < 2 || transport.readLength < 2) fail(`${name}/${id}: invalid report length`);
       if (!Number.isInteger(transport.readTimeoutMs) || transport.readTimeoutMs < 1 || transport.readTimeoutMs > 5000) fail(`${name}/${id}: invalid read timeout`);
+      // 3.3 节：校验声明式 errorMatchers / writeFallbacks
+      validateErrorMatchers(name, id, transport);
+      validateWriteFallbacks(name, id, transport);
     }
     if (transport.kind === 'hid-feature-proxy') {
       if (!transports[transport.baseTransport]) fail(`${name}/${id}: missing base transport`);
@@ -571,15 +794,10 @@ for (const [name, data] of Object.entries(pluginData)) {
       }
       if (!parsers[transport.statusParser]) fail(`${name}/${id}: missing status parser`);
     }
-    if (transport.kind === 'hid-race') {
-      if (![0x06, 0x07].includes(transport.writeReportId)) fail(`${name}/${id}: invalid race write report id`);
-      if (![0x06, 0x07].includes(transport.readReportId)) fail(`${name}/${id}: invalid race read report id`);
-      if (transport.writeLength < 2 || transport.readLength < 2) fail(`${name}/${id}: invalid race report length`);
-      if (![0, 128].includes(transport.raceType)) fail(`${name}/${id}: invalid race type`);
-      if (!['interrupt', 'input-report'].includes(transport.readMode ?? 'interrupt')) fail(`${name}/${id}: invalid race read mode`);
-      if (!Number.isInteger(transport.readDelayMs ?? 0) || (transport.readDelayMs ?? 0) < 0 || (transport.readDelayMs ?? 0) > 500) fail(`${name}/${id}: invalid race read delay`);
-      if (!Number.isInteger(transport.readTimeoutMs) || transport.readTimeoutMs < 1 || transport.readTimeoutMs > 5000) fail(`${name}/${id}: invalid read timeout`);
-      if (!Number.isInteger(transport.readRetries) || transport.readRetries < 1 || transport.readRetries > 100) fail(`${name}/${id}: invalid race read retries`);
+    // 3.2 节：`hid-framed` 与兼容别名 `hid-race` 共用同一组声明式字段。
+    // 不再硬编码 AM35 的 `raceType`，改为校验 `framePrefix`/`lengthFieldOffset`/`typeFieldOffset` 等声明式字段。
+    if (transport.kind === 'hid-framed' || transport.kind === 'hid-race') {
+      validateHidFramedTransport(name, id, transport);
     }
   }
 
