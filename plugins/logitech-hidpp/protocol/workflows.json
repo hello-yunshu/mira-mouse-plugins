@@ -33,7 +33,8 @@
               "field": "deviceIndex"
             },
             "featureRef": "FEATURE_SET"
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "root-get-feature",
@@ -45,7 +46,8 @@
               "field": "deviceIndex"
             },
             "featureRef": "DEVICE_NAME"
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "root-get-feature",
@@ -57,7 +59,8 @@
               "field": "deviceIndex"
             },
             "featureRef": "BATTERY_STATUS"
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "root-get-feature",
@@ -69,7 +72,8 @@
               "field": "deviceIndex"
             },
             "featureRef": "UNIFIED_BATTERY"
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "root-get-feature",
@@ -81,7 +85,8 @@
               "field": "deviceIndex"
             },
             "featureRef": "ADJUSTABLE_DPI"
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "root-get-feature",
@@ -93,7 +98,8 @@
               "field": "deviceIndex"
             },
             "featureRef": "EXTENDED_ADJUSTABLE_DPI"
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "root-get-feature",
@@ -105,7 +111,8 @@
               "field": "deviceIndex"
             },
             "featureRef": "MOUSE_POINTER"
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "root-get-feature",
@@ -117,7 +124,8 @@
               "field": "deviceIndex"
             },
             "featureRef": "POINTER_SPEED"
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "root-get-feature",
@@ -129,7 +137,8 @@
               "field": "deviceIndex"
             },
             "featureRef": "SURFACE_TUNING"
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "root-get-feature",
@@ -141,7 +150,8 @@
               "field": "deviceIndex"
             },
             "featureRef": "XY_STATS"
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "root-get-feature",
@@ -153,7 +163,8 @@
               "field": "deviceIndex"
             },
             "featureRef": "WHEEL_STATS"
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "feature-set-get-count",
@@ -174,7 +185,8 @@
               "output": "featureIndexFeatureSet",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "device-info-get",
@@ -195,7 +207,8 @@
               "output": "device",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "device-name-get-count",
@@ -216,7 +229,8 @@
               "output": "featureIndexDeviceName",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "device-name-get",
@@ -238,7 +252,8 @@
               "output": "featureIndexDeviceName",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "battery-get-status",
@@ -259,7 +274,8 @@
               "output": "featureIndexBattery",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "battery-get-capability",
@@ -280,7 +296,8 @@
               "output": "featureIndexBattery",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "unified-battery-get-capabilities",
@@ -301,7 +318,8 @@
               "output": "featureIndexUnifiedBattery",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "unified-battery-get-status",
@@ -322,7 +340,35 @@
               "output": "featureIndexUnifiedBattery",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
+        },
+        {
+          "command": "dpi-get-capability",
+          "parser": "dpi-get-capability",
+          "output": "dpiCapability",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexDpi", "field": "featureIndex" }
+          },
+          "skipIfZero": [
+            { "output": "featureIndexDpi", "field": "featureIndex" }
+          ],
+          "onFailure": "continue"
+        },
+        {
+          "command": "dpi-get-list",
+          "parser": "dpi-get-list",
+          "output": "dpiList",
+          "params": {
+            "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+            "featureIndex": { "fromOutput": "featureIndexDpi", "field": "featureIndex" },
+            "sensorIndex": 0
+          },
+          "skipIfZero": [
+            { "output": "featureIndexDpi", "field": "featureIndex" }
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "dpi-get-current",
@@ -343,7 +389,8 @@
               "output": "featureIndexDpi",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "extended-dpi-get-current",
@@ -364,7 +411,8 @@
               "output": "featureIndexExtendedDpi",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "mouse-pointer-get",
@@ -385,7 +433,8 @@
               "output": "featureIndexMousePointer",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "pointer-speed-get",
@@ -406,7 +455,8 @@
               "output": "featureIndexPointerSpeed",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "root-get-feature",
@@ -418,7 +468,8 @@
               "field": "deviceIndex"
             },
             "featureRef": "REPORT_RATE"
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "root-get-feature",
@@ -430,7 +481,8 @@
               "field": "deviceIndex"
             },
             "featureRef": "EXTENDED_ADJUSTABLE_REPORT_RATE"
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "root-get-feature",
@@ -442,7 +494,8 @@
               "field": "deviceIndex"
             },
             "featureRef": "COLOR_LED_EFFECTS"
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "root-get-feature",
@@ -454,7 +507,8 @@
               "field": "deviceIndex"
             },
             "featureRef": "RGB_EFFECTS"
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "root-get-feature",
@@ -466,7 +520,8 @@
               "field": "deviceIndex"
             },
             "featureRef": "ONBOARD_PROFILES"
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "onboard-get-mode",
@@ -487,7 +542,8 @@
               "output": "featureIndexOnboardProfiles",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "root-get-feature",
@@ -499,7 +555,8 @@
               "field": "deviceIndex"
             },
             "featureRef": "PROFILE_MANAGEMENT"
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "profile-mgmt-get-info",
@@ -520,7 +577,8 @@
               "output": "featureIndexProfileManagement",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "profile-mgmt-get-count",
@@ -541,7 +599,8 @@
               "output": "featureIndexProfileManagement",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "profile-mgmt-get-current",
@@ -562,7 +621,8 @@
               "output": "featureIndexProfileManagement",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "report-rate-get",
@@ -583,7 +643,8 @@
               "output": "featureIndexReportRate",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "report-rate-get-list",
@@ -604,7 +665,8 @@
               "output": "featureIndexReportRate",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "extended-report-rate-get",
@@ -625,7 +687,8 @@
               "output": "featureIndexExtendedReportRate",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "extended-report-rate-get-list",
@@ -646,7 +709,8 @@
               "output": "featureIndexExtendedReportRate",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "color-led-effects-get-info",
@@ -667,7 +731,8 @@
               "output": "featureIndexColorLed",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "rgb-effects-get-info",
@@ -688,7 +753,8 @@
               "output": "featureIndexRgbEffects",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "rgb-control-get",
@@ -709,7 +775,8 @@
               "output": "featureIndexRgbEffects",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "color-led-effects-get-zone-effect",
@@ -731,7 +798,8 @@
               "output": "featureIndexColorLed",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         }
       ]
     },
@@ -1208,7 +1276,8 @@
               "output": "profileMgmtFeature",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "profile-mgmt-get-count",
@@ -1229,7 +1298,8 @@
               "output": "profileMgmtFeature",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         },
         {
           "command": "profile-mgmt-get-current",
@@ -1250,7 +1320,8 @@
               "output": "profileMgmtFeature",
               "field": "featureIndex"
             }
-          ]
+          ],
+          "onFailure": "continue"
         }
       ]
     }
@@ -1457,6 +1528,47 @@
             "field": "profileIndex",
             "param": "profileIndex"
           }
+        ]
+      }
+    },
+    "hidpp2-device-set-dpi-stage": {
+      "transport": "hidpp2-long",
+      "skipIfZero": [
+        { "output": "featureIndexOnboardProfiles", "field": "featureIndex" }
+      ],
+      "inputs": {
+        "stage": {
+          "kind": "integer",
+          "min": 1,
+          "max": 8,
+          "step": 1,
+          "allowed": [1, 2, 3, 4, 5, 6, 7, 8]
+        }
+      },
+      "read": {
+        "command": "onboard-get-current-dpi-index",
+        "parser": "onboard-get-current-dpi-index",
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexOnboardProfiles", "field": "featureIndex" }
+        }
+      },
+      "writeCommand": "onboard-set-current-dpi-index",
+      "writeParams": {
+        "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+        "featureIndex": { "fromOutput": "featureIndexOnboardProfiles", "field": "featureIndex" }
+      },
+      "preserveUnknown": false,
+      "settleMs": 80,
+      "verify": {
+        "command": "onboard-get-current-dpi-index",
+        "parser": "onboard-get-current-dpi-index",
+        "params": {
+          "deviceIndex": { "fromOutput": "device", "field": "deviceIndex" },
+          "featureIndex": { "fromOutput": "featureIndexOnboardProfiles", "field": "featureIndex" }
+        },
+        "assertions": [
+          { "field": "stage", "param": "stage" }
         ]
       }
     },
@@ -1673,10 +1785,13 @@
           "kind": "integer",
           "min": 125,
           "max": 1000,
-          "step": 125,
           "allowed": [
             125,
+            143,
+            167,
+            200,
             250,
+            333,
             500,
             1000
           ]
@@ -1733,7 +1848,11 @@
             "encoding": "lookup-u8",
             "lookup": {
               "125": 8,
+              "143": 7,
+              "167": 6,
+              "200": 5,
               "250": 4,
+              "333": 3,
               "500": 2,
               "1000": 1
             }

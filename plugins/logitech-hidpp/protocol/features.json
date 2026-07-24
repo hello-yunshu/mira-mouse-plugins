@@ -3,11 +3,15 @@
   "generatedFrom": {
     "solaar": {
       "path": "vendor/solaar/lib/logitech_receiver/hidpp20_constants.py",
-      "license": "GPL-2.0-or-later"
+      "license": "GPL-2.0-or-later",
+      "repository": "https://github.com/pwr-Solaar/Solaar",
+      "commit": "0ecae9f388aab0661025e169ad731eea74a2a826"
     },
     "cpgDocs": {
       "path": "vendor/cpg-docs/hidpp20/features",
-      "license": "See upstream repository"
+      "license": "See upstream repository",
+      "repository": "https://github.com/cvuchener/cpg-docs",
+      "commit": "f9107a4e3190d798f9be8c5d596f255f5e5741d2"
     }
   },
   "generatedAt": "2026-06-21T15:19:55.584Z",
