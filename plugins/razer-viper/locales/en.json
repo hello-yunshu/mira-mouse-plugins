@@ -25,5 +25,6 @@
   "details.value.deviceMode.normal": "Normal Mode",
   "details.value.deviceMode.driver": "Driver Mode",
   "details.value.charging.yes": "Charging",
-  "details.value.charging.no": "Not Charging"
+  "details.value.charging.no": "Not Charging",
+  "plugin.label.capability.device-settings": "Device settings"
 }
