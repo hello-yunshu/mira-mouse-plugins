@@ -15,6 +15,8 @@
   "plugin.label.capability.pointer-speed": "Pointer speed",
   "plugin.label.capability.device-info": "Device info",
   "plugin.label.capability.feature-index": "Feature index",
+  "plugin.label.capability.dpi-capability": "DPI capability",
+  "plugin.label.capability.dpi-list": "DPI list",
   "plugin.label.capability.onboard-profile": "Onboard profile",
   "controlMode.onboard": "Onboard",
   "controlMode.software": "Software"

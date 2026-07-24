@@ -112,6 +112,18 @@ function validateRuntime(name, runtime) {
     || !recovery.connections.every((connection) => HOST_DEVICE_CONNECTIONS.has(connection))) {
     fail(`${name}: invalid runtime.wakeRecovery contract`);
   }
+  const inventory = runtime.inventory;
+  if (inventory === undefined) return;
+  const invAllowed = new Set(['workflows', 'refresh', 'cacheTtlSeconds']);
+  if (!inventory || typeof inventory !== 'object' || Array.isArray(inventory)
+    || Object.keys(inventory).some((key) => !invAllowed.has(key))
+    || !Array.isArray(inventory.workflows)
+    || inventory.workflows.length === 0
+    || !inventory.workflows.every((id) => typeof id === 'string' && id.length > 0)
+    || (inventory.refresh !== undefined && !['on-open', 'manual'].includes(inventory.refresh))
+    || (inventory.cacheTtlSeconds !== undefined && (typeof inventory.cacheTtlSeconds !== 'number' || inventory.cacheTtlSeconds <= 0))) {
+    fail(`${name}: invalid runtime.inventory contract`);
+  }
 }
 
 function validPath(value) { return typeof value === 'string' && value.length > 0 && value.length <= 160; }
@@ -417,6 +429,21 @@ for (const [name, data] of Object.entries(pluginData)) {
       if (!['ff-minus-sum8', 'xor8'].includes(checksum.algorithm)) fail(`${name}/${id}: unsupported checksum`);
       if (checksum.start < 0 || checksum.endExclusive > length || checksum.start >= checksum.endExclusive) fail(`${name}/${id}: invalid checksum range`);
       if (checksum.writeOffset < 0 || checksum.writeOffset >= length) fail(`${name}/${id}: invalid checksum output`);
+    }
+    // 声明式诊断 payload 策略校验（spec 14）
+    if (command.diagnostics !== undefined) {
+      const diag = command.diagnostics;
+      if (!diag || typeof diag !== 'object' || Array.isArray(diag)) {
+        fail(`${name}/${id}: diagnostics must be an object`);
+      }
+      const allowedDiagKeys = new Set(['payload']);
+      const unexpectedDiagKeys = Object.keys(diag).filter((key) => !allowedDiagKeys.has(key));
+      if (unexpectedDiagKeys.length > 0) fail(`${name}/${id}: diagnostics has unexpected keys: ${unexpectedDiagKeys.join(', ')}`);
+      if (diag.payload !== undefined) {
+        if (!['allow', 'mask', 'deny'].includes(diag.payload)) {
+          fail(`${name}/${id}: diagnostics.payload must be 'allow', 'mask', or 'deny'`);
+        }
+      }
     }
   }
 

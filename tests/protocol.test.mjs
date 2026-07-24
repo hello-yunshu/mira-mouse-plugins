@@ -225,6 +225,7 @@ test('logitech-hidpp exposes a read workflow per device family and writable muta
   const mutations = workflows.mutations ?? {};
   assert.deepEqual(Object.keys(mutations).sort(), [
     'hidpp2-device-set-control-mode',
+    'hidpp2-device-set-dpi-stage',
     'hidpp2-device-set-dpi-value',
     'hidpp2-device-set-dpi-value-extended',
     'hidpp2-device-set-mouse-lighting',
@@ -246,6 +247,9 @@ test('logitech-hidpp exposes a read workflow per device family and writable muta
   // mode, so skipIfZero:hostMode correctly hides them in onboard mode.
   const skipIfZeroGated = {
     'hidpp2-device-set-control-mode': [
+      { output: 'featureIndexOnboardProfiles', field: 'featureIndex' },
+    ],
+    'hidpp2-device-set-dpi-stage': [
       { output: 'featureIndexOnboardProfiles', field: 'featureIndex' },
     ],
     'hidpp2-device-set-dpi-value': [
@@ -402,7 +406,14 @@ test('logitech-hidpp declares protocol-level onboard lighting normalization', as
       extraColorOffset: 226,
     },
   );
-  assert.ok(normalizer.layouts.some((layout) => layout.default === true));
+  // D-3 fix: default layout was removed to prevent misapplication to unknown
+  // device formats. Only the explicit V5 conditional layout remains, so no
+  // layout should carry default: true.
+  assert.equal(
+    normalizer.layouts.some((layout) => layout.default === true),
+    false,
+    'no default layout should remain after D-3 fix',
+  );
 });
 
 test('logitech-hidpp root-get-feature discovers feature indices via be-u16 featureId', async () => {
@@ -474,4 +485,84 @@ test('G705 hardware fixtures preserve unified battery and adjustable DPI readbac
   assert.equal(dpi.response[3], dpi.expected.sensorIndex);
   assert.equal((dpi.response[4] << 8) | dpi.response[5], dpi.expected.dpiValue);
   assert.equal((dpi.response[6] << 8) | dpi.response[7], dpi.expected.defaultDpi);
+});
+
+test('Logitech commands declare diagnostics payload policies for sensitive commands', async () => {
+  const commands = await read('plugins/logitech-hidpp/protocol/commands.json');
+  // 敏感命令必须有声明式 diagnostics 策略
+  const sensitiveCommands = {
+    'device-info-get': 'mask',        // 含 unit ID / model ID
+    'device-name-get': 'mask',         // 含用户可定制设备名
+    'onboard-memory-read': 'deny',     // 含 profile / 按键映射 / 宏
+    'onboard-memory-write-start': 'deny',
+    'onboard-memory-write-chunk': 'deny',
+    'onboard-memory-write-end': 'deny',
+  };
+  for (const [id, expectedPolicy] of Object.entries(sensitiveCommands)) {
+    const cmd = commands.commands[id];
+    assert.ok(cmd, `command ${id} should exist`);
+    assert.ok(cmd.diagnostics, `${id}: should declare diagnostics policy`);
+    assert.equal(cmd.diagnostics.payload, expectedPolicy, `${id}: payload policy should be ${expectedPolicy}`);
+  }
+});
+
+test('Logitech commands allow non-sensitive protocol commands', async () => {
+  const commands = await read('plugins/logitech-hidpp/protocol/commands.json');
+  // 非敏感命令应声明 allow
+  const safeCommands = [
+    'root-get-feature',
+    'feature-set-get-count',
+    'battery-get-status',
+    'battery-get-capability',
+    'unified-battery-get-capabilities',
+    'unified-battery-get-status',
+    'dpi-get-capability',
+    'dpi-get-list',
+    'dpi-get-current',
+    'dpi-set',
+    'mouse-pointer-get',
+    'pointer-speed-get',
+    'pointer-speed-set',
+    'report-rate-get-list',
+    'report-rate-get',
+    'report-rate-set',
+    'onboard-get-description',
+    'onboard-get-mode',
+    'onboard-get-current-profile',
+    'onboard-get-current-dpi-index',
+    'onboard-set-current-dpi-index',
+    'profile-mgmt-get-info',
+    'profile-mgmt-get-count',
+    'profile-mgmt-get-current',
+    'profile-mgmt-set-current',
+  ];
+  for (const id of safeCommands) {
+    const cmd = commands.commands[id];
+    assert.ok(cmd, `command ${id} should exist`);
+    assert.ok(cmd.diagnostics, `${id}: should declare diagnostics policy`);
+    assert.equal(cmd.diagnostics.payload, 'allow', `${id}: payload policy should be allow`);
+  }
+});
+
+test('Logitech diagnostics policies use only valid values', async () => {
+  const commands = await read('plugins/logitech-hidpp/protocol/commands.json');
+  const validPolicies = new Set(['allow', 'mask', 'deny']);
+  for (const [id, cmd] of Object.entries(commands.commands)) {
+    if (cmd.diagnostics === undefined) continue;
+    assert.ok(cmd.diagnostics && typeof cmd.diagnostics === 'object', `${id}: diagnostics must be an object`);
+    assert.ok(cmd.diagnostics.payload, `${id}: diagnostics.payload is required`);
+    assert.ok(validPolicies.has(cmd.diagnostics.payload), `${id}: invalid payload policy ${cmd.diagnostics.payload}`);
+  }
+});
+
+test('Logitech devices declare stable identity for cross-connection dedup', async () => {
+  const devices = await read('plugins/logitech-hidpp/devices.json');
+  assert.ok(devices.devices.length > 0, 'Logitech should expose device descriptors');
+  for (const device of devices.devices) {
+    assert.ok(device.identity, `${device.family}: should declare identity`);
+    assert.ok(typeof device.identity.group === 'string' && device.identity.group.length > 0,
+      `${device.family}: identity.group is required`);
+    assert.ok(device.identity.displayName, `${device.family}: identity.displayName is recommended`);
+    assert.ok(Array.isArray(device.identity.aliases), `${device.family}: identity.aliases should be an array`);
+  }
 });

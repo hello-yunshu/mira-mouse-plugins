@@ -36,14 +36,20 @@ const pySource = await loadPySource();
 const features = parseSupportedFeature(pySource);
 const documented = await loadDocumentedFeatures(CPG_DOCS_FEATURES);
 
+const solaarSha = resolveSolaarSha();
+const cpgDocsSha = resolveCpgDocsSha();
 const registry = {
   $schema: "./features.schema.json",
   generatedFrom: {
     solaar: {
+      repository: "https://github.com/pwr-Solaar/Solaar",
+      commit: solaarSha,
       path: "vendor/solaar/lib/logitech_receiver/hidpp20_constants.py",
       license: "GPL-2.0-or-later",
     },
     cpgDocs: {
+      repository: "https://github.com/cvuchener/cpg-docs",
+      commit: cpgDocsSha,
       path: "vendor/cpg-docs/hidpp20/features",
       license: "See upstream repository",
     },
@@ -155,6 +161,30 @@ function resolveSolaarSha() {
     const out = execFileSync(
       "git",
       ["ls-tree", "HEAD", "--", "vendor/solaar"],
+      { cwd: ROOT, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] },
+    ).trim();
+    const match = out.match(/commit\s+([0-9a-f]{40})/);
+    if (match) return match[1];
+  } catch {}
+  return null;
+}
+
+
+// Resolve the cpg-docs submodule commit for provenance tracking.
+function resolveCpgDocsSha() {
+  try {
+    const out = execFileSync("git", ["submodule", "status", "vendor/cpg-docs"], {
+      cwd: ROOT,
+      encoding: "utf8",
+      stdio: ["pipe", "pipe", "pipe"],
+    }).trim();
+    const match = out.match(/^[+\-U ]?([0-9a-f]{7,40})\s/);
+    if (match) return match[1];
+  } catch {}
+  try {
+    const out = execFileSync(
+      "git",
+      ["ls-tree", "HEAD", "--", "vendor/cpg-docs"],
       { cwd: ROOT, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] },
     ).trim();
     const match = out.match(/commit\s+([0-9a-f]{40})/);
