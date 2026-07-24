@@ -13,12 +13,12 @@
     },
     {
       "pluginId": "mira.logitech-hidpp",
-      "version": "0.9.1",
+      "version": "0.9.2",
       "releaseTag": "release/v2026-07-24",
-      "url": "https://github.com/hello-yunshu/mira-mouse-plugins/releases/download/release/v2026-07-24/mira-logitech-hidpp-0.9.1.mira-plugin",
-      "sha256": "b4f1976397ecfeb5e68a8213d5d2088ae8be0f15647401400338f1fbf239bbb3",
+      "url": "https://github.com/hello-yunshu/mira-mouse-plugins/releases/download/release/v2026-07-24/mira-logitech-hidpp-0.9.2.mira-plugin",
+      "sha256": "ed71ebfe64ab7beb479d38afad937a2fb15bc26778b80b0ecf1894aa13575427",
       "publisherKeyId": "mira-plugins-2026-001",
-      "notes": "Mira plugin mira.logitech-hidpp 0.9.1"
+      "notes": "Mira plugin mira.logitech-hidpp 0.9.2"
     },
     {
       "pluginId": "mira.razer-viper",
