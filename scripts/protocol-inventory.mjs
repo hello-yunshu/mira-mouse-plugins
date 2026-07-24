@@ -1,10 +1,40 @@
 #!/usr/bin/env node
-import { existsSync, readFileSync } from "node:fs";
+// 架构要求（第 3.6 节）：动态发现 plugins/*/plugin.json，不得硬编码插件列表。
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const ROOT = new URL("..", import.meta.url).pathname;
 const DOC_PATH = join(ROOT, "docs/protocol-reserve-inventory.md");
-const PLUGINS = ["amaster", "logitech-hidpp", "razer-viper"];
+
+// 动态发现插件：枚举 plugins/*/plugin.json
+const PLUGINS = readdirSync(join(ROOT, "plugins"), { withFileTypes: true })
+  .filter((entry) => entry.isDirectory() && existsSync(join(ROOT, "plugins", entry.name, "plugin.json")))
+  .map((entry) => entry.name)
+  .sort();
+
+// 支持 --plugin <id|dir> 单插件校验（第 9.1 节）
+const pluginFilterIdx = process.argv.indexOf("--plugin");
+if (pluginFilterIdx >= 0) {
+  const filter = process.argv[pluginFilterIdx + 1];
+  PLUGINS.length = 0;
+  // 先按目录名匹配
+  if (existsSync(join(ROOT, "plugins", filter, "plugin.json"))) {
+    PLUGINS.push(filter);
+  } else {
+    // 再按 pluginId 匹配
+    const all = readdirSync(join(ROOT, "plugins"), { withFileTypes: true })
+      .filter((entry) => entry.isDirectory() && existsSync(join(ROOT, "plugins", entry.name, "plugin.json")))
+      .map((entry) => entry.name);
+    const match = all.find((name) => {
+      try {
+        const manifest = JSON.parse(readFileSync(join(ROOT, "plugins", name, "plugin.json"), "utf8"));
+        return manifest.pluginId === filter;
+      } catch { return false; }
+    });
+    if (!match) throw new Error(`plugin not found: ${filter}`);
+    PLUGINS.push(match);
+  }
+}
 
 const checkDocs = process.argv.includes("--check-docs");
 

@@ -8,7 +8,16 @@
   "evidence": "fixture-verified",
   "permissions": [],
   "capabilities": [
-    { "id": "battery", "control": "ReadOnlyValue", "labelKey": "battery", "readOnly": true },
+    {
+      "id": "battery",
+      "control": "ReadOnlyValue",
+      "labelKey": "battery",
+      "readOnly": true,
+      "metadata": {
+        "fields": [{ "id": "value", "source": "battery", "editor": "static-readonly", "format": "percent", "labelKey": "battery" }],
+        "batteryHistory": { "validConnections": ["wireless"] }
+      }
+    },
     { "id": "charging", "control": "ReadOnlyValue", "labelKey": "charging", "readOnly": true },
     { "id": "dpi", "control": "DpiStages", "labelKey": "dpi", "readOnly": true },
     { "id": "polling-rate", "control": "Segmented", "labelKey": "pollingRate", "readOnly": true },
