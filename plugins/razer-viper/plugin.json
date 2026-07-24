@@ -1,12 +1,71 @@
 {
   "schemaVersion": 1,
   "pluginId": "mira.razer-viper",
-  "name": "Razer Viper Research",
-  "version": "0.2.0",
-  "pluginApi": ">=1.0.0, <2.0.0",
+  "name": "Razer Mice",
+  "version": "0.3.0",
+  "pluginApi": ">=1.1.0, <2.0.0",
   "publisherKeyId": null,
-  "evidence": "inferred",
-  "permissions": [],
-  "capabilities": [{ "id": "research-status", "control": "ReadOnlyValue", "labelKey": "researchStatus", "readOnly": true, "metadata": { "fields": [{ "id": "value", "source": "name", "editor": "static-readonly", "labelKey": "researchStatus" }] } }],
+  "evidence": "source-confirmed",
+  "permissions": [{ "kind": "hid", "report_types": ["feature"], "max_report_length": 91, "max_reports_per_second": 30 }],
+  "runtime": {
+    "inventory": {
+      "workflows": ["razer-1f-inventory", "razer-3f-inventory"],
+      "refresh": "on-open",
+      "cacheTtlSeconds": 300
+    }
+  },
+  "capabilities": [
+    {
+      "id": "battery",
+      "control": "ReadOnlyValue",
+      "labelKey": "capability.battery",
+      "readOnly": true,
+      "placements": [{ "region": "hero", "order": 10, "span": 1, "icon": "battery" }],
+      "metadata": {
+        "fields": [{ "id": "value", "source": "battery", "editor": "static-readonly", "format": "percent", "labelKey": "capability.battery" }],
+        "batteryHistory": { "validConnections": ["wireless"] }
+      }
+    },
+    {
+      "id": "dpi",
+      "control": "ReadOnlyValue",
+      "labelKey": "capability.dpi",
+      "readOnly": true,
+      "placements": [{ "region": "control", "group": "performance", "order": 10, "span": 1, "icon": "gauge" }],
+      "metadata": {
+        "fields": [{ "id": "value", "source": "capabilities.dpi", "editor": "static-readonly", "labelKey": "capability.dpi" }]
+      }
+    },
+    {
+      "id": "polling-rate",
+      "control": "ReadOnlyValue",
+      "labelKey": "capability.polling-rate",
+      "readOnly": true,
+      "placements": [{ "region": "control", "group": "polling", "order": 20, "span": 1, "icon": "wave" }],
+      "metadata": {
+        "fields": [{ "id": "value", "source": "capabilities.pollingRate", "editor": "static-readonly", "format": "hertz", "labelKey": "capability.polling-rate" }]
+      }
+    },
+    {
+      "id": "firmware",
+      "control": "ReadOnlyValue",
+      "labelKey": "capability.firmware",
+      "readOnly": true,
+      "placements": [{ "region": "details", "order": 10, "span": 1, "icon": "info" }],
+      "metadata": {
+        "fields": [{ "id": "value", "source": "capabilities.firmware", "editor": "static-readonly", "labelKey": "capability.firmware" }]
+      }
+    },
+    {
+      "id": "device-settings",
+      "control": "ReadOnlyValue",
+      "labelKey": "plugin.label.capability.device-settings",
+      "readOnly": true,
+      "placements": [{ "region": "details", "order": 20, "span": 1, "icon": "info" }],
+      "metadata": {
+        "fields": [{ "id": "value", "source": "capabilities.deviceMode", "editor": "static-readonly", "labelKey": "plugin.label.capability.device-settings" }]
+      }
+    }
+  ],
   "writesEnabled": false
 }
