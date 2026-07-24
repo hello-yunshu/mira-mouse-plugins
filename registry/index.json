@@ -5,8 +5,8 @@
     {
       "pluginId": "mira.amaster",
       "version": "1.8.0",
-      "releaseTag": "release/v2026-07-22",
-      "url": "https://github.com/hello-yunshu/mira-mouse-plugins/releases/download/release/v2026-07-22/mira-amaster-1.8.0.mira-plugin",
+      "releaseTag": "release/v2026-07-24",
+      "url": "https://github.com/hello-yunshu/mira-mouse-plugins/releases/download/release/v2026-07-24/mira-amaster-1.8.0.mira-plugin",
       "sha256": "d101a0b98fd95adee07bdf44f28ce9a2a348ac5aa275461f0f522366b7a3fd6e",
       "publisherKeyId": "mira-plugins-2026-001",
       "notes": "Mira plugin mira.amaster 1.8.0"
@@ -14,11 +14,20 @@
     {
       "pluginId": "mira.logitech-hidpp",
       "version": "0.9.1",
-      "releaseTag": "release/v2026-07-22",
-      "url": "https://github.com/hello-yunshu/mira-mouse-plugins/releases/download/release/v2026-07-22/mira-logitech-hidpp-0.9.1.mira-plugin",
+      "releaseTag": "release/v2026-07-24",
+      "url": "https://github.com/hello-yunshu/mira-mouse-plugins/releases/download/release/v2026-07-24/mira-logitech-hidpp-0.9.1.mira-plugin",
       "sha256": "b4f1976397ecfeb5e68a8213d5d2088ae8be0f15647401400338f1fbf239bbb3",
       "publisherKeyId": "mira-plugins-2026-001",
       "notes": "Mira plugin mira.logitech-hidpp 0.9.1"
+    },
+    {
+      "pluginId": "mira.razer-viper",
+      "version": "0.3.0",
+      "releaseTag": "release/v2026-07-24",
+      "url": "https://github.com/hello-yunshu/mira-mouse-plugins/releases/download/release/v2026-07-24/mira-razer-viper-0.3.0.mira-plugin",
+      "sha256": "9f2435b504f33c7f8b21e9a1ae297d2ff3d84bf68a2c9441318e6ba9533bd800",
+      "publisherKeyId": "mira-plugins-2026-001",
+      "notes": "Mira plugin mira.razer-viper 0.3.0"
     }
   ],
   "status": "active"
