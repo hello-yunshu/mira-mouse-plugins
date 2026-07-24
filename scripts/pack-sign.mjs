@@ -72,6 +72,11 @@ async function main() {
 
     // 3.5 节：CLI inspect 验证刚生成的包（checksum + 签名）。
     execFileSync(cli, ['inspect', outPath, '--require-signature'], { stdio: 'inherit' });
+    // 3.5 节：CLI verify 用 trusted-keys.json 做最终门禁（与 inspect 同一实现）。
+    const trustedKeysPath = join(root, 'registry/trusted-keys.json');
+    if (existsSync(trustedKeysPath)) {
+      execFileSync(cli, ['verify', outPath, '--trusted-keys', trustedKeysPath, '--require-signature'], { stdio: 'inherit' });
+    }
 
     const sha256 = await sha256File(outPath);
     console.log(`packed: ${outPath}`);
