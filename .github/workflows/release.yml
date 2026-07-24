@@ -47,7 +47,7 @@ jobs:
         run: |
           set -euo pipefail
           # A plugin is releasable when its manifest evidence is hardware-verified.
-          # This excludes fixture-verified (example-mock) and inferred (razer-viper) plugins.
+          # This excludes fixture-verified (example-mock) plugins.
           plugins_json="$(node -e '
             const fs = require("fs");
             const path = require("path");
