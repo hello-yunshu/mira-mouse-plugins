@@ -9,6 +9,49 @@ test('protocol A checksum uses ones-complement sum8', async () => {
   const checksum = 0xff - (fixture.input.reduce((sum, byte) => sum + byte, 0) & 0xff);
   assert.equal(checksum, fixture.expectedChecksum);
 });
+
+// 3.4 节：请求 checksum 与响应 checksum 必须彻底分离。
+// - AMaster Protocol A 没有证据的响应不得复用请求 checksum；
+// - Razer Viper 等确实有响应 XOR 的命令显式声明 response.checksum；
+// - 用户提供的 Protocol A checksum-failed 假告警日志必须变成回归夹具。
+test('3.4: AMaster Protocol A commands do not declare response.checksum (no false alarms)', async () => {
+  const commands = await read('plugins/amaster/protocol/commands.json');
+  for (const [id, command] of Object.entries(commands.commands)) {
+    // Protocol A 响应没有证据存在 checksum，不得声明 response.checksum。
+    // 宿主 verify_response_checksum 应返回 None，不发射 on_hid_checksum_failed。
+    if (command.response) {
+      assert.equal(command.response.checksum, undefined, `${id}: Protocol A must not declare response.checksum`);
+    }
+  }
+});
+
+test('3.4: Razer Viper commands declare response.checksum separately from request.checksum', async () => {
+  const commands = await read('plugins/razer-viper/protocol/commands.json');
+  for (const [id, command] of Object.entries(commands.commands)) {
+    // Razer 响应有 XOR checksum，必须独立声明 response.checksum。
+    assert.ok(command.response, `${id}: Razer commands must declare response`);
+    assert.ok(command.response.checksum, `${id}: Razer commands must declare response.checksum`);
+    assert.equal(command.response.checksum.algorithm, 'xor8', `${id}: response checksum algorithm`);
+    // response.checksum 与 request.checksum 是独立声明，不复用。
+    assert.ok(command.request.checksum, `${id}: Razer commands must declare request.checksum`);
+  }
+});
+
+test('3.4: Protocol A checksum-false-alarm regression fixture covers all reported commands', async () => {
+  const fixture = await read('plugins/amaster/tests/fixtures/protocol-a-checksum-false-alarm.json');
+  const commands = await read('plugins/amaster/protocol/commands.json');
+  // 回归夹具中每个假告警命令都必须在 AMaster commands 中存在。
+  for (const alarm of fixture.falseAlarms) {
+    assert.ok(commands.commands[alarm.command], `${alarm.command}: fixture references unknown command`);
+    // 该命令不得声明 response.checksum（否则会再次产生假告警）。
+    const cmd = commands.commands[alarm.command];
+    if (cmd.response) {
+      assert.equal(cmd.response.checksum, undefined, `${alarm.command}: must not declare response.checksum to avoid false alarm`);
+    }
+  }
+  // 确保覆盖了用户报告的全部 12 个命令。
+  assert.equal(fixture.falseAlarms.length, 12, 'fixture must cover all 12 reported false-alarm commands');
+});
 test('protocol A commands write checksum at payload offset 7', async () => {
   const commands = await read('plugins/amaster/protocol/commands.json');
   for (const [id, command] of Object.entries(commands.commands)) {

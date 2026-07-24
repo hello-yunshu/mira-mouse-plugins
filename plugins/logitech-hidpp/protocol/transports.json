@@ -7,7 +7,19 @@
       "writeLength": 20,
       "readLength": 20,
       "stripReportIdOnRead": true,
-      "readTimeoutMs": 250
+      "readTimeoutMs": 250,
+      "errorMatchers": [
+        {
+          "name": "hidpp2-error",
+          "pattern": [{ "offset": 1, "eq": 255 }],
+          "requestMatch": [
+            { "offset": 2, "requestOffset": 1 },
+            { "offset": 3, "requestOffset": 2 }
+          ],
+          "errorOffset": 4,
+          "label": "HID++ 2.0 error 0x{error:02X}"
+        }
+      ]
     },
     "hidpp2-short": {
       "kind": "hid-output-input",
@@ -15,7 +27,33 @@
       "writeLength": 7,
       "readLength": 7,
       "stripReportIdOnRead": true,
-      "readTimeoutMs": 250
+      "readTimeoutMs": 250,
+      "errorMatchers": [
+        {
+          "name": "hidpp1-error",
+          "pattern": [
+            { "offset": 0, "eq": 16 },
+            { "offset": 2, "eq": 143 }
+          ],
+          "requestMatch": [
+            { "offset": 1, "requestOffset": 0 },
+            { "offset": 3, "requestOffset": 1 },
+            { "offset": 4, "requestOffset": 2 }
+          ],
+          "errorOffset": 5,
+          "label": "HID++ 1.0 transport error 0x{error:02X}"
+        }
+      ],
+      "writeFallbacks": [
+        {
+          "name": "short-to-long-report",
+          "fromReportId": 16,
+          "fromLength": 7,
+          "toReportId": 17,
+          "toLength": 20,
+          "payloadCopy": { "fromOffset": 1, "toOffset": 1, "length": 6 }
+        }
+      ]
     }
   }
 }

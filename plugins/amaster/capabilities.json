@@ -4,5 +4,16 @@
   "enabledWrites": ["current-dpi-stage", "dpi-value", "polling-rate", "sleep-time", "mouse-lighting", "receiver-lighting"],
   "disabledWrites": ["application-layer-light-link", "button-mapping"],
   "forbidden": ["firmware-update", "bootloader", "dfu", "flash-erase", "receiver-pairing", "macros"],
-  "pollingRatesHz": [125, 250, 500, 1000, 2000, 4000, 8000]
+  "pollingRatesHz": [125, 250, 500, 1000, 2000, 4000, 8000],
+  "semanticMappings": {
+    "mouseLighting": [
+      { "output": "mouseEffect" },
+      { "output": "mouseLightMode", "fieldMap": { "mode": "effect", "modeName": "effectName" } },
+      { "output": "mouseLightColor" },
+      { "output": "settings", "fieldMap": { "mouseLightStartColor": "color", "mouseLightEndColor": "endColor", "mouseLightEnabled": "enabled" } }
+    ],
+    "receiverLighting": [
+      { "output": "receiverLight", "fieldMap": { "type": ["effect", "option"], "color1": "color" } }
+    ]
+  }
 }
