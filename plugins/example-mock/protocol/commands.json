@@ -1,1 +1,1 @@
-{ "schemaVersion": 1, "commands": { "snapshot": { "request": [1], "responseFixture": "snapshot.json" } } }
+{ "schemaVersion": 1, "commands": { "snapshot": { "request": { "length": 1, "bytes": [{ "offset": 0, "value": "0x01" }], "checksum": null }, "responseFixture": "snapshot.json" } } }

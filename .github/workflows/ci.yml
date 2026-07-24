@@ -17,6 +17,7 @@ jobs:
       - run: node scripts/sync-hidpp-features.mjs --check
       - run: npm run validate
       - run: npm test
+      - run: npm run check:architecture
       - name: Reject forbidden content
         run: |
           set -euo pipefail
@@ -37,79 +38,8 @@ jobs:
       - shell: bash
         run: |
           find plugins registry -name '*.json' -print0 | xargs -0 node -e "const fs=require('fs'); for (const f of process.argv.slice(1)) { try { JSON.parse(fs.readFileSync(f)); } catch (e) { console.error(f + ': ' + e.message); process.exit(1); } }"
-  auto-release:
-    needs: [validate-and-fixtures, platform-parse]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-22.04
-    timeout-minutes: 5
-    permissions:
-      actions: write
-    concurrency:
-      group: plugin-auto-release
-      cancel-in-progress: false
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with: { node-version: 22 }
-      - name: Determine release action
-        id: decide
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          # Collect current hardware-verified plugin asset names
-          current=$(node -e '
-            const fs = require("fs");
-            const path = require("path");
-            const result = [];
-            for (const name of fs.readdirSync("plugins").sort()) {
-              const m = path.join("plugins", name, "plugin.json");
-              if (!fs.existsSync(m)) continue;
-              const manifest = JSON.parse(fs.readFileSync(m, "utf8"));
-              if (manifest.evidence === "hardware-verified") {
-                const asset = manifest.pluginId.replace(/\./g, "-") + "-" + manifest.version + ".mira-plugin";
-                result.push(asset);
-              }
-            }
-            console.log(JSON.stringify(result));
-          ')
-          echo "Current assets: $current"
-          latest_tag=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 1 --json tagName --jq '.[0].tagName' 2>/dev/null || echo "")
-          if [ -z "$latest_tag" ]; then
-            tag="release/v$(date -u +%Y-%m-%d)"
-            echo "action=new" >> "$GITHUB_OUTPUT"
-            echo "tag=$tag" >> "$GITHUB_OUTPUT"
-            echo "No previous release; creating $tag"
-          else
-            published=$(gh release view "$latest_tag" --repo "$GITHUB_REPOSITORY" --json assets --jq '[.assets[].name | select(endswith(".mira-plugin"))]')
-            need_new=$(node -e "
-              const current = new Set($current);
-              const published = new Set($published);
-              const changed = current.size !== published.size || [...current].some(a => !published.has(a));
-              console.log(changed ? 'yes' : 'no');
-            ")
-            if [ "$need_new" = "yes" ]; then
-              tag="release/v$(date -u +%Y-%m-%d)"
-              echo "action=new" >> "$GITHUB_OUTPUT"
-              echo "tag=$tag" >> "$GITHUB_OUTPUT"
-              echo "Version changed; creating $tag"
-            else
-              echo "action=overwrite" >> "$GITHUB_OUTPUT"
-              echo "tag=$latest_tag" >> "$GITHUB_OUTPUT"
-              echo "Version unchanged; overwriting $latest_tag"
-            fi
-          fi
-      - name: Trigger release workflow
-        run: |
-          if [ "$ACTION" = "new" ]; then
-            gh workflow run release.yml --repo "$GITHUB_REPOSITORY" \
-              -f overwrite_latest=false \
-              -f release_tag="$TAG"
-          else
-            gh workflow run release.yml --repo "$GITHUB_REPOSITORY" \
-              -f overwrite_latest=true
-          fi
-        env:
-          ACTION: ${{ steps.decide.outputs.action }}
-          TAG: ${{ steps.decide.outputs.tag }}
-          GH_TOKEN: ${{ github.token }}
+  # 第 3.7 节：删除 auto-release job。
+  # 插件发布必须通过 workflow_dispatch 手动触发 release.yml，创建不可覆盖的
+  # per-plugin Release（plugin/<plugin-id>/v<semver>）。push 到 main 不得自动
+  # 触发覆盖式发布，否则会违反“Release 不可覆盖”与“插件独立发布”规则。
+  # CI 仍负责 validate / test / architecture lint，确保 main 始终可发布。
