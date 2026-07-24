@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "workflows": {
+    "razer-1f-read": {
+      "transport": "razer-hid",
+      "steps": [
+        { "command": "firmware", "parser": "firmware", "output": "firmware" },
+        { "command": "serial", "parser": "serial", "output": "serial", "onFailure": "continue" },
+        { "command": "battery-level", "parser": "battery-level", "output": "battery", "onFailure": "continue" },
+        { "command": "charging-status", "parser": "charging-status", "output": "charging", "onFailure": "continue" },
+        { "command": "dpi", "parser": "dpi", "output": "dpi", "onFailure": "continue" },
+        { "command": "polling-rate", "parser": "polling-rate", "output": "pollingRate", "onFailure": "continue" },
+        { "command": "device-mode", "parser": "device-mode", "output": "deviceMode", "onFailure": "continue" }
+      ]
+    },
+    "razer-3f-read": {
+      "transport": "razer-hid",
+      "steps": [
+        { "command": "firmware", "parser": "firmware", "output": "firmware" },
+        { "command": "serial", "parser": "serial", "output": "serial", "onFailure": "continue" },
+        { "command": "battery-level", "parser": "battery-level", "output": "battery", "onFailure": "continue" },
+        { "command": "charging-status", "parser": "charging-status", "output": "charging", "onFailure": "continue" },
+        { "command": "dpi", "parser": "dpi", "output": "dpi", "onFailure": "continue" },
+        { "command": "polling-rate", "parser": "polling-rate", "output": "pollingRate", "onFailure": "continue" },
+        { "command": "device-mode", "parser": "device-mode", "output": "deviceMode", "onFailure": "continue" }
+      ]
+    },
+    "razer-1f-inventory": {
+      "transport": "razer-hid",
+      "steps": [
+        { "command": "dpi-stages", "parser": "dpi-stages", "output": "dpiStages", "onFailure": "continue" }
+      ]
+    },
+    "razer-3f-inventory": {
+      "transport": "razer-hid",
+      "steps": [
+        { "command": "dpi-stages", "parser": "dpi-stages", "output": "dpiStages", "onFailure": "continue" }
+      ]
+    }
+  }
+}

@@ -97,3 +97,26 @@ Feature registry 储备项：
 - 所有其他 feature registry 条目均为查询用储备项。它们不意味着 UI
   支持，在某条 workflow 引用它们并声明 capability/mutation 契约之前，
   不得将其视为能力。
+
+## Razer
+
+当前计数（来自 `node scripts/protocol-inventory.mjs`）：
+
+| Category | Entries |
+|---|---|
+| Commands | 8 total; 8 enabled by read workflows or inventory workflows; 0 reserved. |
+| Parsers | 8 total; 8 enabled by read workflows or inventory workflows; 0 reserved. |
+| Mutations | 0 enabled. |
+
+保留的协议原语：
+
+| Entry | Kind | Reason to keep | Activation rule |
+|---|---|---|---|
+| _(none)_ | — | All 8 commands (battery-level, charging-status, dpi, dpi-stages, polling-rate, serial, firmware, device-mode) are enabled across the `razer-1f-read`, `razer-3f-read`, `razer-1f-inventory`, and `razer-3f-inventory` workflows. | No reserved protocol primitives at this time. |
+
+Razer 边界：
+
+- 所有能力均为只读（`writesEnabled: false`）。
+- `forbidden` 列表阻止固件更新、bootloader、DFU、闪存擦除、接收器配对和宏。
+- DPI 值为大端序（x_hi 在 x_lo 之前），与 AMaster 的 `le-u16` 不同。
+- 回报率使用编码表（0x01=1000 Hz, 0x02=500 Hz, 0x08=125 Hz），而非线性值。

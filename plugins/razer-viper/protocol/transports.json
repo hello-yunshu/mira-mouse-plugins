@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "transports": {
+    "razer-hid": {
+      "kind": "hid-feature",
+      "reportId": 0,
+      "writeLength": 91,
+      "readLength": 91,
+      "stripReportIdOnRead": true
+    }
+  }
+}
