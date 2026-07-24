@@ -1,186 +1,311 @@
 # SPDX-License-Identifier: CC0-1.0
-# Unified plugin release workflow.
-# Packs and signs all production-ready plugins into a single GitHub Release.
-# Downstream registry publication and Mira lock sync are handled by
-# publish-registry.yml and sync-mira.yml (triggered by the release event).
+# Per-plugin release workflow (第 3.7 节)。
+#
+# 一次调用默认只发布一个插件，并创建不可覆盖的 per-plugin Release：
+#   plugin/<plugin-id>/v<semver>
+#
+# 可选批量调度：通过 plugins 输入传入逗号分隔的 pluginId 列表，
+# 但每个插件仍创建独立的 Release，且某个插件失败不阻止其他目标插件。
+#
+# 严禁：
+#   - 覆盖式 Release（已删除，Release 一旦创建即不可变）
+#   - 自动 checkout / push 主仓库（sync-mira 已删除）
+#   - 触发其他插件构建
+#   - 依赖主仓库 token（已不读取）
 name: Plugin Release
 on:
   workflow_dispatch:
     inputs:
-      overwrite_latest:
-        description: 'Overwrite latest release (rebuild without version bump)'
-        required: false
-        default: 'true'
-        type: boolean
-      release_tag:
-        description: 'Tag to create (required when overwrite_latest is false, e.g. release/v2026-06-26)'
+      plugin_id:
+        description: 'Target pluginId (e.g. mira.amaster). Mutually exclusive with plugins.'
         required: false
         type: string
+      plugins:
+        description: 'Comma-separated pluginIds for batch scheduling (each still gets its own Release).'
+        required: false
+        type: string
+      expected_version:
+        description: 'Optional: assert manifest version equals this value before packing.'
+        required: false
+        type: string
+      channel:
+        description: 'Release channel (stable | beta).'
+        required: false
+        default: 'stable'
+        type: choice
+        options: ['stable', 'beta']
+      dry_run:
+        description: 'Run pack/sign/inspect but skip the final Release creation.'
+        required: false
+        default: false
+        type: boolean
 permissions:
-  contents: read
+  contents: write
   actions: write
   id-token: write
   attestations: write
 concurrency:
-  group: "plugin-release-${{ inputs.release_tag || 'overwrite' }}"
+  # 每个 pluginId 独立串行，避免同时发布同一插件。
+  group: "plugin-release-${{ inputs.plugin_id || inputs.plugins }}"
   cancel-in-progress: false
 jobs:
   gate:
     runs-on: ubuntu-22.04
     timeout-minutes: 15
     outputs:
-      plugins: '${{ steps.list.outputs.plugins }}'
-      plugins_count: '${{ steps.list.outputs.plugins_count }}'
-      release_tag: '${{ steps.list.outputs.release_tag }}'
+      targets: '${{ steps.plan.outputs.targets }}'
+      targets_count: '${{ steps.plan.outputs.targets_count }}'
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
           node-version: 22
-      - run: npm run validate && npm test
-      - id: list
-        name: Enumerate releasable plugins
-        env:
-          GH_TOKEN: '${{ github.token }}'
-          OVERWRITE: "${{ inputs.overwrite_latest == true }}"
-          INPUT_TAG: '${{ inputs.release_tag }}'
+      - name: Validate repository-level rules
         run: |
           set -euo pipefail
-          # A plugin is releasable when its manifest evidence is hardware-verified.
-          # This excludes fixture-verified (example-mock) plugins.
-          plugins_json="$(node -e '
+          npm ci
+          npm run validate:all
+          npm test
+          npm run check:architecture
+      - id: plan
+        name: Plan release targets
+        env:
+          PLUGIN_ID: '${{ inputs.plugin_id }}'
+          PLUGINS: '${{ inputs.plugins }}'
+          EXPECTED_VERSION: '${{ inputs.expected_version }}'
+          CHANNEL: '${{ inputs.channel }}'
+          DRY_RUN: '${{ inputs.dry_run }}'
+          GH_TOKEN: '${{ github.token }}'
+        run: |
+          set -euo pipefail
+          if [ -z "$PLUGIN_ID" ] && [ -z "$PLUGINS" ]; then
+            echo "Either plugin_id or plugins input is required" >&2
+            exit 1
+          fi
+          if [ -n "$PLUGIN_ID" ] && [ -n "$PLUGINS" ]; then
+            echo "plugin_id and plugins are mutually exclusive" >&2
+            exit 1
+          fi
+
+          # 解析目标 pluginId 列表（去重 + 排序）
+          if [ -n "$PLUGIN_ID" ]; then
+            ids_raw="$PLUGIN_ID"
+          else
+            ids_raw="$(printf '%s' "$PLUGINS" | tr ',' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+          fi
+          ids="$(printf '%s\n' "$ids_raw" | awk 'NF' | sort -u)"
+          count="$(printf '%s\n' "$ids" | grep -c . || true)"
+          if [ "$count" -eq 0 ]; then
+            echo "No target plugins after parsing" >&2
+            exit 1
+          fi
+
+          # 校验每个 pluginId 都对应 plugins/*/plugin.json 且证据等级达标。
+          # 通过 Node 脚本完成动态发现 + 字段验证，不在 shell 中硬编码目录。
+          targets_json="$(node -e '
             const fs = require("fs");
             const path = require("path");
-            const dir = "plugins";
-            const result = [];
-            for (const name of fs.readdirSync(dir).sort()) {
-              const manifestPath = path.join(dir, name, "plugin.json");
-              if (!fs.existsSync(manifestPath)) continue;
-              const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
-              if (manifest.evidence === "hardware-verified") {
-                result.push({ dir: name, pluginId: manifest.pluginId, version: manifest.version });
+            const ids = process.argv[1].split("\n").filter(Boolean);
+            const expectedVersion = process.argv[2] || null;
+            const channel = process.argv[3] || "stable";
+            const dryRun = process.argv[4] === "true";
+            const ghRepo = process.env.GITHUB_REPOSITORY;
+            const out = [];
+            for (const id of ids) {
+              // 动态发现：枚举 plugins/*/plugin.json，匹配 pluginId
+              let found = null;
+              for (const name of fs.readdirSync("plugins").sort()) {
+                const mp = path.join("plugins", name, "plugin.json");
+                if (!fs.existsSync(mp)) continue;
+                const m = JSON.parse(fs.readFileSync(mp, "utf8"));
+                if (m.pluginId === id) { found = { dir: name, manifest: m }; break; }
+              }
+              if (!found) {
+                console.error(`pluginId ${id} not found under plugins/*/plugin.json`);
+                process.exit(1);
+              }
+              const m = found.manifest;
+              if (!m.version) {
+                console.error(`${id}: manifest missing version`);
+                process.exit(1);
+              }
+              if (expectedVersion && m.version !== expectedVersion) {
+                console.error(`${id}: expected version ${expectedVersion}, manifest has ${m.version}`);
+                process.exit(1);
+              }
+              // 仅 hardware-verified 插件可走 stable channel；beta 允许 source-confirmed。
+              const evidence = m.evidence || "fixture-verified";
+              const allowed = channel === "beta"
+                ? ["hardware-verified", "source-confirmed", "reverse-engineered"]
+                : ["hardware-verified"];
+              if (!allowed.includes(evidence)) {
+                console.error(`${id}: evidence=${evidence} not allowed for channel=${channel}`);
+                process.exit(1);
+              }
+              if (!m.publisherKeyId || String(m.publisherKeyId).startsWith("TEST-ONLY")) {
+                console.error(`${id}: publisherKeyId must be a production key id`);
+                process.exit(1);
+              }
+              const tag = `plugin/${id}/v${m.version}`;
+              out.push({
+                pluginId: id,
+                dir: found.dir,
+                version: m.version,
+                pluginApi: m.pluginApi || null,
+                evidence,
+                channel,
+                releaseTag: tag,
+                dryRun,
+              });
+            }
+            // 检查 Release 是否已存在（不可覆盖）。dry_run 模式跳过。
+            if (!dryRun) {
+              const { execSync } = require("child_process");
+              for (const t of out) {
+                try {
+                  execSync(`gh release view ${t.releaseTag} --repo ${ghRepo} >/dev/null`, { stdio: "ignore" });
+                  console.error(`${t.releaseTag} already exists; releases are immutable`);
+                  process.exit(1);
+                } catch {
+                  // 不存在即为预期
+                }
               }
             }
-            console.log(JSON.stringify(result));
-          ')"
-          echo "plugins=$plugins_json" >> "$GITHUB_OUTPUT"
-          plugins_count=$(printf '%s' "$plugins_json" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).length))')
-          echo "plugins_count=$plugins_count" >> "$GITHUB_OUTPUT"
-          if [ "$OVERWRITE" = "true" ]; then
-            release_tag=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 1 --json tagName --jq '.[0].tagName' 2>/dev/null || echo "")
-            test -n "$release_tag" || { echo "No existing release to overwrite"; exit 1; }
-          else
-            release_tag="$INPUT_TAG"
-            test -n "$release_tag" || { echo "release_tag input is required when overwrite_latest is false"; exit 1; }
-          fi
-          echo "release_tag=$release_tag" >> "$GITHUB_OUTPUT"
-          echo "### Releasable plugins" >> "$GITHUB_STEP_SUMMARY"
-          echo '```json' >> "$GITHUB_STEP_SUMMARY"
-          echo "$plugins_json" >> "$GITHUB_STEP_SUMMARY"
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
+            console.log(JSON.stringify(out));
+          ' "$ids" "$EXPECTED_VERSION" "$CHANNEL" "$DRY_RUN")"
 
-  signed-package:
+          echo "targets=$targets_json" >> "$GITHUB_OUTPUT"
+          targets_count="$(printf '%s' "$targets_json" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).length))')"
+          echo "targets_count=$targets_count" >> "$GITHUB_OUTPUT"
+          echo "### Release plan" >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '| pluginId | version | tag | channel | dry_run |' >> "$GITHUB_STEP_SUMMARY"
+          echo '|---|---|---|---|---|' >> "$GITHUB_STEP_SUMMARY"
+          printf '%s' "$targets_json" | node -e '
+            let s = "";
+            process.stdin.on("data", d => s += d).on("end", () => {
+              for (const t of JSON.parse(s)) {
+                console.log(`| ${t.pluginId} | ${t.version} | ${t.releaseTag} | ${t.channel} | ${t.dryRun} |`);
+              }
+            });
+          ' >> "$GITHUB_STEP_SUMMARY"
+
+  release-plugin:
     needs: gate
     runs-on: ubuntu-22.04
-    timeout-minutes: 20
+    timeout-minutes: 25
     permissions:
-      contents: read
+      contents: write
       id-token: write
       attestations: write
     environment: plugin-release
     strategy:
       fail-fast: false
       matrix:
-        plugin: '${{ fromJson(needs.gate.outputs.plugins) }}'
+        target: '${{ fromJson(needs.gate.outputs.targets) }}'
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
           node-version: 22
+      - name: Validate target plugin only
+        env:
+          PLUGIN_ID: '${{ matrix.target.pluginId }}'
+        run: |
+          set -euo pipefail
+          npm ci
+          # 单插件校验：架构 lint 仍然全量执行（仓库级规则），但 validate/test 只跑目标插件。
+          npm run check:architecture
+          npm run validate:plugin -- --plugin "$PLUGIN_ID"
+          npm run test:all
       - name: Pack and sign plugin
         env:
           PLUGIN_SIGNING_KEY: '${{ secrets.PLUGIN_SIGNING_KEY }}'
           PLUGIN_KEY_ID: 'mira-plugins-2026-001'
-          PLUGIN_DIR: '${{ matrix.plugin.dir }}'
+          PLUGIN_DIR: '${{ matrix.target.dir }}'
         run: |
           set -euo pipefail
-          plugin_id="${{ matrix.plugin.pluginId }}"
-          version="${{ matrix.plugin.version }}"
+          plugin_id="${{ matrix.target.pluginId }}"
+          version="${{ matrix.target.version }}"
           asset="${plugin_id//./-}-${version}.mira-plugin"
-          mkdir -p dist
-          node scripts/pack-sign.mjs "plugins/$PLUGIN_DIR" "dist/$asset"
-          sha256sum "dist/$asset" | awk '{print $1}' > "dist/$asset.sha256"
+          mkdir -p "dist/${plugin_id}"
+          node scripts/pack-sign.mjs "plugins/$PLUGIN_DIR" "dist/${plugin_id}/$asset"
+          sha256sum "dist/${plugin_id}/$asset" | awk '{print $1}' > "dist/${plugin_id}/$asset.sha256"
           echo "asset=$asset" >> "$GITHUB_ENV"
+          echo "asset_path=dist/${plugin_id}/$asset" >> "$GITHUB_ENV"
+      - name: Inspect package
+        env:
+          ASSET_PATH: '${{ env.asset_path }}'
+        run: |
+          set -euo pipefail
+          echo "=== ZIP entries ==="
+          unzip -l "$ASSET_PATH"
+          echo "=== plugin.json ==="
+          unzip -p "$ASSET_PATH" plugin.json
+          echo "=== checksums.json ==="
+          unzip -p "$ASSET_PATH" checksums.json
+          echo "=== signature (hex) ==="
+          unzip -p "$ASSET_PATH" META-INF/signature.ed25519 | xxd -p -c 64
+          echo "=== sha256 ==="
+          cat "$ASSET_PATH.sha256"
       - uses: actions/upload-artifact@v7
         with:
-          name: plugin-${{ matrix.plugin.dir }}
-          path: dist/*
+          name: plugin-${{ matrix.target.pluginId }}
+          path: dist/${{ matrix.target.pluginId }}/*
           if-no-files-found: error
-
-  create-release:
-    needs: [gate, signed-package]
-    runs-on: ubuntu-22.04
-    timeout-minutes: 10
-    permissions:
-      contents: write
-      actions: write
-      id-token: write
-      attestations: write
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/download-artifact@v8
-        with:
-          path: dist
-          pattern: plugin-*
-          merge-multiple: true
-      - name: Verify all expected assets present
-        env:
-          EXPECTED: '${{ needs.gate.outputs.plugins_count }}'
-        run: |
-          set -euo pipefail
-          echo "Downloaded assets:"
-          ls -la dist/
-          actual=$(find dist -name '*.mira-plugin' | wc -l | tr -d ' ')
-          if [ "$actual" != "$EXPECTED" ]; then
-            echo "Asset count mismatch: expected $EXPECTED, got $actual. Refusing to touch release." >&2
-            exit 1
-          fi
-          echo "Asset count OK: $actual/$EXPECTED"
       - uses: actions/attest-build-provenance@v4
         with:
-          subject-path: 'dist/*'
-      - name: Create unified release
+          subject-path: 'dist/${{ matrix.target.pluginId }}/*'
+      - name: Create per-plugin immutable Release
+        if: ${{ matrix.target.dryRun != true }}
         env:
           GH_TOKEN: '${{ github.token }}'
-          TAG: '${{ needs.gate.outputs.release_tag }}'
+          TAG: '${{ matrix.target.releaseTag }}'
           TARGET: '${{ github.sha }}'
+          PLUGIN_ID: '${{ matrix.target.pluginId }}'
+          VERSION: '${{ matrix.target.version }}'
+          CHANNEL: '${{ matrix.target.channel }}'
         run: |
           set -euo pipefail
+          # 双重保险：再次确认 Release 不存在
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "Release $TAG already exists; cleaning existing assets before upload."
-            # overwrite 模式下 gh release upload --clobber 只覆盖同名文件，删不掉改了版本的旧产物（如 0.7.0→0.7.2）
-            # 先删掉 release 现有所有资产，再上传本次构建结果，保证 release 永远只反映最新一次构建
-            existing_assets=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name')
-            if [ -n "$existing_assets" ]; then
-              printf '%s\n' "$existing_assets" | xargs -P 4 -I {} gh release delete-asset "$TAG" {} --repo "$GITHUB_REPOSITORY" --yes
-            fi
-            gh release upload "$TAG" dist/* --repo "$GITHUB_REPOSITORY"
-          else
-            gh release create "$TAG" dist/* --target "$TARGET" \
-              --title "Mira Plugins $TAG" \
-              --notes "Unified signed Mira plugin release bundle.
-
-          This release contains all production-ready plugins built from tag $TAG.
-          Each plugin asset is individually signed with the Ed25519 production key.
-          SHA-256 checksums and build provenance attestations are attached."
+            echo "Release $TAG already exists; refusing to overwrite (per-plugin releases are immutable)" >&2
+            exit 1
           fi
-      - name: Dispatch downstream metadata sync
+          gh release create "$TAG" "dist/${PLUGIN_ID}/"* --target "$TARGET" \
+            --title "Mira Plugin ${PLUGIN_ID} v${VERSION}" \
+            --notes "Per-plugin immutable release for ${PLUGIN_ID} v${VERSION}.
+
+          - Channel: ${CHANNEL}
+          - Tag: ${TAG}
+          - Each plugin asset is individually signed with the Ed25519 production key.
+          - SHA-256 checksums and build provenance attestations are attached.
+          - This Release is independent of other plugins and does not modify the host repository."
+      - name: Dispatch registry publication
+        if: ${{ matrix.target.dryRun != true }}
         env:
           GH_TOKEN: '${{ github.token }}'
-          TAG: '${{ needs.gate.outputs.release_tag }}'
+          TAG: '${{ matrix.target.releaseTag }}'
         run: |
           set -euo pipefail
+          # 每个 per-plugin Release 独立触发 registry 同步。
+          # 不触发 sync-mira（已删除）；插件发布不得修改主仓库。
           gh workflow run publish-registry.yml --repo "$GITHUB_REPOSITORY" \
             -f release_tag="$TAG"
-          gh workflow run sync-mira.yml --repo "$GITHUB_REPOSITORY" \
-            -f release_tag="$TAG"
+      - name: Dry-run summary
+        if: ${{ matrix.target.dryRun == true }}
+        env:
+          PLUGIN_ID: '${{ matrix.target.pluginId }}'
+          VERSION: '${{ matrix.target.version }}'
+          TAG: '${{ matrix.target.releaseTag }}'
+        run: |
+          set -euo pipefail
+          echo "### Dry-run: ${PLUGIN_ID} v${VERSION}" >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo "Asset packed and signed; Release **NOT** created (dry_run=true)." >> "$GITHUB_STEP_SUMMARY"
+          echo "Would-have-been tag: \`${TAG}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo "ZIP entries:" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          unzip -l "$asset_path" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"

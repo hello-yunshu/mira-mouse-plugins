@@ -1,1 +1,17 @@
-{ "schemaVersion": 1, "workflows": [{ "id": "snapshot", "maxSteps": 4, "totalTimeoutMs": 100, "writesEnabled": false }] }
+{
+  "schemaVersion": 1,
+  "workflows": {
+    "virtual-wireless-mouse-read": {
+      "transport": "mock",
+      "steps": [
+        { "command": "snapshot", "parser": "snapshot", "output": "snapshot" }
+      ]
+    },
+    "snapshot": {
+      "transport": "mock",
+      "steps": [
+        { "command": "snapshot", "parser": "snapshot", "output": "snapshot" }
+      ]
+    }
+  }
+}

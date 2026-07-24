@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "keys": [
+    {
+      "keyId": "mira-plugins-2026-001",
+      "algorithm": "ed25519",
+      "publicKey": "9f08f376f0d35b878aa9f59ce683fee1a038ddbc060a94fab3f0d01634331fad",
+      "activatedAt": "2026-07-01T00:00:00.000Z",
+      "revokedAt": null,
+      "revocationReason": null,
+      "owner": "Mira Plugins Project",
+      "purpose": ["plugin-package", "registry"]
+    }
+  ]
+}

@@ -1,8 +1,56 @@
 #!/usr/bin/env node
 // SPDX-License-Identifier: AGPL-3.0-or-later
-import { readFile, access } from 'node:fs/promises';
+// 架构要求（第 3.6 节）：validator 必须动态发现 plugins/*/plugin.json，
+// 不得硬编码插件目录数组。支持 --plugin <id|dir> 单插件校验。
+import { readFile, access, readdir } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const plugins = ['amaster', 'logitech-hidpp', 'razer-viper'];
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
+const PLUGINS_DIR = join(__dirname, '..', 'plugins');
+
+async function discoverPlugins() {
+  const entries = await readdir(PLUGINS_DIR, { withFileTypes: true });
+  const plugins = [];
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    try {
+      await access(join(PLUGINS_DIR, entry.name, 'plugin.json'));
+      plugins.push(entry.name);
+    } catch {
+      // 不是插件目录（没有 plugin.json），跳过
+    }
+  }
+  return plugins.sort();
+}
+
+// 支持 --plugin <id|dir> 单插件校验（第 9.1 节）
+const pluginFilterIdx = process.argv.indexOf('--plugin');
+const pluginFilter = pluginFilterIdx >= 0 ? process.argv[pluginFilterIdx + 1] : null;
+
+let plugins;
+if (pluginFilter) {
+  // 先尝试作为目录名匹配
+  try {
+    await access(join(PLUGINS_DIR, pluginFilter, 'plugin.json'));
+    plugins = [pluginFilter];
+  } catch {
+    // 再尝试用 pluginId（如 mira.amaster）查找目录
+    const all = await discoverPlugins();
+    const match = all.find((name) => {
+      try {
+        const manifest = JSON.parse(readFileSync(join(PLUGINS_DIR, name, 'plugin.json'), 'utf8'));
+        return manifest.pluginId === pluginFilter;
+      } catch { return false; }
+    });
+    if (!match) throw new Error(`plugin not found: ${pluginFilter}`);
+    plugins = [match];
+  }
+} else {
+  plugins = await discoverPlugins();
+}
+
 const fail = (message) => { throw new Error(message); };
 const HOST_DEVICE_CONNECTIONS = new Set(['usb', 'wireless', 'bluetooth', 'virtual']);
 const VALUE_FORMATS = new Set(['sleep', 'color']);
@@ -500,8 +548,16 @@ for (const [name, data] of Object.entries(pluginData)) {
   }
 
   for (const [id, transport] of Object.entries(transports)) {
-    if (!['hid-feature', 'hid-feature-proxy', 'hid-output-input', 'hid-race'].includes(transport.kind)) {
+    if (!['hid-feature', 'hid-feature-proxy', 'hid-output-input', 'hid-race', 'fixture'].includes(transport.kind)) {
       fail(`${name}/${id}: unsupported transport kind`);
+    }
+    if (transport.kind === 'fixture') {
+      // Fixture transport 用于 fixture-verified mock 插件（example-mock 类）。
+      // 不参与真实 HID I/O，仅由测试 harness 消费 responseFixture。
+      if (!Number.isInteger(transport.maxReportLength) || transport.maxReportLength < 1 || transport.maxReportLength > 4096) {
+        fail(`${name}/${id}: invalid fixture maxReportLength`);
+      }
+      continue;
     }
     if (transport.kind === 'hid-output-input') {
       if (![0x10, 0x11, 0x12].includes(transport.reportId)) fail(`${name}/${id}: invalid HID++ report id`);
@@ -556,14 +612,13 @@ for (const [name, data] of Object.entries(pluginData)) {
     }
   }
 
-  const familyPrefixes = name === 'amaster' ? ['protocol-a-', 'am35-'] : name === 'razer-viper' ? ['razer-'] : ['hidpp2-'];
+  // 架构要求：family 前缀不得硬编码（第 3.6 节）。
+  // 直接从 devices.json 收集所有 family，验证每个 family 都有对应的 read workflow。
   for (const device of devices.devices) {
     validateDeviceIdentity(name, device);
     validateDeviceSelection(name, device);
-    for (const prefix of familyPrefixes) {
-      if (device.family.startsWith(prefix) && !workflows[`${device.family}-read`]) {
-        fail(`${name}/${device.family}: missing read workflow`);
-      }
+    if (!workflows[`${device.family}-read`]) {
+      fail(`${name}/${device.family}: missing read workflow`);
     }
   }
 

@@ -15,8 +15,7 @@ jobs:
   publish:
     if: |
       github.event_name == 'workflow_dispatch' ||
-      startsWith(github.event.release.tag_name, 'plugin/') ||
-      startsWith(github.event.release.tag_name, 'release/')
+      startsWith(github.event.release.tag_name, 'plugin/')
     runs-on: ubuntu-22.04
     timeout-minutes: 15
     steps:
@@ -71,6 +70,21 @@ jobs:
             process.stdout.write(JSON.stringify(items));
           ')
           node scripts/update-registry.mjs registry/index.json --batch "$batch"
+      - name: Sign registry with Ed25519 detached signature
+        env:
+          REGISTRY_SIGNING_KEY: '${{ secrets.REGISTRY_SIGNING_KEY }}'
+          REGISTRY_KEY_ID: 'mira-plugins-2026-001'
+        run: |
+          set -euo pipefail
+          if [ -z "$REGISTRY_SIGNING_KEY" ]; then
+            echo "REGISTRY_SIGNING_KEY secret is required to publish a signed registry (3.8)" >&2
+            exit 1
+          fi
+          node scripts/sign-registry.mjs registry/index.json
+      - name: Verify registry signature against trusted keys
+        run: |
+          set -euo pipefail
+          node scripts/verify-registry.mjs registry/index.json registry/trusted-keys.json
       - run: npm run validate && npm test
       - name: Commit immutable registry metadata
         env:

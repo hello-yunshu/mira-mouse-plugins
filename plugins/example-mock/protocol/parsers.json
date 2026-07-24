@@ -1,1 +1,9 @@
-{ "schemaVersion": 1, "parsers": [{ "id": "snapshot", "kind": "fixture-fields", "preserveUnknownFields": true }] }
+{
+  "schemaVersion": 1,
+  "parsers": {
+    "snapshot": {
+      "kind": "fixture-fields",
+      "preserveUnknownFields": true
+    }
+  }
+}
