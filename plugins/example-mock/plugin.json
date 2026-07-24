@@ -1,5 +1,6 @@
 {
   "schemaVersion": 1,
+  "packageFormatVersion": 1,
   "pluginId": "mira.example-mock",
   "name": "Mira Example Mock",
   "version": "1.0.0",

@@ -1,5 +1,6 @@
 {
   "schemaVersion": 1,
+  "packageFormatVersion": 1,
   "pluginId": "mira.amaster",
   "name": "AMaster Protocol A",
   "version": "1.8.0",
