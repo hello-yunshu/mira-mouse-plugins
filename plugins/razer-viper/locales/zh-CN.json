@@ -25,5 +25,6 @@
   "details.value.deviceMode.normal": "正常模式",
   "details.value.deviceMode.driver": "驱动模式",
   "details.value.charging.yes": "充电中",
-  "details.value.charging.no": "未充电"
+  "details.value.charging.no": "未充电",
+  "plugin.label.capability.device-settings": "设备设置"
 }
