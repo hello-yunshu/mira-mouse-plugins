@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "comment": "3.5 节：插件仓库下载并固定一个已发布的 mira-plugin-cli。CI 不 checkout 主仓库源码，只下载此文件声明的二进制 + SHA-256。版本号遵循项目规则：不得含数字 4 或 11。",
+  "version": "1.0.0",
+  "releaseTag": "mira-plugin-cli-v1.0.0",
+  "repository": "hello-yunshu/mira-mouse",
+  "packageFormatVersion": 1,
+  "targets": {
+    "aarch64-apple-darwin": {
+      "asset": "mira-plugin-aarch64-apple-darwin.tar.gz",
+      "sha256": "PENDING_RELEASE_PUBLISH"
+    },
+    "x86_64-apple-darwin": {
+      "asset": "mira-plugin-x86_64-apple-darwin.tar.gz",
+      "sha256": "PENDING_RELEASE_PUBLISH"
+    },
+    "x86_64-unknown-linux-gnu": {
+      "asset": "mira-plugin-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "PENDING_RELEASE_PUBLISH"
+    },
+    "x86_64-pc-windows-msvc": {
+      "asset": "mira-plugin-x86_64-pc-windows-msvc.zip",
+      "sha256": "PENDING_RELEASE_PUBLISH"
+    }
+  }
+}
