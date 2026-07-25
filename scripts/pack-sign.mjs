@@ -12,7 +12,8 @@
 //   MIRA_PLUGIN_CLI    — 已下载的 mira-plugin 二进制路径（跳过 fetch）
 //
 // 若未设置 PLUGIN_SIGNING_KEY，CLI 会生成临时测试密钥（仅用于本地）。
-import { readFile, writeFile, mkdir, mkdtemp, rm, copyFile, readdir, existsSync } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, mkdtemp, rm, copyFile, readdir } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { join, dirname, resolve, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
@@ -63,6 +64,11 @@ async function main() {
     const unsignedPath = join(stage, 'unsigned.mira-plugin');
     execFileSync(cli, ['pack', stage, '--output', unsignedPath], { stdio: 'inherit' });
 
+    // 3.5 节：CLI inspect 验证未签名包结构（checksum 覆盖、文件限制、manifest）。
+    // 在签名前 inspect：inspect 使用空 TrustStore::default()，
+    // 签名存在时会因 key 不在 trust store 而报 UnknownKey 错误。
+    execFileSync(cli, ['inspect', unsignedPath], { stdio: 'inherit' });
+
     // 3.5 节：CLI sign 使用 PLUGIN_SIGNING_KEY 或 --key-hex。
     // 生产环境通过环境变量传入 PEM 私钥；CI secret 可能是 base64 编码的 PEM。
     execFileSync(cli, ['sign', unsignedPath, '--output', outPath], {
@@ -70,11 +76,10 @@ async function main() {
       env: { ...process.env },
     });
 
-    // 3.5 节：CLI inspect 验证刚生成的包（checksum + 签名）。
-    execFileSync(cli, ['inspect', outPath, '--require-signature'], { stdio: 'inherit' });
     // 3.5 节：CLI verify 用 trusted-keys.json 做最终门禁（与 inspect 同一实现）。
+    // TEST-ONLY 密钥不在生产 trusted-keys.json 中，跳过 verify（本地测试包）。
     const trustedKeysPath = join(root, 'registry/trusted-keys.json');
-    if (existsSync(trustedKeysPath)) {
+    if (!keyId.startsWith('TEST-ONLY') && existsSync(trustedKeysPath)) {
       execFileSync(cli, ['verify', outPath, '--trusted-keys', trustedKeysPath, '--require-signature'], { stdio: 'inherit' });
     }
 
