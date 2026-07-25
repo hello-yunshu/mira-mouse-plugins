@@ -13,7 +13,21 @@
       { "output": "settings", "fieldMap": { "mouseLightStartColor": "color", "mouseLightEndColor": "endColor", "mouseLightEnabled": "enabled" } }
     ],
     "receiverLighting": [
-      { "output": "receiverLight", "fieldMap": { "type": ["effect", "option"], "color1": "color" } }
+      {
+        "output": "receiverLight",
+        "fieldMap": {
+          "enabled": "enabled",
+          "type": ["effect", "type"],
+          "color1": ["color", "color1"],
+          "color2": "color2",
+          "color3": "color3",
+          "ratio1": "ratio1",
+          "ratio2": "ratio2",
+          "ratio3": "ratio3",
+          "speed": "speed",
+          "brightness": "brightness"
+        }
+      }
     ]
   }
 }
