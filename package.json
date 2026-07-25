@@ -11,6 +11,7 @@
     "pack": "node scripts/pack-sign.mjs",
     "sign:registry": "node scripts/sign-registry.mjs",
     "verify:registry": "node scripts/verify-registry.mjs",
+    "verify:plugin-package": "node scripts/verify-plugin-package.mjs",
     "check:architecture": "node scripts/check-architecture.mjs",
     "inventory:protocol": "node scripts/protocol-inventory.mjs",
     "inventory:protocol:check": "node scripts/protocol-inventory.mjs --check-docs",

@@ -117,7 +117,7 @@ for (const name of plugins) {
 
   const manifestKeys = new Set([
     'schemaVersion', 'packageFormatVersion', 'pluginId', 'name', 'version', 'pluginApi', 'publisherKeyId',
-    'evidence', 'permissions', 'runtime', 'capabilities', 'writesEnabled',
+    'evidence', 'familyEvidence', 'permissions', 'runtime', 'capabilities', 'writesEnabled',
     'exportableFields', 'dependsOn',
   ]);
   const unexpectedManifestKeys = Object.keys(manifest).filter((key) => !manifestKeys.has(key));
@@ -228,17 +228,19 @@ function validSummary(value) {
     && (item.options === undefined || validOptions(item.options)));
 }
 function validateExportableFields(name, fields) {
-  const allowed = new Set(['id', 'exportKey', 'kind', 'mutation', 'param', 'source', 'sources']);
+  // ITERATION-003 Gate C §7.5：允许同一 exportKey 通过 visibleWhen 区分 family。
+  // 当多个 entry 共享 exportKey 时，每个 entry 都必须声明 visibleWhen。
+  const allowed = new Set(['id', 'exportKey', 'kind', 'mutation', 'param', 'source', 'sources', 'visibleWhen']);
   if (!Array.isArray(fields)) fail(`${name}: exportableFields must be an array`);
-  const exportKeys = new Set();
+  const exportKeyCounts = new Map();
   for (const field of fields) {
     if (!field || typeof field !== 'object' || Array.isArray(field)
       || !validPath(field.id) || !validPath(field.exportKey)
       || Object.keys(field).some((key) => !allowed.has(key))) {
       fail(`${name}: invalid exportable field declaration`);
     }
-    if (exportKeys.has(field.exportKey)) fail(`${name}: duplicate exportable key ${field.exportKey}`);
-    exportKeys.add(field.exportKey);
+    if (!validWhen(field.visibleWhen)) fail(`${name}/${field.id}: invalid export visibleWhen`);
+    exportKeyCounts.set(field.exportKey, (exportKeyCounts.get(field.exportKey) ?? 0) + 1);
     if (field.kind !== undefined && !validPath(field.kind)) fail(`${name}/${field.id}: invalid export kind`);
     if (field.mutation !== undefined && (typeof field.mutation !== 'string' || !validPath(field.mutation))) fail(`${name}/${field.id}: invalid export mutation`);
     if (field.param !== undefined && !validPath(field.param)) fail(`${name}/${field.id}: invalid export param`);
@@ -246,6 +248,16 @@ function validateExportableFields(name, fields) {
     if (field.sources !== undefined && (!field.sources || typeof field.sources !== 'object' || Array.isArray(field.sources)
       || Object.keys(field.sources).length === 0 || !Object.entries(field.sources).every(([param, source]) => validPath(param) && validPath(source)))) {
       fail(`${name}/${field.id}: invalid export sources`);
+    }
+  }
+  // 共享 exportKey 的 entry 必须每个都声明 visibleWhen。
+  for (const [exportKey, count] of exportKeyCounts) {
+    if (count > 1) {
+      for (const field of fields) {
+        if (field.exportKey === exportKey && field.visibleWhen === undefined) {
+          fail(`${name}/${field.id}: shared exportKey ${exportKey} requires visibleWhen`);
+        }
+      }
     }
   }
 }
@@ -694,7 +706,7 @@ for (const [name, data] of Object.entries(pluginData)) {
     for (const byte of bytes) {
       if (byte.offset < 0 || byte.offset >= length) fail(`${name}/${id}: byte offset out of range`);
       if ((byte.value === undefined) === (byte.param === undefined)) fail(`${name}/${id}: byte must have exactly one source`);
-      if (byte.encoding && !['u8', 'bool', 'le-u16', 'be-u16', 'rgb', 'bytes', 'lookup-u8', 'bool-lookup-u8', 'hue-index-be-u16'].includes(byte.encoding)) fail(`${name}/${id}: unsupported encoding`);
+      if (byte.encoding && !['u8', 'bool', 'le-u16', 'be-u16', 'i8', 'le-i16', 'rgb', 'bytes', 'lookup-u8', 'bool-lookup-u8', 'hue-index-be-u16', 'sleep-semantic-triple-le-u16'].includes(byte.encoding)) fail(`${name}/${id}: unsupported encoding`);
       if (byte.indexedBy && (!Number.isInteger(byte.stride) || byte.stride < 1)) fail(`${name}/${id}: invalid indexed stride`);
     }
     if (command.request.base && command.request.base !== 'read-response') fail(`${name}/${id}: invalid request base`);
@@ -762,7 +774,14 @@ for (const [name, data] of Object.entries(pluginData)) {
     }
   }
 
-  if (Object.keys(mutations).length > 0 && (!manifest.writesEnabled || manifest.evidence !== 'hardware-verified')) {
+  // ITERATION-003 Gate C §7.1：family-level evidence 支持。
+  // writesEnabled 要求：顶层 evidence == 'hardware-verified'，或
+  // familyEvidence 中至少一个 family 为 'hardware-verified'。
+  // mutation 通过 family-conditional visibleWhen 限制实际可编辑范围。
+  if (Object.keys(mutations).length > 0 && (!manifest.writesEnabled || (
+    manifest.evidence !== 'hardware-verified'
+    && !Object.values(manifest.familyEvidence ?? {}).some((level) => level === 'hardware-verified')
+  ))) {
     fail(`${name}: declared writes require a hardware-verified writable manifest`);
   }
 

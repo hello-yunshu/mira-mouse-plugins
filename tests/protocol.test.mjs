@@ -168,7 +168,21 @@ test('AMaster declares complete declarative host capability metadata', async () 
   assert.deepEqual(capabilities.lighting.metadata.zones.map((zone) => zone.id), ['mouse', 'receiver', 'receiver-am35']);
   assert.equal(capabilities.lighting.metadata.zones[0].fields[0].mutation, 'set-mouse-lighting');
   assert.deepEqual(Object.keys(capabilities.lighting.metadata.zones[0].fields[0].paramSources).sort(), ['color', 'enabled']);
-  assert.equal(capabilities.lighting.metadata.zones[0].fields[1].visibleWhen, undefined);
+  // Protocol A mouse zone fields use visibleWhen.in to separate from AM35 siblings.
+  assert.deepEqual(capabilities.lighting.metadata.zones[0].fields[0].visibleWhen, {
+    path: 'family', in: ['protocol-a-direct', 'protocol-a-receiver'],
+  });
+  assert.deepEqual(capabilities.lighting.metadata.zones[0].fields[1].visibleWhen, {
+    path: 'family', in: ['protocol-a-direct', 'protocol-a-receiver'],
+  });
+  // AM35 mouse zone fields expose mode/speed/color with family gating.
+  const am35MouseFields = capabilities.lighting.metadata.zones[0].fields.filter(
+    (field) => field.visibleWhen?.in?.includes('am35-direct'),
+  );
+  assert.ok(am35MouseFields.length >= 4, 'AM35 mouse zone must expose mode/speed/color fields');
+  for (const field of am35MouseFields) {
+    assert.ok(['set-mouse-light-mode', 'set-mouse-light-color'].includes(field.mutation), `unexpected mutation ${field.mutation}`);
+  }
   assert.equal(capabilities.lighting.metadata.zones[1].fields.length, 5);
   assert.deepEqual(Object.keys(capabilities.lighting.metadata.zones[1].fields[0].paramSources).sort(), ['brightness', 'color', 'effect', 'option', 'speed']);
   // AM35 receiver-am35 zone 暴露十字段，与 AM35 mutation inputs 严格对齐。
@@ -178,8 +192,20 @@ test('AMaster declares complete declarative host capability metadata', async () 
   assert.equal(capabilities.profile.metadata.statusDisplay.valueSource, 'state.profile');
   assert.equal(capabilities.firmware.metadata.fields[0].editor, 'static-readonly');
   assert.deepEqual(
-    capabilities['sleep-time'].metadata.fields.map((field) => [field.id, field.visibleWhen.eq]),
-    [['bluetooth', 'bluetooth'], ['wireless', 'wireless'], ['virtual', 'virtual']],
+    capabilities['sleep-time'].metadata.fields
+      .filter((field) => field.visibleWhen?.eq)
+      .map((field) => [field.id, field.visibleWhen.eq]),
+    [['protocol-a-bluetooth', 'bluetooth'], ['protocol-a-wireless', 'wireless'], ['protocol-a-virtual', 'virtual']],
+  );
+  assert.deepEqual(
+    capabilities['sleep-time'].metadata.fields
+      .filter((field) => field.visibleWhen?.in)
+      .map((field) => [field.id, field.visibleWhen.in]),
+    [
+      ['am35-bluetooth', ['am35-direct', 'am35-receiver']],
+      ['am35-wireless', ['am35-direct', 'am35-receiver']],
+      ['am35-virtual', ['am35-direct', 'am35-receiver']],
+    ],
   );
   for (const field of capabilities['sleep-time'].metadata.fields) {
     assert.ok(

@@ -2,34 +2,2126 @@
   "schemaVersion": 1,
   "packageFormatVersion": 1,
   "pluginId": "mira.amaster",
-  "name": "AMaster Protocol A",
-  "version": "1.8.0",
+  "name": "AMaster Mouse Plugin",
+  "version": "1.9.0",
   "pluginApi": ">=1.1.0, <2.0.0",
   "publisherKeyId": null,
-  "evidence": "hardware-verified",
-  "permissions": [{ "kind": "hid", "report_types": ["feature", "input", "output"], "max_report_length": 64, "max_reports_per_second": 60 }],
-  "runtime": { "wakeRecovery": { "activitySource": "system-pointer", "componentId": "mouse", "connections": ["wireless"] } },
+  "evidence": "source-confirmed",
+  "familyEvidence": {
+    "protocol-a-direct": "hardware-verified",
+    "protocol-a-receiver": "hardware-verified",
+    "am35-direct": "source-confirmed",
+    "am35-receiver": "source-confirmed"
+  },
+  "permissions": [
+    {
+      "kind": "hid",
+      "report_types": [
+        "feature",
+        "input",
+        "output"
+      ],
+      "max_report_length": 64,
+      "max_reports_per_second": 60
+    }
+  ],
+  "runtime": {
+    "wakeRecovery": {
+      "activitySource": "system-pointer",
+      "componentId": "mouse",
+      "connections": [
+        "wireless"
+      ]
+    },
+    "inventory": {
+      "workflows": [
+        "am35-direct-inventory-read",
+        "am35-receiver-inventory-read"
+      ],
+      "refresh": "on-open",
+      "cacheTtlSeconds": 300
+    }
+  },
   "capabilities": [
-    { "id": "battery", "control": "ReadOnlyValue", "labelKey": "capability.battery", "readOnly": true, "placements": [{ "region": "hero", "order": 10, "span": 1, "icon": "battery" }], "metadata": { "fields": [{ "id": "value", "source": "battery", "editor": "static-readonly", "format": "percent", "labelKey": "capability.battery" }], "batteryHistory": { "validConnections": ["wireless", "bluetooth"] } } },
-    { "id": "dpi", "control": "DpiStages", "labelKey": "capability.dpi", "readOnly": false, "placements": [{ "region": "control", "group": "performance", "order": 10, "span": 1, "icon": "gauge" }], "metadata": { "stageLayout": { "dotsSource": "state.dpiStages", "selectMutation": "set-dpi-stage", "setMutation": "set-dpi-value", "valueSource": "state.dpiStages", "range": { "min": 50, "max": 30000, "step": 50 }, "selectParam": "stage", "stageParam": "stage", "valueParam": "dpi" }, "stateMapping": { "dpiStages": "dpiStages" } } },
-    { "id": "polling-rate", "control": "Select", "labelKey": "capability.polling-rate", "readOnly": false, "placements": [{ "region": "control", "group": "polling", "order": 20, "span": 1, "icon": "wave" }], "metadata": { "fields": [{ "id": "value", "source": "state.pollingRate", "mutation": "set-polling-rate", "param": "rate", "editor": "modal-select", "optionSource": "state.supportedPollingRates", "format": "hertz", "labelKey": "capability.polling-rate" }], "stateMapping": { "pollingRate": "pollingRateHz", "supportedPollingRates": "supportedPollingRatesHz" }, "summary": [{ "labelKey": "summary.motionSync", "source": "capabilities.settings.motionSync" }, { "labelKey": "summary.angleSnap", "source": "capabilities.settings.angleSnap" }, { "labelKey": "summary.liftCutOff", "source": "capabilities.settings.liftCutOff" }] } },
-    { "id": "sleep-time", "control": "Number", "labelKey": "capability.sleep-time", "readOnly": false, "placements": [{ "region": "status", "order": 10, "span": 1, "icon": "timer" }], "metadata": { "fields": [{ "id": "bluetooth", "source": "capabilities.settings.bluetoothSleepValue", "mutation": "set-bluetooth-sleep-time", "param": "seconds", "editor": "modal-number", "format": "sleep", "range": { "min": 10, "max": 65535, "step": 10 }, "labelKey": "sleep.bluetooth", "editTitleKey": "dashboard.setSleepTitle", "editLabelKey": "dashboard.timeoutSeconds", "visibleWhen": { "path": "connection", "eq": "bluetooth" } }, { "id": "wireless", "source": "capabilities.settings.wirelessSleepValue", "mutation": "set-wireless-sleep-time", "param": "seconds", "editor": "modal-number", "format": "sleep", "range": { "min": 10, "max": 65535, "step": 10 }, "labelKey": "sleep.wireless", "editTitleKey": "dashboard.setSleepTitle", "editLabelKey": "dashboard.timeoutSeconds", "visibleWhen": { "path": "connection", "eq": "wireless" } }, { "id": "virtual", "source": "capabilities.settings.wirelessSleepValue", "mutation": "set-wireless-sleep-time", "param": "seconds", "editor": "modal-number", "format": "sleep", "range": { "min": 10, "max": 65535, "step": 10 }, "labelKey": "sleep.wireless", "editTitleKey": "dashboard.setSleepTitle", "editLabelKey": "dashboard.timeoutSeconds", "visibleWhen": { "path": "connection", "eq": "virtual" } }], "statusDisplay": { "valueSource": "capabilities.settings.wirelessSleepValue", "valueFormat": "sleep", "onClickField": "wireless" } } },
-    { "id": "profile", "control": "ReadOnlyValue", "labelKey": "capability.profile", "readOnly": true, "placements": [{ "region": "status", "order": 20, "span": 1, "icon": "profile" }], "metadata": { "fields": [{ "id": "value", "source": "state.profile", "editor": "static-readonly", "labelKey": "capability.profile" }], "statusDisplay": { "valueSource": "state.profile" }, "stateMapping": { "profile": "profile" } } },
-    { "id": "lighting", "control": "LightingZone", "labelKey": "capability.lighting", "readOnly": false, "placements": [{ "region": "control", "group": "lighting", "order": 30, "span": 1, "icon": "lightbulb" }, { "region": "status", "order": 30, "span": 1, "icon": "lightbulb" }], "metadata": { "accentSource": "capabilities.mouseLighting.color", "zones": [{ "id": "mouse", "labelKey": "lighting.mouse", "fields": [{ "id": "enabled", "source": "capabilities.settings.mouseLightEnabled", "mutation": "set-mouse-lighting", "param": "enabled", "editor": "inline-toggle", "switch": { "source": "capabilities.settings.mouseLightEnabled", "offValue": false }, "labelKey": "dashboard.status", "paramSources": { "color": "capabilities.mouseLighting.color", "enabled": "capabilities.settings.mouseLightEnabled" } }, { "id": "color", "source": "capabilities.mouseLighting.color", "mutation": "set-mouse-lighting", "param": "color", "editor": "modal-color", "format": "color", "labelKey": "receiverLighting.field.color", "editTitleKey": "dashboard.mouseLightColor", "paramSources": { "color": "capabilities.mouseLighting.color", "enabled": "capabilities.settings.mouseLightEnabled" } }] }, { "id": "receiver", "labelKey": "lighting.receiver", "visibleWhen": { "path": "capabilities.receiverLighting" }, "fields": [{ "id": "effect", "source": "capabilities.receiverLighting.effect", "mutation": "set-receiver-lighting", "param": "effect", "editor": "modal-select", "labelKey": "receiverLighting.field.effect", "editTitleKey": "dashboard.editReceiverLightingTitle", "labelSource": "capabilities.receiverLighting.effectName", "options": [{ "value": 0, "labelKey": "receiverLighting.effect.off" }, { "value": 1, "labelKey": "receiverLighting.effect.fixed" }, { "value": 2, "labelKey": "receiverLighting.effect.breathing" }, { "value": 3, "labelKey": "receiverLighting.effect.neon" }, { "value": 4, "labelKey": "receiverLighting.effect.wave" }, { "value": 5, "labelKey": "receiverLighting.effect.running" }, { "value": 6, "labelKey": "receiverLighting.effect.ring" }, { "value": 7, "labelKey": "receiverLighting.effect.buffer" }, { "value": 8, "labelKey": "receiverLighting.effect.chase" }], "paramSources": { "effect": "capabilities.receiverLighting.effect", "speed": "capabilities.receiverLighting.speed", "brightness": "capabilities.receiverLighting.brightness", "option": "capabilities.receiverLighting.option", "color": "capabilities.receiverLighting.color" } }, { "id": "option", "source": "capabilities.receiverLighting.option", "mutation": "set-receiver-lighting", "param": "option", "editor": "modal-select", "labelKey": "receiverLighting.field.option", "editTitleKey": "dashboard.editReceiverLightingTitle", "labelSource": "capabilities.receiverLighting.optionName", "options": [{ "value": 0, "labelKey": "receiverLighting.colorMode.red" }, { "value": 1, "labelKey": "receiverLighting.colorMode.orange" }, { "value": 2, "labelKey": "receiverLighting.colorMode.yellow" }, { "value": 3, "labelKey": "receiverLighting.colorMode.green" }, { "value": 4, "labelKey": "receiverLighting.colorMode.cyan" }, { "value": 5, "labelKey": "receiverLighting.colorMode.blue" }, { "value": 6, "labelKey": "receiverLighting.colorMode.purple" }, { "value": 7, "labelKey": "receiverLighting.colorMode.custom" }, { "value": 8, "labelKey": "receiverLighting.colorMode.colorful" }], "paramSources": { "effect": "capabilities.receiverLighting.effect", "speed": "capabilities.receiverLighting.speed", "brightness": "capabilities.receiverLighting.brightness", "option": "capabilities.receiverLighting.option", "color": "capabilities.receiverLighting.color" } }, { "id": "speed", "source": "capabilities.receiverLighting.speed", "mutation": "set-receiver-lighting", "param": "speed", "editor": "modal-select", "labelKey": "receiverLighting.field.speed", "editTitleKey": "dashboard.editReceiverLightingTitle", "labelSource": "capabilities.receiverLighting.speedLabel", "options": [{ "value": 0, "labelKey": "receiverLighting.speed.fastest" }, { "value": 1, "labelKey": "receiverLighting.speed.fast" }, { "value": 2, "labelKey": "receiverLighting.speed.medium" }, { "value": 3, "labelKey": "receiverLighting.speed.slow" }, { "value": 4, "labelKey": "receiverLighting.speed.slowest" }], "paramSources": { "effect": "capabilities.receiverLighting.effect", "speed": "capabilities.receiverLighting.speed", "brightness": "capabilities.receiverLighting.brightness", "option": "capabilities.receiverLighting.option", "color": "capabilities.receiverLighting.color" } }, { "id": "brightness", "source": "capabilities.receiverLighting.brightness", "mutation": "set-receiver-lighting", "param": "brightness", "editor": "modal-select", "labelKey": "receiverLighting.field.brightness", "editTitleKey": "dashboard.editReceiverLightingTitle", "labelSource": "capabilities.receiverLighting.brightnessLabel", "options": [{ "value": 0, "labelKey": "receiverLighting.brightness.dimmest" }, { "value": 1, "labelKey": "receiverLighting.brightness.dark" }, { "value": 2, "labelKey": "receiverLighting.brightness.medium" }, { "value": 3, "labelKey": "receiverLighting.brightness.bright" }, { "value": 4, "labelKey": "receiverLighting.brightness.brightest" }], "paramSources": { "effect": "capabilities.receiverLighting.effect", "speed": "capabilities.receiverLighting.speed", "brightness": "capabilities.receiverLighting.brightness", "option": "capabilities.receiverLighting.option", "color": "capabilities.receiverLighting.color" } }, { "id": "color", "source": "capabilities.receiverLighting.color", "mutation": "set-receiver-lighting", "param": "color", "editor": "modal-color", "format": "color", "labelKey": "receiverLighting.field.color", "editTitleKey": "dashboard.editReceiverLightingTitle", "paramSources": { "effect": "capabilities.receiverLighting.effect", "speed": "capabilities.receiverLighting.speed", "brightness": "capabilities.receiverLighting.brightness", "option": "capabilities.receiverLighting.option", "color": "capabilities.receiverLighting.color" } }] }, { "id": "receiver-am35", "labelKey": "lighting.receiver", "visibleWhen": { "path": "capabilities.receiverLight" }, "fields": [{ "id": "enabled", "source": "capabilities.receiverLight.enabled", "mutation": "set-receiver-lighting", "param": "enabled", "editor": "inline-toggle", "switch": { "source": "capabilities.receiverLight.enabled", "offValue": 0 }, "labelKey": "dashboard.status", "paramSources": { "enabled": "capabilities.receiverLight.enabled", "type": "capabilities.receiverLight.type", "color1": "capabilities.receiverLight.color1", "ratio1": "capabilities.receiverLight.ratio1", "color2": "capabilities.receiverLight.color2", "ratio2": "capabilities.receiverLight.ratio2", "color3": "capabilities.receiverLight.color3", "ratio3": "capabilities.receiverLight.ratio3", "speed": "capabilities.receiverLight.speed", "brightness": "capabilities.receiverLight.brightness" } }, { "id": "type", "source": "capabilities.receiverLight.type", "mutation": "set-receiver-lighting", "param": "type", "editor": "modal-select", "labelKey": "receiverLighting.field.effect", "editTitleKey": "dashboard.editReceiverLightingTitle", "options": [{ "value": 0, "labelKey": "receiverLighting.effect.off" }, { "value": 1, "labelKey": "receiverLighting.effect.fixed" }, { "value": 2, "labelKey": "receiverLighting.effect.breathing" }, { "value": 3, "labelKey": "receiverLighting.effect.neon" }, { "value": 4, "labelKey": "receiverLighting.effect.wave" }, { "value": 5, "labelKey": "receiverLighting.effect.running" }, { "value": 6, "labelKey": "receiverLighting.effect.ring" }, { "value": 7, "labelKey": "receiverLighting.effect.buffer" }, { "value": 8, "labelKey": "receiverLighting.effect.chase" }], "paramSources": { "enabled": "capabilities.receiverLight.enabled", "type": "capabilities.receiverLight.type", "color1": "capabilities.receiverLight.color1", "ratio1": "capabilities.receiverLight.ratio1", "color2": "capabilities.receiverLight.color2", "ratio2": "capabilities.receiverLight.ratio2", "color3": "capabilities.receiverLight.color3", "ratio3": "capabilities.receiverLight.ratio3", "speed": "capabilities.receiverLight.speed", "brightness": "capabilities.receiverLight.brightness" } }, { "id": "color1", "source": "capabilities.receiverLight.color1", "mutation": "set-receiver-lighting", "param": "color1", "editor": "modal-color", "format": "color", "labelKey": "receiverLighting.field.color", "editTitleKey": "dashboard.editReceiverLightingTitle", "paramSources": { "enabled": "capabilities.receiverLight.enabled", "type": "capabilities.receiverLight.type", "color1": "capabilities.receiverLight.color1", "ratio1": "capabilities.receiverLight.ratio1", "color2": "capabilities.receiverLight.color2", "ratio2": "capabilities.receiverLight.ratio2", "color3": "capabilities.receiverLight.color3", "ratio3": "capabilities.receiverLight.ratio3", "speed": "capabilities.receiverLight.speed", "brightness": "capabilities.receiverLight.brightness" } }, { "id": "ratio1", "source": "capabilities.receiverLight.ratio1", "mutation": "set-receiver-lighting", "param": "ratio1", "editor": "modal-number", "format": "percent", "range": { "min": 0, "max": 100, "step": 1 }, "labelKey": "receiverLighting.field.ratio", "editTitleKey": "dashboard.editReceiverLightingTitle", "paramSources": { "enabled": "capabilities.receiverLight.enabled", "type": "capabilities.receiverLight.type", "color1": "capabilities.receiverLight.color1", "ratio1": "capabilities.receiverLight.ratio1", "color2": "capabilities.receiverLight.color2", "ratio2": "capabilities.receiverLight.ratio2", "color3": "capabilities.receiverLight.color3", "ratio3": "capabilities.receiverLight.ratio3", "speed": "capabilities.receiverLight.speed", "brightness": "capabilities.receiverLight.brightness" } }, { "id": "color2", "source": "capabilities.receiverLight.color2", "mutation": "set-receiver-lighting", "param": "color2", "editor": "modal-color", "format": "color", "labelKey": "receiverLighting.field.color", "editTitleKey": "dashboard.editReceiverLightingTitle", "paramSources": { "enabled": "capabilities.receiverLight.enabled", "type": "capabilities.receiverLight.type", "color1": "capabilities.receiverLight.color1", "ratio1": "capabilities.receiverLight.ratio1", "color2": "capabilities.receiverLight.color2", "ratio2": "capabilities.receiverLight.ratio2", "color3": "capabilities.receiverLight.color3", "ratio3": "capabilities.receiverLight.ratio3", "speed": "capabilities.receiverLight.speed", "brightness": "capabilities.receiverLight.brightness" } }, { "id": "ratio2", "source": "capabilities.receiverLight.ratio2", "mutation": "set-receiver-lighting", "param": "ratio2", "editor": "modal-number", "format": "percent", "range": { "min": 0, "max": 100, "step": 1 }, "labelKey": "receiverLighting.field.ratio", "editTitleKey": "dashboard.editReceiverLightingTitle", "paramSources": { "enabled": "capabilities.receiverLight.enabled", "type": "capabilities.receiverLight.type", "color1": "capabilities.receiverLight.color1", "ratio1": "capabilities.receiverLight.ratio1", "color2": "capabilities.receiverLight.color2", "ratio2": "capabilities.receiverLight.ratio2", "color3": "capabilities.receiverLight.color3", "ratio3": "capabilities.receiverLight.ratio3", "speed": "capabilities.receiverLight.speed", "brightness": "capabilities.receiverLight.brightness" } }, { "id": "color3", "source": "capabilities.receiverLight.color3", "mutation": "set-receiver-lighting", "param": "color3", "editor": "modal-color", "format": "color", "labelKey": "receiverLighting.field.color", "editTitleKey": "dashboard.editReceiverLightingTitle", "paramSources": { "enabled": "capabilities.receiverLight.enabled", "type": "capabilities.receiverLight.type", "color1": "capabilities.receiverLight.color1", "ratio1": "capabilities.receiverLight.ratio1", "color2": "capabilities.receiverLight.color2", "ratio2": "capabilities.receiverLight.ratio2", "color3": "capabilities.receiverLight.color3", "ratio3": "capabilities.receiverLight.ratio3", "speed": "capabilities.receiverLight.speed", "brightness": "capabilities.receiverLight.brightness" } }, { "id": "ratio3", "source": "capabilities.receiverLight.ratio3", "mutation": "set-receiver-lighting", "param": "ratio3", "editor": "modal-number", "format": "percent", "range": { "min": 0, "max": 100, "step": 1 }, "labelKey": "receiverLighting.field.ratio", "editTitleKey": "dashboard.editReceiverLightingTitle", "paramSources": { "enabled": "capabilities.receiverLight.enabled", "type": "capabilities.receiverLight.type", "color1": "capabilities.receiverLight.color1", "ratio1": "capabilities.receiverLight.ratio1", "color2": "capabilities.receiverLight.color2", "ratio2": "capabilities.receiverLight.ratio2", "color3": "capabilities.receiverLight.color3", "ratio3": "capabilities.receiverLight.ratio3", "speed": "capabilities.receiverLight.speed", "brightness": "capabilities.receiverLight.brightness" } }, { "id": "speed", "source": "capabilities.receiverLight.speed", "mutation": "set-receiver-lighting", "param": "speed", "editor": "modal-select", "labelKey": "receiverLighting.field.speed", "editTitleKey": "dashboard.editReceiverLightingTitle", "options": [{ "value": 0, "labelKey": "receiverLighting.speed.fastest" }, { "value": 1, "labelKey": "receiverLighting.speed.fast" }, { "value": 2, "labelKey": "receiverLighting.speed.medium" }, { "value": 3, "labelKey": "receiverLighting.speed.slow" }, { "value": 4, "labelKey": "receiverLighting.speed.slowest" }], "paramSources": { "enabled": "capabilities.receiverLight.enabled", "type": "capabilities.receiverLight.type", "color1": "capabilities.receiverLight.color1", "ratio1": "capabilities.receiverLight.ratio1", "color2": "capabilities.receiverLight.color2", "ratio2": "capabilities.receiverLight.ratio2", "color3": "capabilities.receiverLight.color3", "ratio3": "capabilities.receiverLight.ratio3", "speed": "capabilities.receiverLight.speed", "brightness": "capabilities.receiverLight.brightness" } }, { "id": "brightness", "source": "capabilities.receiverLight.brightness", "mutation": "set-receiver-lighting", "param": "brightness", "editor": "modal-select", "labelKey": "receiverLighting.field.brightness", "editTitleKey": "dashboard.editReceiverLightingTitle", "options": [{ "value": 0, "labelKey": "receiverLighting.brightness.dimmest" }, { "value": 1, "labelKey": "receiverLighting.brightness.dark" }, { "value": 2, "labelKey": "receiverLighting.brightness.medium" }, { "value": 3, "labelKey": "receiverLighting.brightness.bright" }, { "value": 4, "labelKey": "receiverLighting.brightness.brightest" }], "paramSources": { "enabled": "capabilities.receiverLight.enabled", "type": "capabilities.receiverLight.type", "color1": "capabilities.receiverLight.color1", "ratio1": "capabilities.receiverLight.ratio1", "color2": "capabilities.receiverLight.color2", "ratio2": "capabilities.receiverLight.ratio2", "color3": "capabilities.receiverLight.color3", "ratio3": "capabilities.receiverLight.ratio3", "speed": "capabilities.receiverLight.speed", "brightness": "capabilities.receiverLight.brightness" } }] }], "statusDisplay": { "labelKey": "capability.lighting", "valueSource": "capabilities.settings.mouseLightEnabled", "valueOptions": [{ "value": false, "labelKey": "lighting.off" }, { "value": true, "labelKey": "lighting.on" }], "onClickField": "enabled" } } },
-    { "id": "firmware", "control": "ReadOnlyValue", "labelKey": "capability.firmware", "readOnly": true, "placements": [{ "region": "details", "order": 10, "span": 1, "icon": "info" }], "metadata": { "fields": [{ "id": "protocol-a-value", "source": "capabilities.firmwareUsb.versionRaw", "editor": "static-readonly", "labelKey": "capability.firmware", "visibleWhen": { "path": "family", "in": ["protocol-a-direct", "protocol-a-receiver"] } }, { "id": "am35-value", "source": "capabilities.firmware.versionString", "editor": "static-readonly", "labelKey": "capability.firmware", "visibleWhen": { "path": "family", "in": ["am35-direct", "am35-receiver"] } }] } },
-    { "id": "serial", "control": "ReadOnlyValue", "labelKey": "capability.serial", "readOnly": true, "placements": [{ "region": "details", "order": 15, "span": 1, "icon": "info" }], "metadata": { "fields": [{ "id": "value", "source": "capabilities.serial.serialString", "editor": "static-readonly", "labelKey": "capability.serial", "visibleWhen": { "path": "family", "in": ["am35-direct", "am35-receiver"] } }] } },
-    { "id": "dpi-colors", "control": "ReadOnlyValue", "labelKey": "capability.dpiColors", "readOnly": true, "placements": [{ "region": "details", "order": 16, "span": 1, "icon": "palette" }], "metadata": { "fields": [{ "id": "stage1", "source": "capabilities.dpiColor1.color", "editor": "static-readonly", "format": "color", "labelKey": "capability.dpiColorStage", "labelKeyParams": { "stage": 1 }, "visibleWhen": { "path": "family", "in": ["am35-direct", "am35-receiver"] } }, { "id": "stage2", "source": "capabilities.dpiColor2.color", "editor": "static-readonly", "format": "color", "labelKey": "capability.dpiColorStage", "labelKeyParams": { "stage": 2 }, "visibleWhen": { "path": "family", "in": ["am35-direct", "am35-receiver"] } }, { "id": "stage3", "source": "capabilities.dpiColor3.color", "editor": "static-readonly", "format": "color", "labelKey": "capability.dpiColorStage", "labelKeyParams": { "stage": 3 }, "visibleWhen": { "path": "family", "in": ["am35-direct", "am35-receiver"] } }, { "id": "stage4", "source": "capabilities.dpiColor4.color", "editor": "static-readonly", "format": "color", "labelKey": "capability.dpiColorStage", "labelKeyParams": { "stage": 4 }, "visibleWhen": { "path": "family", "in": ["am35-direct", "am35-receiver"] } }, { "id": "stage5", "source": "capabilities.dpiColor5.color", "editor": "static-readonly", "format": "color", "labelKey": "capability.dpiColorStage", "labelKeyParams": { "stage": 5 }, "visibleWhen": { "path": "family", "in": ["am35-direct", "am35-receiver"] } }, { "id": "stage6", "source": "capabilities.dpiColor6.color", "editor": "static-readonly", "format": "color", "labelKey": "capability.dpiColorStage", "labelKeyParams": { "stage": 6 }, "visibleWhen": { "path": "family", "in": ["am35-direct", "am35-receiver"] } }, { "id": "stage7", "source": "capabilities.dpiColor7.color", "editor": "static-readonly", "format": "color", "labelKey": "capability.dpiColorStage", "labelKeyParams": { "stage": 7 }, "visibleWhen": { "path": "family", "in": ["am35-direct", "am35-receiver"] } }, { "id": "stage8", "source": "capabilities.dpiColor8.color", "editor": "static-readonly", "format": "color", "labelKey": "capability.dpiColorStage", "labelKeyParams": { "stage": 8 }, "visibleWhen": { "path": "family", "in": ["am35-direct", "am35-receiver"] } }] } },
-    { "id": "device-settings", "control": "ReadOnlyValue", "labelKey": "plugin.label.capability.device-settings", "readOnly": true, "placements": [{ "region": "details", "order": 20, "span": 1, "icon": "info" }], "metadata": { "fields": [{ "id": "value", "source": "capabilities.settings", "editor": "static-readonly", "labelKey": "plugin.label.capability.device-settings" }] } },
-    { "id": "receiver-status", "control": "ReadOnlyValue", "labelKey": "plugin.label.capability.receiver-status", "readOnly": true, "placements": [{ "region": "details", "order": 30, "span": 1, "icon": "info" }], "metadata": { "fields": [{ "id": "value", "source": "capabilities.receiverLighting", "editor": "static-readonly", "labelKey": "plugin.label.capability.receiver-status" }] } },
-    { "id": "button-mappings", "control": "ReadOnlyValue", "labelKey": "plugin.label.capability.button-mappings", "readOnly": true, "placements": [{ "region": "details", "order": 40, "span": 1, "icon": "info" }], "metadata": { "fields": [{ "id": "value", "source": "capabilities.buttonMappings", "editor": "static-readonly", "labelKey": "plugin.label.capability.button-mappings" }] } }
+    {
+      "id": "battery",
+      "control": "ReadOnlyValue",
+      "labelKey": "capability.battery",
+      "readOnly": true,
+      "placements": [
+        {
+          "region": "hero",
+          "order": 10,
+          "span": 1,
+          "icon": "battery"
+        }
+      ],
+      "metadata": {
+        "fields": [
+          {
+            "id": "value",
+            "source": "battery",
+            "editor": "static-readonly",
+            "format": "percent",
+            "labelKey": "capability.battery"
+          }
+        ],
+        "batteryHistory": {
+          "validConnections": [
+            "wireless",
+            "bluetooth"
+          ]
+        }
+      }
+    },
+    {
+      "id": "dpi",
+      "control": "DpiStages",
+      "labelKey": "capability.dpi",
+      "readOnly": false,
+      "placements": [
+        {
+          "region": "control",
+          "group": "performance",
+          "order": 10,
+          "span": 1,
+          "icon": "gauge"
+        }
+      ],
+      "metadata": {
+        "stageLayout": {
+          "dotsSource": "state.dpiStages",
+          "selectMutation": "set-dpi-stage",
+          "setMutation": "set-dpi-value",
+          "valueSource": "state.dpiStages",
+          "range": {
+            "min": 50,
+            "max": 30000,
+            "step": 50
+          },
+          "selectParam": "stage",
+          "stageParam": "stage",
+          "valueParam": "dpi"
+        },
+        "stateMapping": {
+          "dpiStages": "dpiStages"
+        }
+      }
+    },
+    {
+      "id": "polling-rate",
+      "control": "Select",
+      "labelKey": "capability.polling-rate",
+      "readOnly": false,
+      "placements": [
+        {
+          "region": "control",
+          "group": "polling",
+          "order": 20,
+          "span": 1,
+          "icon": "wave"
+        }
+      ],
+      "metadata": {
+        "fields": [
+          {
+            "id": "value",
+            "source": "state.pollingRate",
+            "mutation": "set-polling-rate",
+            "param": "rate",
+            "editor": "modal-select",
+            "optionSource": "state.supportedPollingRates",
+            "format": "hertz",
+            "labelKey": "capability.polling-rate"
+          }
+        ],
+        "stateMapping": {
+          "pollingRate": "pollingRateHz",
+          "supportedPollingRates": "supportedPollingRatesHz"
+        },
+        "summary": [
+          {
+            "labelKey": "summary.motionSync",
+            "source": "capabilities.settings.motionSync"
+          },
+          {
+            "labelKey": "summary.angleSnap",
+            "source": "capabilities.settings.angleSnap"
+          },
+          {
+            "labelKey": "summary.liftCutOff",
+            "source": "capabilities.settings.liftCutOff"
+          }
+        ]
+      }
+    },
+    {
+      "id": "sleep-time",
+      "control": "Number",
+      "labelKey": "capability.sleep-time",
+      "readOnly": false,
+      "placements": [
+        {
+          "region": "status",
+          "order": 10,
+          "span": 1,
+          "icon": "timer"
+        }
+      ],
+      "metadata": {
+        "fields": [
+          {
+            "id": "protocol-a-bluetooth",
+            "source": "capabilities.settings.bluetoothSleepValue",
+            "mutation": "set-bluetooth-sleep-time",
+            "param": "seconds",
+            "editor": "modal-number",
+            "format": "sleep",
+            "range": {
+              "min": 10,
+              "max": 65535,
+              "step": 10
+            },
+            "labelKey": "sleep.bluetooth",
+            "editTitleKey": "dashboard.setSleepTitle",
+            "editLabelKey": "dashboard.timeoutSeconds",
+            "visibleWhen": {
+              "path": "connection",
+              "eq": "bluetooth"
+            }
+          },
+          {
+            "id": "protocol-a-wireless",
+            "source": "capabilities.settings.wirelessSleepValue",
+            "mutation": "set-wireless-sleep-time",
+            "param": "seconds",
+            "editor": "modal-number",
+            "format": "sleep",
+            "range": {
+              "min": 10,
+              "max": 65535,
+              "step": 10
+            },
+            "labelKey": "sleep.wireless",
+            "editTitleKey": "dashboard.setSleepTitle",
+            "editLabelKey": "dashboard.timeoutSeconds",
+            "visibleWhen": {
+              "path": "connection",
+              "eq": "wireless"
+            }
+          },
+          {
+            "id": "protocol-a-virtual",
+            "source": "capabilities.settings.wirelessSleepValue",
+            "mutation": "set-wireless-sleep-time",
+            "param": "seconds",
+            "editor": "modal-number",
+            "format": "sleep",
+            "range": {
+              "min": 10,
+              "max": 65535,
+              "step": 10
+            },
+            "labelKey": "sleep.wireless",
+            "editTitleKey": "dashboard.setSleepTitle",
+            "editLabelKey": "dashboard.timeoutSeconds",
+            "visibleWhen": {
+              "path": "connection",
+              "eq": "virtual"
+            }
+          },
+          {
+            "id": "am35-bluetooth",
+            "source": "capabilities.sleepTime.bluetoothSleepValue",
+            "mutation": "set-sleep-time",
+            "param": "bluetoothSleepValue",
+            "editor": "modal-number",
+            "format": "sleep",
+            "range": {
+              "min": -1,
+              "max": 65535,
+              "step": 10
+            },
+            "labelKey": "sleep.bluetooth",
+            "editTitleKey": "dashboard.setSleepTitle",
+            "editLabelKey": "dashboard.timeoutSeconds",
+            "visibleWhen": {
+              "path": "family",
+              "in": ["am35-direct", "am35-receiver"]
+            },
+            "paramSources": {
+              "wirelessSleepValue": "capabilities.sleepTime.wirelessSleepValue",
+              "bluetoothSleepValue": "capabilities.sleepTime.bluetoothSleepValue"
+            }
+          },
+          {
+            "id": "am35-wireless",
+            "source": "capabilities.sleepTime.wirelessSleepValue",
+            "mutation": "set-sleep-time",
+            "param": "wirelessSleepValue",
+            "editor": "modal-number",
+            "format": "sleep",
+            "range": {
+              "min": -1,
+              "max": 65535,
+              "step": 10
+            },
+            "labelKey": "sleep.wireless",
+            "editTitleKey": "dashboard.setSleepTitle",
+            "editLabelKey": "dashboard.timeoutSeconds",
+            "visibleWhen": {
+              "path": "family",
+              "in": ["am35-direct", "am35-receiver"]
+            },
+            "paramSources": {
+              "wirelessSleepValue": "capabilities.sleepTime.wirelessSleepValue",
+              "bluetoothSleepValue": "capabilities.sleepTime.bluetoothSleepValue"
+            }
+          },
+          {
+            "id": "am35-virtual",
+            "source": "capabilities.sleepTime.wirelessSleepValue",
+            "mutation": "set-sleep-time",
+            "param": "wirelessSleepValue",
+            "editor": "modal-number",
+            "format": "sleep",
+            "range": {
+              "min": -1,
+              "max": 65535,
+              "step": 10
+            },
+            "labelKey": "sleep.wireless",
+            "editTitleKey": "dashboard.setSleepTitle",
+            "editLabelKey": "dashboard.timeoutSeconds",
+            "visibleWhen": {
+              "path": "family",
+              "in": ["am35-direct", "am35-receiver"]
+            },
+            "paramSources": {
+              "wirelessSleepValue": "capabilities.sleepTime.wirelessSleepValue",
+              "bluetoothSleepValue": "capabilities.sleepTime.bluetoothSleepValue"
+            }
+          }
+        ],
+        "statusDisplay": {
+          "valueSource": "capabilities.settings.wirelessSleepValue",
+          "valueFormat": "sleep",
+          "onClickField": "protocol-a-wireless"
+        }
+      }
+    },
+    {
+      "id": "profile",
+      "control": "Select",
+      "labelKey": "capability.profile",
+      "readOnly": false,
+      "placements": [
+        {
+          "region": "status",
+          "order": 20,
+          "span": 1,
+          "icon": "profile"
+        }
+      ],
+      "metadata": {
+        "fields": [
+          {
+            "id": "protocol-a-value",
+            "source": "state.profile",
+            "editor": "static-readonly",
+            "labelKey": "capability.profile",
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "protocol-a-direct",
+                "protocol-a-receiver"
+              ]
+            }
+          },
+          {
+            "id": "am35-value",
+            "source": "state.profile",
+            "mutation": "set-profile",
+            "param": "profile",
+            "editor": "modal-select",
+            "labelKey": "capability.profile",
+            "range": {
+              "min": 1,
+              "max": 8,
+              "step": 1
+            },
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "am35-direct",
+                "am35-receiver"
+              ]
+            }
+          }
+        ],
+        "statusDisplay": {
+          "valueSource": "state.profile"
+        },
+        "stateMapping": {
+          "profile": "profile"
+        }
+      }
+    },
+    {
+      "id": "lighting",
+      "control": "LightingZone",
+      "labelKey": "capability.lighting",
+      "readOnly": false,
+      "placements": [
+        {
+          "region": "control",
+          "group": "lighting",
+          "order": 30,
+          "span": 1,
+          "icon": "lightbulb"
+        },
+        {
+          "region": "status",
+          "order": 30,
+          "span": 1,
+          "icon": "lightbulb"
+        }
+      ],
+      "metadata": {
+        "accentSource": "capabilities.mouseLighting.color",
+        "zones": [
+          {
+            "id": "mouse",
+            "labelKey": "lighting.mouse",
+            "fields": [
+              {
+                "id": "enabled",
+                "source": "capabilities.settings.mouseLightEnabled",
+                "mutation": "set-mouse-lighting",
+                "param": "enabled",
+                "editor": "inline-toggle",
+                "switch": {
+                  "source": "capabilities.settings.mouseLightEnabled",
+                  "offValue": false
+                },
+                "labelKey": "dashboard.status",
+                "paramSources": {
+                  "color": "capabilities.mouseLighting.color",
+                  "enabled": "capabilities.settings.mouseLightEnabled"
+                },
+                "visibleWhen": {
+                  "path": "family",
+                  "in": [
+                    "protocol-a-direct",
+                    "protocol-a-receiver"
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "source": "capabilities.mouseLighting.color",
+                "mutation": "set-mouse-lighting",
+                "param": "color",
+                "editor": "modal-color",
+                "format": "color",
+                "labelKey": "receiverLighting.field.color",
+                "editTitleKey": "dashboard.mouseLightColor",
+                "paramSources": {
+                  "color": "capabilities.mouseLighting.color",
+                  "enabled": "capabilities.settings.mouseLightEnabled"
+                },
+                "visibleWhen": {
+                  "path": "family",
+                  "in": [
+                    "protocol-a-direct",
+                    "protocol-a-receiver"
+                  ]
+                }
+              },
+              {
+                "id": "am35-enabled",
+                "source": "capabilities.mouseLightMode.mode",
+                "mutation": "set-mouse-light-mode",
+                "param": "enabled",
+                "editor": "inline-toggle",
+                "switch": {
+                  "source": "capabilities.mouseLightMode.mode",
+                  "offValue": 0
+                },
+                "labelKey": "dashboard.status",
+                "editTitleKey": "dashboard.mouseLightMode",
+                "visibleWhen": {
+                  "path": "family",
+                  "in": [
+                    "am35-direct",
+                    "am35-receiver"
+                  ]
+                },
+                "paramSources": {
+                  "enabled": "capabilities.mouseLightMode.mode",
+                  "mode": "capabilities.mouseLightMode.mode",
+                  "speed": "capabilities.mouseLightMode.speed"
+                }
+              },
+              {
+                "id": "am35-mode",
+                "source": "capabilities.mouseLightMode.mode",
+                "mutation": "set-mouse-light-mode",
+                "param": "mode",
+                "editor": "modal-select",
+                "labelKey": "receiverLighting.field.effect",
+                "editTitleKey": "dashboard.mouseLightMode",
+                "labelSource": "capabilities.mouseLightMode.modeName",
+                "options": [
+                  {
+                    "value": 0,
+                    "labelKey": "mouseLight.am35.mode.0"
+                  },
+                  {
+                    "value": 1,
+                    "labelKey": "mouseLight.am35.mode.1"
+                  },
+                  {
+                    "value": 2,
+                    "labelKey": "mouseLight.am35.mode.2"
+                  }
+                ],
+                "visibleWhen": {
+                  "path": "family",
+                  "in": [
+                    "am35-direct",
+                    "am35-receiver"
+                  ]
+                },
+                "paramSources": {
+                  "enabled": "capabilities.mouseLightMode.mode",
+                  "mode": "capabilities.mouseLightMode.mode",
+                  "speed": "capabilities.mouseLightMode.speed"
+                }
+              },
+              {
+                "id": "am35-speed",
+                "source": "capabilities.mouseLightMode.speed",
+                "mutation": "set-mouse-light-mode",
+                "param": "speed",
+                "editor": "modal-select",
+                "labelKey": "receiverLighting.field.speed",
+                "editTitleKey": "dashboard.mouseLightMode",
+                "labelSource": "capabilities.mouseLightMode.speedLabel",
+                "options": [
+                  {
+                    "value": 0,
+                    "labelKey": "receiverLighting.speed.fastest"
+                  },
+                  {
+                    "value": 1,
+                    "labelKey": "receiverLighting.speed.fast"
+                  },
+                  {
+                    "value": 2,
+                    "labelKey": "receiverLighting.speed.medium"
+                  },
+                  {
+                    "value": 3,
+                    "labelKey": "receiverLighting.speed.slow"
+                  },
+                  {
+                    "value": 4,
+                    "labelKey": "receiverLighting.speed.slowest"
+                  }
+                ],
+                "visibleWhen": {
+                  "path": "family",
+                  "in": [
+                    "am35-direct",
+                    "am35-receiver"
+                  ]
+                },
+                "paramSources": {
+                  "enabled": "capabilities.mouseLightMode.mode",
+                  "mode": "capabilities.mouseLightMode.mode",
+                  "speed": "capabilities.mouseLightMode.speed"
+                }
+              },
+              {
+                "id": "am35-color",
+                "source": "capabilities.mouseLightColor.color",
+                "mutation": "set-mouse-light-color",
+                "param": "color",
+                "editor": "modal-color",
+                "format": "color",
+                "labelKey": "receiverLighting.field.color",
+                "editTitleKey": "dashboard.mouseLightColor",
+                "visibleWhen": {
+                  "path": "family",
+                  "in": [
+                    "am35-direct",
+                    "am35-receiver"
+                  ]
+                },
+                "paramSources": {
+                  "color": "capabilities.mouseLightColor.color"
+                }
+              }
+            ]
+          },
+          {
+            "id": "receiver",
+            "labelKey": "lighting.receiver",
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "protocol-a-direct",
+                "protocol-a-receiver"
+              ]
+            },
+            "fields": [
+              {
+                "id": "effect",
+                "source": "capabilities.receiverLighting.effect",
+                "mutation": "set-receiver-lighting",
+                "param": "effect",
+                "editor": "modal-select",
+                "labelKey": "receiverLighting.field.effect",
+                "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "labelSource": "capabilities.receiverLighting.effectName",
+                "options": [
+                  {
+                    "value": 0,
+                    "labelKey": "receiverLighting.effect.off"
+                  },
+                  {
+                    "value": 1,
+                    "labelKey": "receiverLighting.effect.fixed"
+                  },
+                  {
+                    "value": 2,
+                    "labelKey": "receiverLighting.effect.breathing"
+                  },
+                  {
+                    "value": 3,
+                    "labelKey": "receiverLighting.effect.neon"
+                  },
+                  {
+                    "value": 4,
+                    "labelKey": "receiverLighting.effect.wave"
+                  },
+                  {
+                    "value": 5,
+                    "labelKey": "receiverLighting.effect.running"
+                  },
+                  {
+                    "value": 6,
+                    "labelKey": "receiverLighting.effect.ring"
+                  },
+                  {
+                    "value": 7,
+                    "labelKey": "receiverLighting.effect.buffer"
+                  },
+                  {
+                    "value": 8,
+                    "labelKey": "receiverLighting.effect.chase"
+                  }
+                ],
+                "paramSources": {
+                  "effect": "capabilities.receiverLighting.effect",
+                  "speed": "capabilities.receiverLighting.speed",
+                  "brightness": "capabilities.receiverLighting.brightness",
+                  "option": "capabilities.receiverLighting.option",
+                  "color": "capabilities.receiverLighting.color"
+                }
+              },
+              {
+                "id": "option",
+                "source": "capabilities.receiverLighting.option",
+                "mutation": "set-receiver-lighting",
+                "param": "option",
+                "editor": "modal-select",
+                "labelKey": "receiverLighting.field.option",
+                "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "labelSource": "capabilities.receiverLighting.optionName",
+                "options": [
+                  {
+                    "value": 0,
+                    "labelKey": "receiverLighting.colorMode.red"
+                  },
+                  {
+                    "value": 1,
+                    "labelKey": "receiverLighting.colorMode.orange"
+                  },
+                  {
+                    "value": 2,
+                    "labelKey": "receiverLighting.colorMode.yellow"
+                  },
+                  {
+                    "value": 3,
+                    "labelKey": "receiverLighting.colorMode.green"
+                  },
+                  {
+                    "value": 4,
+                    "labelKey": "receiverLighting.colorMode.cyan"
+                  },
+                  {
+                    "value": 5,
+                    "labelKey": "receiverLighting.colorMode.blue"
+                  },
+                  {
+                    "value": 6,
+                    "labelKey": "receiverLighting.colorMode.purple"
+                  },
+                  {
+                    "value": 7,
+                    "labelKey": "receiverLighting.colorMode.custom"
+                  },
+                  {
+                    "value": 8,
+                    "labelKey": "receiverLighting.colorMode.colorful"
+                  }
+                ],
+                "paramSources": {
+                  "effect": "capabilities.receiverLighting.effect",
+                  "speed": "capabilities.receiverLighting.speed",
+                  "brightness": "capabilities.receiverLighting.brightness",
+                  "option": "capabilities.receiverLighting.option",
+                  "color": "capabilities.receiverLighting.color"
+                }
+              },
+              {
+                "id": "speed",
+                "source": "capabilities.receiverLighting.speed",
+                "mutation": "set-receiver-lighting",
+                "param": "speed",
+                "editor": "modal-select",
+                "labelKey": "receiverLighting.field.speed",
+                "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "labelSource": "capabilities.receiverLighting.speedLabel",
+                "options": [
+                  {
+                    "value": 0,
+                    "labelKey": "receiverLighting.speed.fastest"
+                  },
+                  {
+                    "value": 1,
+                    "labelKey": "receiverLighting.speed.fast"
+                  },
+                  {
+                    "value": 2,
+                    "labelKey": "receiverLighting.speed.medium"
+                  },
+                  {
+                    "value": 3,
+                    "labelKey": "receiverLighting.speed.slow"
+                  },
+                  {
+                    "value": 4,
+                    "labelKey": "receiverLighting.speed.slowest"
+                  }
+                ],
+                "paramSources": {
+                  "effect": "capabilities.receiverLighting.effect",
+                  "speed": "capabilities.receiverLighting.speed",
+                  "brightness": "capabilities.receiverLighting.brightness",
+                  "option": "capabilities.receiverLighting.option",
+                  "color": "capabilities.receiverLighting.color"
+                }
+              },
+              {
+                "id": "brightness",
+                "source": "capabilities.receiverLighting.brightness",
+                "mutation": "set-receiver-lighting",
+                "param": "brightness",
+                "editor": "modal-select",
+                "labelKey": "receiverLighting.field.brightness",
+                "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "labelSource": "capabilities.receiverLighting.brightnessLabel",
+                "options": [
+                  {
+                    "value": 0,
+                    "labelKey": "receiverLighting.brightness.dimmest"
+                  },
+                  {
+                    "value": 1,
+                    "labelKey": "receiverLighting.brightness.dark"
+                  },
+                  {
+                    "value": 2,
+                    "labelKey": "receiverLighting.brightness.medium"
+                  },
+                  {
+                    "value": 3,
+                    "labelKey": "receiverLighting.brightness.bright"
+                  },
+                  {
+                    "value": 4,
+                    "labelKey": "receiverLighting.brightness.brightest"
+                  }
+                ],
+                "paramSources": {
+                  "effect": "capabilities.receiverLighting.effect",
+                  "speed": "capabilities.receiverLighting.speed",
+                  "brightness": "capabilities.receiverLighting.brightness",
+                  "option": "capabilities.receiverLighting.option",
+                  "color": "capabilities.receiverLighting.color"
+                }
+              },
+              {
+                "id": "color",
+                "source": "capabilities.receiverLighting.color",
+                "mutation": "set-receiver-lighting",
+                "param": "color",
+                "editor": "modal-color",
+                "format": "color",
+                "labelKey": "receiverLighting.field.color",
+                "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "paramSources": {
+                  "effect": "capabilities.receiverLighting.effect",
+                  "speed": "capabilities.receiverLighting.speed",
+                  "brightness": "capabilities.receiverLighting.brightness",
+                  "option": "capabilities.receiverLighting.option",
+                  "color": "capabilities.receiverLighting.color"
+                }
+              }
+            ]
+          },
+          {
+            "id": "receiver-am35",
+            "labelKey": "lighting.receiver",
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "am35-direct",
+                "am35-receiver"
+              ]
+            },
+            "fields": [
+              {
+                "id": "enabled",
+                "source": "capabilities.receiverLight.enabled",
+                "mutation": "set-receiver-lighting",
+                "param": "enabled",
+                "editor": "inline-toggle",
+                "switch": {
+                  "source": "capabilities.receiverLight.enabled",
+                  "offValue": 0
+                },
+                "labelKey": "dashboard.status",
+                "paramSources": {
+                  "enabled": "capabilities.receiverLight.enabled",
+                  "type": "capabilities.receiverLight.type",
+                  "color1": "capabilities.receiverLight.color1",
+                  "ratio1": "capabilities.receiverLight.ratio1",
+                  "color2": "capabilities.receiverLight.color2",
+                  "ratio2": "capabilities.receiverLight.ratio2",
+                  "color3": "capabilities.receiverLight.color3",
+                  "ratio3": "capabilities.receiverLight.ratio3",
+                  "speed": "capabilities.receiverLight.speed",
+                  "brightness": "capabilities.receiverLight.brightness"
+                }
+              },
+              {
+                "id": "type",
+                "source": "capabilities.receiverLight.type",
+                "mutation": "set-receiver-lighting",
+                "param": "type",
+                "editor": "modal-select",
+                "labelKey": "receiverLighting.field.type",
+                "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "options": [
+                  {
+                    "value": 0,
+                    "labelKey": "receiverLighting.am35.mode.0"
+                  },
+                  {
+                    "value": 1,
+                    "labelKey": "receiverLighting.am35.mode.1"
+                  },
+                  {
+                    "value": 2,
+                    "labelKey": "receiverLighting.am35.mode.2"
+                  },
+                  {
+                    "value": 3,
+                    "labelKey": "receiverLighting.am35.mode.3"
+                  },
+                  {
+                    "value": 4,
+                    "labelKey": "receiverLighting.am35.mode.4"
+                  },
+                  {
+                    "value": 5,
+                    "labelKey": "receiverLighting.am35.mode.5"
+                  },
+                  {
+                    "value": 6,
+                    "labelKey": "receiverLighting.am35.mode.6"
+                  },
+                  {
+                    "value": 7,
+                    "labelKey": "receiverLighting.am35.mode.7"
+                  },
+                  {
+                    "value": 8,
+                    "labelKey": "receiverLighting.am35.mode.8"
+                  }
+                ],
+                "paramSources": {
+                  "enabled": "capabilities.receiverLight.enabled",
+                  "type": "capabilities.receiverLight.type",
+                  "color1": "capabilities.receiverLight.color1",
+                  "ratio1": "capabilities.receiverLight.ratio1",
+                  "color2": "capabilities.receiverLight.color2",
+                  "ratio2": "capabilities.receiverLight.ratio2",
+                  "color3": "capabilities.receiverLight.color3",
+                  "ratio3": "capabilities.receiverLight.ratio3",
+                  "speed": "capabilities.receiverLight.speed",
+                  "brightness": "capabilities.receiverLight.brightness"
+                }
+              },
+              {
+                "id": "color1",
+                "source": "capabilities.receiverLight.color1",
+                "mutation": "set-receiver-lighting",
+                "param": "color1",
+                "editor": "modal-color",
+                "format": "color",
+                "labelKey": "receiverLighting.field.color",
+                "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "paramSources": {
+                  "enabled": "capabilities.receiverLight.enabled",
+                  "type": "capabilities.receiverLight.type",
+                  "color1": "capabilities.receiverLight.color1",
+                  "ratio1": "capabilities.receiverLight.ratio1",
+                  "color2": "capabilities.receiverLight.color2",
+                  "ratio2": "capabilities.receiverLight.ratio2",
+                  "color3": "capabilities.receiverLight.color3",
+                  "ratio3": "capabilities.receiverLight.ratio3",
+                  "speed": "capabilities.receiverLight.speed",
+                  "brightness": "capabilities.receiverLight.brightness"
+                }
+              },
+              {
+                "id": "ratio1",
+                "source": "capabilities.receiverLight.ratio1",
+                "mutation": "set-receiver-lighting",
+                "param": "ratio1",
+                "editor": "modal-number",
+                "format": "percent",
+                "range": {
+                  "min": 0,
+                  "max": 100,
+                  "step": 1
+                },
+                "labelKey": "receiverLighting.field.ratio",
+                "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "paramSources": {
+                  "enabled": "capabilities.receiverLight.enabled",
+                  "type": "capabilities.receiverLight.type",
+                  "color1": "capabilities.receiverLight.color1",
+                  "ratio1": "capabilities.receiverLight.ratio1",
+                  "color2": "capabilities.receiverLight.color2",
+                  "ratio2": "capabilities.receiverLight.ratio2",
+                  "color3": "capabilities.receiverLight.color3",
+                  "ratio3": "capabilities.receiverLight.ratio3",
+                  "speed": "capabilities.receiverLight.speed",
+                  "brightness": "capabilities.receiverLight.brightness"
+                }
+              },
+              {
+                "id": "color2",
+                "source": "capabilities.receiverLight.color2",
+                "mutation": "set-receiver-lighting",
+                "param": "color2",
+                "editor": "modal-color",
+                "format": "color",
+                "labelKey": "receiverLighting.field.color",
+                "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "paramSources": {
+                  "enabled": "capabilities.receiverLight.enabled",
+                  "type": "capabilities.receiverLight.type",
+                  "color1": "capabilities.receiverLight.color1",
+                  "ratio1": "capabilities.receiverLight.ratio1",
+                  "color2": "capabilities.receiverLight.color2",
+                  "ratio2": "capabilities.receiverLight.ratio2",
+                  "color3": "capabilities.receiverLight.color3",
+                  "ratio3": "capabilities.receiverLight.ratio3",
+                  "speed": "capabilities.receiverLight.speed",
+                  "brightness": "capabilities.receiverLight.brightness"
+                }
+              },
+              {
+                "id": "ratio2",
+                "source": "capabilities.receiverLight.ratio2",
+                "mutation": "set-receiver-lighting",
+                "param": "ratio2",
+                "editor": "modal-number",
+                "format": "percent",
+                "range": {
+                  "min": 0,
+                  "max": 100,
+                  "step": 1
+                },
+                "labelKey": "receiverLighting.field.ratio",
+                "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "paramSources": {
+                  "enabled": "capabilities.receiverLight.enabled",
+                  "type": "capabilities.receiverLight.type",
+                  "color1": "capabilities.receiverLight.color1",
+                  "ratio1": "capabilities.receiverLight.ratio1",
+                  "color2": "capabilities.receiverLight.color2",
+                  "ratio2": "capabilities.receiverLight.ratio2",
+                  "color3": "capabilities.receiverLight.color3",
+                  "ratio3": "capabilities.receiverLight.ratio3",
+                  "speed": "capabilities.receiverLight.speed",
+                  "brightness": "capabilities.receiverLight.brightness"
+                }
+              },
+              {
+                "id": "color3",
+                "source": "capabilities.receiverLight.color3",
+                "mutation": "set-receiver-lighting",
+                "param": "color3",
+                "editor": "modal-color",
+                "format": "color",
+                "labelKey": "receiverLighting.field.color",
+                "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "paramSources": {
+                  "enabled": "capabilities.receiverLight.enabled",
+                  "type": "capabilities.receiverLight.type",
+                  "color1": "capabilities.receiverLight.color1",
+                  "ratio1": "capabilities.receiverLight.ratio1",
+                  "color2": "capabilities.receiverLight.color2",
+                  "ratio2": "capabilities.receiverLight.ratio2",
+                  "color3": "capabilities.receiverLight.color3",
+                  "ratio3": "capabilities.receiverLight.ratio3",
+                  "speed": "capabilities.receiverLight.speed",
+                  "brightness": "capabilities.receiverLight.brightness"
+                }
+              },
+              {
+                "id": "ratio3",
+                "source": "capabilities.receiverLight.ratio3",
+                "mutation": "set-receiver-lighting",
+                "param": "ratio3",
+                "editor": "modal-number",
+                "format": "percent",
+                "range": {
+                  "min": 0,
+                  "max": 100,
+                  "step": 1
+                },
+                "labelKey": "receiverLighting.field.ratio",
+                "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "paramSources": {
+                  "enabled": "capabilities.receiverLight.enabled",
+                  "type": "capabilities.receiverLight.type",
+                  "color1": "capabilities.receiverLight.color1",
+                  "ratio1": "capabilities.receiverLight.ratio1",
+                  "color2": "capabilities.receiverLight.color2",
+                  "ratio2": "capabilities.receiverLight.ratio2",
+                  "color3": "capabilities.receiverLight.color3",
+                  "ratio3": "capabilities.receiverLight.ratio3",
+                  "speed": "capabilities.receiverLight.speed",
+                  "brightness": "capabilities.receiverLight.brightness"
+                }
+              },
+              {
+                "id": "speed",
+                "source": "capabilities.receiverLight.speed",
+                "mutation": "set-receiver-lighting",
+                "param": "speed",
+                "editor": "modal-select",
+                "labelKey": "receiverLighting.field.speed",
+                "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "options": [
+                  {
+                    "value": 0,
+                    "labelKey": "receiverLighting.speed.fastest"
+                  },
+                  {
+                    "value": 1,
+                    "labelKey": "receiverLighting.speed.fast"
+                  },
+                  {
+                    "value": 2,
+                    "labelKey": "receiverLighting.speed.medium"
+                  },
+                  {
+                    "value": 3,
+                    "labelKey": "receiverLighting.speed.slow"
+                  },
+                  {
+                    "value": 4,
+                    "labelKey": "receiverLighting.speed.slowest"
+                  }
+                ],
+                "paramSources": {
+                  "enabled": "capabilities.receiverLight.enabled",
+                  "type": "capabilities.receiverLight.type",
+                  "color1": "capabilities.receiverLight.color1",
+                  "ratio1": "capabilities.receiverLight.ratio1",
+                  "color2": "capabilities.receiverLight.color2",
+                  "ratio2": "capabilities.receiverLight.ratio2",
+                  "color3": "capabilities.receiverLight.color3",
+                  "ratio3": "capabilities.receiverLight.ratio3",
+                  "speed": "capabilities.receiverLight.speed",
+                  "brightness": "capabilities.receiverLight.brightness"
+                }
+              },
+              {
+                "id": "brightness",
+                "source": "capabilities.receiverLight.brightness",
+                "mutation": "set-receiver-lighting",
+                "param": "brightness",
+                "editor": "modal-select",
+                "labelKey": "receiverLighting.field.brightness",
+                "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "options": [
+                  {
+                    "value": 0,
+                    "labelKey": "receiverLighting.brightness.dimmest"
+                  },
+                  {
+                    "value": 1,
+                    "labelKey": "receiverLighting.brightness.dark"
+                  },
+                  {
+                    "value": 2,
+                    "labelKey": "receiverLighting.brightness.medium"
+                  },
+                  {
+                    "value": 3,
+                    "labelKey": "receiverLighting.brightness.bright"
+                  },
+                  {
+                    "value": 4,
+                    "labelKey": "receiverLighting.brightness.brightest"
+                  }
+                ],
+                "paramSources": {
+                  "enabled": "capabilities.receiverLight.enabled",
+                  "type": "capabilities.receiverLight.type",
+                  "color1": "capabilities.receiverLight.color1",
+                  "ratio1": "capabilities.receiverLight.ratio1",
+                  "color2": "capabilities.receiverLight.color2",
+                  "ratio2": "capabilities.receiverLight.ratio2",
+                  "color3": "capabilities.receiverLight.color3",
+                  "ratio3": "capabilities.receiverLight.ratio3",
+                  "speed": "capabilities.receiverLight.speed",
+                  "brightness": "capabilities.receiverLight.brightness"
+                }
+              }
+            ]
+          }
+        ],
+        "statusDisplay": {
+          "labelKey": "capability.lighting",
+          "valueSource": "capabilities.settings.mouseLightEnabled",
+          "valueOptions": [
+            {
+              "value": false,
+              "labelKey": "lighting.off"
+            },
+            {
+              "value": true,
+              "labelKey": "lighting.on"
+            }
+          ],
+          "onClickField": "enabled"
+        }
+      }
+    },
+    {
+      "id": "firmware",
+      "control": "ReadOnlyValue",
+      "labelKey": "capability.firmware",
+      "readOnly": true,
+      "placements": [
+        {
+          "region": "details",
+          "order": 10,
+          "span": 1,
+          "icon": "info"
+        }
+      ],
+      "metadata": {
+        "fields": [
+          {
+            "id": "protocol-a-value",
+            "source": "capabilities.firmwareUsb.versionRaw",
+            "editor": "static-readonly",
+            "labelKey": "capability.firmware",
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "protocol-a-direct",
+                "protocol-a-receiver"
+              ]
+            }
+          },
+          {
+            "id": "am35-value",
+            "source": "capabilities.firmware.versionString",
+            "editor": "static-readonly",
+            "labelKey": "capability.firmware",
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "am35-direct",
+                "am35-receiver"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "serial",
+      "control": "ReadOnlyValue",
+      "labelKey": "capability.serial",
+      "readOnly": true,
+      "placements": [
+        {
+          "region": "details",
+          "order": 15,
+          "span": 1,
+          "icon": "info"
+        }
+      ],
+      "metadata": {
+        "fields": [
+          {
+            "id": "value",
+            "source": "capabilities.serial.serialString",
+            "editor": "static-readonly",
+            "labelKey": "capability.serial",
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "am35-direct",
+                "am35-receiver"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "dpi-colors",
+      "control": "ReadOnlyValue",
+      "labelKey": "capability.dpiColors",
+      "readOnly": false,
+      "placements": [
+        {
+          "region": "details",
+          "order": 16,
+          "span": 1,
+          "icon": "palette"
+        }
+      ],
+      "metadata": {
+        "fields": [
+          {
+            "id": "stage1",
+            "source": "capabilities.dpiColor1.color",
+            "mutation": "set-dpi-color",
+            "param": "color",
+            "editor": "modal-color",
+            "format": "color",
+            "labelKey": "capability.dpiColorStage",
+            "labelKeyParams": {
+              "stage": 1
+            },
+            "editTitleKey": "dashboard.editDpiColorTitle",
+            "params": { "stage": 1 },
+            "paramSources": {
+              "color": "capabilities.dpiColor1.color"
+            },
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "am35-direct",
+                "am35-receiver"
+              ]
+            }
+          },
+          {
+            "id": "stage2",
+            "source": "capabilities.dpiColor2.color",
+            "mutation": "set-dpi-color",
+            "param": "color",
+            "editor": "modal-color",
+            "format": "color",
+            "labelKey": "capability.dpiColorStage",
+            "labelKeyParams": {
+              "stage": 2
+            },
+            "editTitleKey": "dashboard.editDpiColorTitle",
+            "params": { "stage": 2 },
+            "paramSources": {
+              "color": "capabilities.dpiColor2.color"
+            },
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "am35-direct",
+                "am35-receiver"
+              ]
+            }
+          },
+          {
+            "id": "stage3",
+            "source": "capabilities.dpiColor3.color",
+            "mutation": "set-dpi-color",
+            "param": "color",
+            "editor": "modal-color",
+            "format": "color",
+            "labelKey": "capability.dpiColorStage",
+            "labelKeyParams": {
+              "stage": 3
+            },
+            "editTitleKey": "dashboard.editDpiColorTitle",
+            "params": { "stage": 3 },
+            "paramSources": {
+              "color": "capabilities.dpiColor3.color"
+            },
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "am35-direct",
+                "am35-receiver"
+              ]
+            }
+          },
+          {
+            "id": "stage4",
+            "source": "capabilities.dpiColor4.color",
+            "mutation": "set-dpi-color",
+            "param": "color",
+            "editor": "modal-color",
+            "format": "color",
+            "labelKey": "capability.dpiColorStage",
+            "labelKeyParams": {
+              "stage": 4
+            },
+            "editTitleKey": "dashboard.editDpiColorTitle",
+            "params": { "stage": 4 },
+            "paramSources": {
+              "color": "capabilities.dpiColor4.color"
+            },
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "am35-direct",
+                "am35-receiver"
+              ]
+            }
+          },
+          {
+            "id": "stage5",
+            "source": "capabilities.dpiColor5.color",
+            "mutation": "set-dpi-color",
+            "param": "color",
+            "editor": "modal-color",
+            "format": "color",
+            "labelKey": "capability.dpiColorStage",
+            "labelKeyParams": {
+              "stage": 5
+            },
+            "editTitleKey": "dashboard.editDpiColorTitle",
+            "params": { "stage": 5 },
+            "paramSources": {
+              "color": "capabilities.dpiColor5.color"
+            },
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "am35-direct",
+                "am35-receiver"
+              ]
+            }
+          },
+          {
+            "id": "stage6",
+            "source": "capabilities.dpiColor6.color",
+            "mutation": "set-dpi-color",
+            "param": "color",
+            "editor": "modal-color",
+            "format": "color",
+            "labelKey": "capability.dpiColorStage",
+            "labelKeyParams": {
+              "stage": 6
+            },
+            "editTitleKey": "dashboard.editDpiColorTitle",
+            "params": { "stage": 6 },
+            "paramSources": {
+              "color": "capabilities.dpiColor6.color"
+            },
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "am35-direct",
+                "am35-receiver"
+              ]
+            }
+          },
+          {
+            "id": "stage7",
+            "source": "capabilities.dpiColor7.color",
+            "mutation": "set-dpi-color",
+            "param": "color",
+            "editor": "modal-color",
+            "format": "color",
+            "labelKey": "capability.dpiColorStage",
+            "labelKeyParams": {
+              "stage": 7
+            },
+            "editTitleKey": "dashboard.editDpiColorTitle",
+            "params": { "stage": 7 },
+            "paramSources": {
+              "color": "capabilities.dpiColor7.color"
+            },
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "am35-direct",
+                "am35-receiver"
+              ]
+            }
+          },
+          {
+            "id": "stage8",
+            "source": "capabilities.dpiColor8.color",
+            "mutation": "set-dpi-color",
+            "param": "color",
+            "editor": "modal-color",
+            "format": "color",
+            "labelKey": "capability.dpiColorStage",
+            "labelKeyParams": {
+              "stage": 8
+            },
+            "editTitleKey": "dashboard.editDpiColorTitle",
+            "params": { "stage": 8 },
+            "paramSources": {
+              "color": "capabilities.dpiColor8.color"
+            },
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "am35-direct",
+                "am35-receiver"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "fps",
+      "control": "ReadOnlyValue",
+      "labelKey": "capability.fps",
+      "readOnly": false,
+      "placements": [
+        {
+          "region": "status",
+          "order": 25,
+          "span": 1,
+          "icon": "gauge"
+        }
+      ],
+      "metadata": {
+        "fields": [
+          {
+            "id": "value",
+            "source": "capabilities.fps.enabled",
+            "mutation": "set-fps",
+            "param": "enabled",
+            "editor": "inline-toggle",
+            "switch": {
+              "source": "capabilities.fps.enabled",
+              "offValue": false
+            },
+            "labelKey": "capability.fps",
+            "editTitleKey": "dashboard.editFpsTitle"
+          }
+        ],
+        "statusDisplay": {
+          "labelKey": "capability.fps",
+          "valueSource": "capabilities.fps.enabled",
+          "valueOptions": [
+            {
+              "value": false,
+              "labelKey": "lighting.off"
+            },
+            {
+              "value": true,
+              "labelKey": "lighting.on"
+            }
+          ],
+          "onClickField": "value"
+        }
+      }
+    },
+    {
+      "id": "dpi-button",
+      "control": "ReadOnlyValue",
+      "labelKey": "capability.dpiButton",
+      "readOnly": false,
+      "placements": [
+        {
+          "region": "status",
+          "order": 26,
+          "span": 1,
+          "icon": "button"
+        }
+      ],
+      "metadata": {
+        "fields": [
+          {
+            "id": "value",
+            "source": "capabilities.dpiButton.enabled",
+            "mutation": "set-dpi-button",
+            "param": "enabled",
+            "editor": "inline-toggle",
+            "switch": {
+              "source": "capabilities.dpiButton.enabled",
+              "offValue": false
+            },
+            "labelKey": "capability.dpiButton",
+            "editTitleKey": "dashboard.editDpiButtonTitle"
+          }
+        ],
+        "statusDisplay": {
+          "labelKey": "capability.dpiButton",
+          "valueSource": "capabilities.dpiButton.enabled",
+          "valueOptions": [
+            {
+              "value": false,
+              "labelKey": "lighting.off"
+            },
+            {
+              "value": true,
+              "labelKey": "lighting.on"
+            }
+          ],
+          "onClickField": "value"
+        }
+      }
+    },
+    {
+      "id": "rotation",
+      "control": "ReadOnlyValue",
+      "labelKey": "capability.rotation",
+      "readOnly": false,
+      "placements": [
+        {
+          "region": "control",
+          "group": "performance",
+          "order": 40,
+          "span": 1,
+          "icon": "rotate"
+        }
+      ],
+      "metadata": {
+        "fields": [
+          {
+            "id": "enabled",
+            "source": "capabilities.rotation.enabled",
+            "mutation": "set-rotation",
+            "param": "enabled",
+            "editor": "inline-toggle",
+            "switch": {
+              "source": "capabilities.rotation.enabled",
+              "offValue": false
+            },
+            "labelKey": "dashboard.rotationEnabled",
+            "editTitleKey": "dashboard.editRotationTitle",
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "am35-direct",
+                "am35-receiver"
+              ]
+            },
+            "paramSources": {
+              "enabled": "capabilities.rotation.enabled",
+              "angle": "capabilities.rotation.angle"
+            }
+          },
+          {
+            "id": "angle",
+            "source": "capabilities.rotation.angle",
+            "mutation": "set-rotation",
+            "param": "angle",
+            "editor": "modal-number",
+            "format": "default",
+            "range": {
+              "min": -128,
+              "max": 127,
+              "step": 1
+            },
+            "labelKey": "dashboard.rotationAngle",
+            "editTitleKey": "dashboard.editRotationTitle",
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "am35-direct",
+                "am35-receiver"
+              ]
+            },
+            "paramSources": {
+              "enabled": "capabilities.rotation.enabled",
+              "angle": "capabilities.rotation.angle"
+            }
+          }
+        ],
+        "statusDisplay": {
+          "labelKey": "capability.rotation",
+          "valueSource": "capabilities.rotation.enabled",
+          "valueOptions": [
+            {
+              "value": false,
+              "labelKey": "lighting.off"
+            },
+            {
+              "value": true,
+              "labelKey": "lighting.on"
+            }
+          ],
+          "onClickField": "enabled"
+        }
+      }
+    },
+    {
+      "id": "debounce",
+      "control": "ReadOnlyValue",
+      "labelKey": "capability.debounce",
+      "readOnly": false,
+      "placements": [
+        {
+          "region": "control",
+          "group": "performance",
+          "order": 50,
+          "span": 1,
+          "icon": "timer"
+        }
+      ],
+      "metadata": {
+        "fields": [
+          {
+            "id": "usb",
+            "source": "capabilities.debounce.usbDebounce",
+            "mutation": "set-debounce",
+            "param": "usbDebounce",
+            "editor": "modal-number",
+            "format": "default",
+            "range": {
+              "min": 0,
+              "max": 255,
+              "step": 1
+            },
+            "labelKey": "debounce.usb",
+            "editTitleKey": "dashboard.editDebounceTitle",
+            "editLabelKey": "dashboard.debounceMs",
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "am35-direct",
+                "am35-receiver"
+              ]
+            },
+            "paramSources": {
+              "usbDebounce": "capabilities.debounce.usbDebounce",
+              "wirelessDebounce": "capabilities.debounce.wirelessDebounce",
+              "bluetoothDebounce": "capabilities.debounce.bluetoothDebounce"
+            }
+          },
+          {
+            "id": "wireless",
+            "source": "capabilities.debounce.wirelessDebounce",
+            "mutation": "set-debounce",
+            "param": "wirelessDebounce",
+            "editor": "modal-number",
+            "format": "default",
+            "range": {
+              "min": 0,
+              "max": 255,
+              "step": 1
+            },
+            "labelKey": "debounce.wireless",
+            "editTitleKey": "dashboard.editDebounceTitle",
+            "editLabelKey": "dashboard.debounceMs",
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "am35-direct",
+                "am35-receiver"
+              ]
+            },
+            "paramSources": {
+              "usbDebounce": "capabilities.debounce.usbDebounce",
+              "wirelessDebounce": "capabilities.debounce.wirelessDebounce",
+              "bluetoothDebounce": "capabilities.debounce.bluetoothDebounce"
+            }
+          },
+          {
+            "id": "bluetooth",
+            "source": "capabilities.debounce.bluetoothDebounce",
+            "mutation": "set-debounce",
+            "param": "bluetoothDebounce",
+            "editor": "modal-number",
+            "format": "default",
+            "range": {
+              "min": 0,
+              "max": 255,
+              "step": 1
+            },
+            "labelKey": "debounce.bluetooth",
+            "editTitleKey": "dashboard.editDebounceTitle",
+            "editLabelKey": "dashboard.debounceMs",
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "am35-direct",
+                "am35-receiver"
+              ]
+            },
+            "paramSources": {
+              "usbDebounce": "capabilities.debounce.usbDebounce",
+              "wirelessDebounce": "capabilities.debounce.wirelessDebounce",
+              "bluetoothDebounce": "capabilities.debounce.bluetoothDebounce"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "lod",
+      "control": "ReadOnlyValue",
+      "labelKey": "capability.lod",
+      "readOnly": false,
+      "placements": [
+        {
+          "region": "control",
+          "group": "performance",
+          "order": 60,
+          "span": 1,
+          "icon": "arrow-up"
+        }
+      ],
+      "metadata": {
+        "fields": [
+          {
+            "id": "value",
+            "source": "capabilities.lod.liftCutOff",
+            "mutation": "set-lod",
+            "param": "liftCutOff",
+            "editor": "modal-number",
+            "format": "default",
+            "range": {
+              "min": 0,
+              "max": 255,
+              "step": 1
+            },
+            "labelKey": "capability.lod",
+            "editTitleKey": "dashboard.editLodTitle",
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "am35-direct",
+                "am35-receiver"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "motion-sync",
+      "control": "ReadOnlyValue",
+      "labelKey": "capability.motionSync",
+      "readOnly": false,
+      "placements": [
+        {
+          "region": "control",
+          "group": "performance",
+          "order": 70,
+          "span": 1,
+          "icon": "sync"
+        }
+      ],
+      "metadata": {
+        "fields": [
+          {
+            "id": "value",
+            "source": "capabilities.motionSync.motionSync",
+            "mutation": "set-motion-sync",
+            "param": "motionSync",
+            "editor": "inline-toggle",
+            "switch": {
+              "source": "capabilities.motionSync.motionSync",
+              "offValue": 0
+            },
+            "labelKey": "capability.motionSync",
+            "editTitleKey": "dashboard.editMotionSyncTitle",
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "am35-direct",
+                "am35-receiver"
+              ]
+            }
+          }
+        ],
+        "statusDisplay": {
+          "labelKey": "capability.motionSync",
+          "valueSource": "capabilities.motionSync.motionSync",
+          "valueOptions": [
+            {
+              "value": 0,
+              "labelKey": "lighting.off"
+            },
+            {
+              "value": 1,
+              "labelKey": "lighting.on"
+            }
+          ],
+          "onClickField": "value"
+        }
+      }
+    },
+    {
+      "id": "angle-snapping",
+      "control": "ReadOnlyValue",
+      "labelKey": "capability.angleSnap",
+      "readOnly": false,
+      "placements": [
+        {
+          "region": "control",
+          "group": "performance",
+          "order": 80,
+          "span": 1,
+          "icon": "ruler"
+        }
+      ],
+      "metadata": {
+        "fields": [
+          {
+            "id": "value",
+            "source": "capabilities.angleSnap.angleSnap",
+            "mutation": "set-angle-snapping",
+            "param": "angleSnap",
+            "editor": "inline-toggle",
+            "switch": {
+              "source": "capabilities.angleSnap.angleSnap",
+              "offValue": 0
+            },
+            "labelKey": "capability.angleSnap",
+            "editTitleKey": "dashboard.editAngleSnapTitle",
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "am35-direct",
+                "am35-receiver"
+              ]
+            }
+          }
+        ],
+        "statusDisplay": {
+          "labelKey": "capability.angleSnap",
+          "valueSource": "capabilities.angleSnap.angleSnap",
+          "valueOptions": [
+            {
+              "value": 0,
+              "labelKey": "lighting.off"
+            },
+            {
+              "value": 1,
+              "labelKey": "lighting.on"
+            }
+          ],
+          "onClickField": "value"
+        }
+      }
+    },
+    {
+      "id": "ripple-control",
+      "control": "ReadOnlyValue",
+      "labelKey": "capability.rippleControl",
+      "readOnly": false,
+      "placements": [
+        {
+          "region": "control",
+          "group": "performance",
+          "order": 90,
+          "span": 1,
+          "icon": "wave"
+        }
+      ],
+      "metadata": {
+        "fields": [
+          {
+            "id": "value",
+            "source": "capabilities.rippleControl.rippleControl",
+            "mutation": "set-ripple-control",
+            "param": "rippleControl",
+            "editor": "inline-toggle",
+            "switch": {
+              "source": "capabilities.rippleControl.rippleControl",
+              "offValue": 0
+            },
+            "labelKey": "capability.rippleControl",
+            "editTitleKey": "dashboard.editRippleControlTitle",
+            "visibleWhen": {
+              "path": "family",
+              "in": [
+                "am35-direct",
+                "am35-receiver"
+              ]
+            }
+          }
+        ],
+        "statusDisplay": {
+          "labelKey": "capability.rippleControl",
+          "valueSource": "capabilities.rippleControl.rippleControl",
+          "valueOptions": [
+            {
+              "value": 0,
+              "labelKey": "lighting.off"
+            },
+            {
+              "value": 1,
+              "labelKey": "lighting.on"
+            }
+          ],
+          "onClickField": "value"
+        }
+      }
+    },
+    {
+      "id": "device-settings",
+      "control": "ReadOnlyValue",
+      "labelKey": "plugin.label.capability.device-settings",
+      "readOnly": true,
+      "placements": [
+        {
+          "region": "details",
+          "order": 20,
+          "span": 1,
+          "icon": "info"
+        }
+      ],
+      "metadata": {
+        "fields": [
+          {
+            "id": "value",
+            "source": "capabilities.settings",
+            "editor": "static-readonly",
+            "labelKey": "plugin.label.capability.device-settings"
+          }
+        ]
+      }
+    },
+    {
+      "id": "receiver-status",
+      "control": "ReadOnlyValue",
+      "labelKey": "plugin.label.capability.receiver-status",
+      "readOnly": true,
+      "placements": [
+        {
+          "region": "details",
+          "order": 30,
+          "span": 1,
+          "icon": "info"
+        }
+      ],
+      "metadata": {
+        "fields": [
+          {
+            "id": "value",
+            "source": "capabilities.receiverLighting",
+            "editor": "static-readonly",
+            "labelKey": "plugin.label.capability.receiver-status"
+          }
+        ]
+      }
+    },
+    {
+      "id": "button-mappings",
+      "control": "ReadOnlyValue",
+      "labelKey": "plugin.label.capability.button-mappings",
+      "readOnly": true,
+      "placements": [
+        {
+          "region": "details",
+          "order": 40,
+          "span": 1,
+          "icon": "info"
+        }
+      ],
+      "metadata": {
+        "fields": [
+          {
+            "id": "value",
+            "source": "capabilities.buttonMappings",
+            "editor": "static-readonly",
+            "labelKey": "plugin.label.capability.button-mappings"
+          }
+        ]
+      }
+    }
   ],
   "writesEnabled": true,
   "exportableFields": [
-    { "id": "current-dpi-stage", "exportKey": "currentDpiStage", "kind": "number", "mutation": "set-dpi-stage", "param": "stage", "source": "capabilities.dpi.currentStage" },
-    { "id": "polling-rate", "exportKey": "pollingRate", "kind": "number", "mutation": "set-polling-rate", "param": "rate", "source": "capabilities.settings.pollingRate" },
-    { "id": "bluetooth-sleep", "exportKey": "bluetoothSleepSeconds", "kind": "number", "mutation": "set-bluetooth-sleep-time", "param": "seconds", "source": "capabilities.settings.bluetoothSleepValue" },
-    { "id": "wireless-sleep", "exportKey": "wirelessSleepSeconds", "kind": "number", "mutation": "set-wireless-sleep-time", "param": "seconds", "source": "capabilities.settings.wirelessSleepValue" },
-    { "id": "mouse-lighting", "exportKey": "mouseLighting", "kind": "object", "mutation": "set-mouse-lighting", "sources": { "color": "capabilities.mouseLighting.color", "enabled": "capabilities.settings.mouseLightEnabled" } },
-    { "id": "receiver-lighting", "exportKey": "receiverLighting", "kind": "object", "mutation": "set-receiver-lighting", "sources": { "effect": "capabilities.receiverLighting.effect", "speed": "capabilities.receiverLighting.speed", "brightness": "capabilities.receiverLighting.brightness", "option": "capabilities.receiverLighting.option", "color": "capabilities.receiverLighting.color" } }
+    {
+      "id": "current-dpi-stage",
+      "exportKey": "currentDpiStage",
+      "kind": "number",
+      "mutation": "set-dpi-stage",
+      "param": "stage",
+      "source": "capabilities.dpi.currentStage"
+    },
+    {
+      "id": "polling-rate",
+      "exportKey": "pollingRate",
+      "kind": "number",
+      "mutation": "set-polling-rate",
+      "param": "rate",
+      "source": "capabilities.settings.pollingRate"
+    },
+    {
+      "id": "bluetooth-sleep",
+      "exportKey": "bluetoothSleepSeconds",
+      "kind": "number",
+      "mutation": "set-bluetooth-sleep-time",
+      "param": "seconds",
+      "source": "capabilities.settings.bluetoothSleepValue"
+    },
+    {
+      "id": "wireless-sleep",
+      "exportKey": "wirelessSleepSeconds",
+      "kind": "number",
+      "mutation": "set-wireless-sleep-time",
+      "param": "seconds",
+      "source": "capabilities.settings.wirelessSleepValue"
+    },
+    {
+      "id": "mouse-lighting",
+      "exportKey": "mouseLighting",
+      "kind": "object",
+      "mutation": "set-mouse-lighting",
+      "sources": {
+        "color": "capabilities.mouseLighting.color",
+        "enabled": "capabilities.settings.mouseLightEnabled"
+      },
+      "visibleWhen": {
+        "path": "family",
+        "in": [
+          "protocol-a-direct",
+          "protocol-a-receiver"
+        ]
+      }
+    },
+    {
+      "id": "mouse-lighting-mode-am35",
+      "exportKey": "mouseLightingMode",
+      "kind": "object",
+      "mutation": "set-mouse-light-mode",
+      "sources": {
+        "enabled": "capabilities.mouseLightMode.mode",
+        "mode": "capabilities.mouseLightMode.mode",
+        "speed": "capabilities.mouseLightMode.speed"
+      },
+      "visibleWhen": {
+        "path": "family",
+        "in": [
+          "am35-direct",
+          "am35-receiver"
+        ]
+      }
+    },
+    {
+      "id": "mouse-lighting-color-am35",
+      "exportKey": "mouseLightingColor",
+      "kind": "object",
+      "mutation": "set-mouse-light-color",
+      "sources": {
+        "color": "capabilities.mouseLightColor.color"
+      },
+      "visibleWhen": {
+        "path": "family",
+        "in": [
+          "am35-direct",
+          "am35-receiver"
+        ]
+      }
+    },
+    {
+      "id": "dpi-color-am35",
+      "exportKey": "dpiColors",
+      "kind": "object",
+      "mutation": "set-dpi-color",
+      "sources": {
+        "stage1Color": "capabilities.dpiColor1.color",
+        "stage2Color": "capabilities.dpiColor2.color",
+        "stage3Color": "capabilities.dpiColor3.color",
+        "stage4Color": "capabilities.dpiColor4.color",
+        "stage5Color": "capabilities.dpiColor5.color",
+        "stage6Color": "capabilities.dpiColor6.color",
+        "stage7Color": "capabilities.dpiColor7.color",
+        "stage8Color": "capabilities.dpiColor8.color"
+      },
+      "visibleWhen": {
+        "path": "family",
+        "in": [
+          "am35-direct",
+          "am35-receiver"
+        ]
+      }
+    },
+    {
+      "id": "receiver-lighting-protocol-a",
+      "exportKey": "receiverLighting",
+      "kind": "object",
+      "mutation": "set-receiver-lighting",
+      "sources": {
+        "effect": "capabilities.receiverLighting.effect",
+        "speed": "capabilities.receiverLighting.speed",
+        "brightness": "capabilities.receiverLighting.brightness",
+        "option": "capabilities.receiverLighting.option",
+        "color": "capabilities.receiverLighting.color"
+      },
+      "visibleWhen": {
+        "path": "family",
+        "in": [
+          "protocol-a-direct",
+          "protocol-a-receiver"
+        ]
+      }
+    },
+    {
+      "id": "receiver-lighting-am35",
+      "exportKey": "receiverLighting",
+      "kind": "object",
+      "mutation": "set-receiver-lighting",
+      "sources": {
+        "enabled": "capabilities.receiverLight.enabled",
+        "type": "capabilities.receiverLight.type",
+        "color1": "capabilities.receiverLight.color1",
+        "ratio1": "capabilities.receiverLight.ratio1",
+        "color2": "capabilities.receiverLight.color2",
+        "ratio2": "capabilities.receiverLight.ratio2",
+        "color3": "capabilities.receiverLight.color3",
+        "ratio3": "capabilities.receiverLight.ratio3",
+        "speed": "capabilities.receiverLight.speed",
+        "brightness": "capabilities.receiverLight.brightness"
+      },
+      "visibleWhen": {
+        "path": "family",
+        "in": [
+          "am35-direct",
+          "am35-receiver"
+        ]
+      }
+    }
   ]
 }

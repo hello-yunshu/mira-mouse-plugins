@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "case": "am35-mouse-light-color-write",
+  "evidence": "source-confirmed",
+  "description": "AM35 mouse light color setter writes a single RGB color repeated 12 times via RACE raceId 0x0A0D. Frame: 05 5A 2C 00 0D 0A 00 62 01 24 00 10 [color×12]. Total length 48 bytes (12 header + 36 RGB data). No checksum. The 'repeat: 12' field in ByteDefinition (commands.json) causes the 3-byte RGB encoding to be repeated 12 times, matching the device's expectation of 12 color slots in a single write frame. Source: commands.json am35-mouse-light-color-write; parser am35-mouse-light-color reads color from offset 17.",
+  "transport": "am35-direct",
+  "setter": {
+    "command": "am35-mouse-light-color-write",
+    "raceId": [13, 10],
+    "raceIdHex": "0x0A0D",
+    "params": [
+      { "name": "color", "offset": 12, "encoding": "rgb", "repeat": 12 }
+    ],
+    "checksum": null
+  },
+  "samples": [
+    {
+      "input": { "color": "#FF8800" },
+      "expectedRequestPayload": [5, 90, 44, 0, 13, 10, 0, 98, 1, 36, 0, 16, 255, 136, 0, 255, 136, 0, 255, 136, 0, 255, 136, 0, 255, 136, 0, 255, 136, 0, 255, 136, 0, 255, 136, 0, 255, 136, 0, 255, 136, 0, 255, 136, 0, 255, 136, 0],
+      "comment": "color #FF8800 (R=255, G=136, B=0) repeated 12 times = 36 bytes"
+    },
+    {
+      "input": { "color": "#FF0000" },
+      "expectedRequestPayload": [5, 90, 44, 0, 13, 10, 0, 98, 1, 36, 0, 16, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0],
+      "comment": "color #FF0000 (pure red) repeated 12 times"
+    },
+    {
+      "input": { "color": "#00FF00" },
+      "expectedRequestPayload": [5, 90, 44, 0, 13, 10, 0, 98, 1, 36, 0, 16, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0],
+      "comment": "color #00FF00 (pure green) repeated 12 times"
+    }
+  ],
+  "readback": {
+    "command": "am35-mouse-light-color",
+    "raceId": [12, 10],
+    "raceIdHex": "0x0A0C",
+    "parser": "am35-mouse-light-color",
+    "responseSample": [5, 90, 6, 0, 12, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 136, 0],
+    "expectedParsed": { "color": "#FF8800" }
+  }
+}

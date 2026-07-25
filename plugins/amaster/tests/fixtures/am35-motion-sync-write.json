@@ -2,24 +2,24 @@
   "schemaVersion": 1,
   "case": "am35-motion-sync-write",
   "evidence": "reverse-confirmed",
-  "description": "AM35 motion sync setter (set_motion_sync) uses RACE raceId 0x30D2. Param motionSync encoded as u8 at offset 6. RACE framing: [0x05, 0x5A, length_le_u16, raceId_le_u16, ...params]. No request checksum. Source: disassembly/AM35model.dis set_motion_sync. Getter 0x30D3 returns res[9] parsed as u8 (parsers.json am35-motion-sync).",
+  "description": "AM35 motion sync setter (set_motion_sync) uses RACE raceId 0x30D2. Param motionSync encoded as bool at offset 6 (true → 0x01, false → 0x00). RACE framing: [0x05, 0x5A, length_le_u16, raceId_le_u16, ...params]. No request checksum. Source: disassembly/AM35model.dis set_motion_sync. Getter 0x30D3 returns res[9] parsed as bool (parsers.json am35-motion-sync).",
   "transport": "am35-direct",
   "setter": {
     "command": "am35-motion-sync-write",
     "raceId": [210, 48],
     "raceIdHex": "0x30D2",
     "params": [
-      { "name": "motionSync", "offset": 6, "encoding": "u8" }
+      { "name": "motionSync", "offset": 6, "encoding": "bool" }
     ],
     "checksum": null
   },
   "samples": [
     {
-      "input": { "motionSync": 1 },
+      "input": { "motionSync": true },
       "expectedRequestPayload": [5, 90, 3, 0, 210, 48, 1]
     },
     {
-      "input": { "motionSync": 0 },
+      "input": { "motionSync": false },
       "expectedRequestPayload": [5, 90, 3, 0, 210, 48, 0]
     }
   ],
@@ -29,6 +29,6 @@
     "raceIdHex": "0x30D3",
     "parser": "am35-motion-sync",
     "responseSample": [5, 90, 3, 0, 211, 48, 0, 0, 0, 1],
-    "expectedParsed": { "motionSync": 1 }
+    "expectedParsed": { "motionSync": true }
   }
 }

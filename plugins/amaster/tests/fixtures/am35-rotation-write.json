@@ -2,32 +2,49 @@
   "schemaVersion": 1,
   "case": "am35-rotation-write",
   "evidence": "reverse-confirmed",
-  "description": "AM35 rotation setter (set_am35_angle) uses RACE raceId 0x30D8. Params enabled (u8 at offset 6) and angle (le-u16 at offset 7). Per AM35_EVIDENCE section 5, negative angles encode as 256+angle. RACE framing: [0x05, 0x5A, length_le_u16, raceId_le_u16, ...params]. No request checksum. Source: disassembly/AM35model.dis set_am35_angle. Getter 0x30D9 returns res[9] as angle (u8) and res[10] as enabled (u8) (parsers.json am35-rotation).",
+  "description": "AM35 rotation setter (set_am35_angle) uses RACE raceId 0x30D8. Params enabled (bool at offset 6) and angle (i8 at offset 7, with padding 0x00 at offset 8). Per AM35_EVIDENCE section 5, negative angles encode as 256+angle (two's complement u8). RACE framing: [0x05, 0x5A, length_le_u16, raceId_le_u16, ...params]. No request checksum. Source: disassembly/AM35model.dis set_am35_angle. Getter 0x30D9 returns res[9] as rawAngle (u8) and res[10] as enabled (bool); derived angle = signed-u8(rawAngle) (parsers.json am35-rotation).",
   "transport": "am35-direct",
   "setter": {
     "command": "am35-rotation-write",
     "raceId": [216, 48],
     "raceIdHex": "0x30D8",
     "params": [
-      { "name": "enabled", "offset": 6, "encoding": "u8" },
-      { "name": "angle", "offset": 7, "encoding": "le-u16" }
+      { "name": "enabled", "offset": 6, "encoding": "bool" },
+      { "name": "angle", "offset": 7, "encoding": "i8" },
+      { "name": "_padding", "offset": 8, "encoding": "u8", "fixed": 0 }
     ],
     "checksum": null
   },
   "samples": [
     {
-      "input": { "enabled": 1, "angle": 90 },
+      "input": { "enabled": true, "angle": 90 },
       "expectedRequestPayload": [5, 90, 5, 0, 216, 48, 1, 90, 0],
-      "comment": "angle 90 = 0x005A little-endian"
+      "comment": "angle 90 = 0x5A (i8), padding 0x00"
     },
     {
-      "input": { "enabled": 1, "angle": 180 },
-      "expectedRequestPayload": [5, 90, 5, 0, 216, 48, 1, 180, 0],
-      "comment": "angle 180 = 0x00B4 little-endian"
+      "input": { "enabled": true, "angle": -1 },
+      "expectedRequestPayload": [5, 90, 5, 0, 216, 48, 1, 255, 0],
+      "comment": "angle -1 = 0xFF (two's complement = 256+(-1)=255), padding 0x00"
     },
     {
-      "input": { "enabled": 0, "angle": 0 },
-      "expectedRequestPayload": [5, 90, 5, 0, 216, 48, 0, 0, 0]
+      "input": { "enabled": true, "angle": -45 },
+      "expectedRequestPayload": [5, 90, 5, 0, 216, 48, 1, 211, 0],
+      "comment": "angle -45 = 0xD3 (256+(-45)=211), padding 0x00"
+    },
+    {
+      "input": { "enabled": true, "angle": 127 },
+      "expectedRequestPayload": [5, 90, 5, 0, 216, 48, 1, 127, 0],
+      "comment": "angle 127 = 0x7F (max positive i8), padding 0x00"
+    },
+    {
+      "input": { "enabled": true, "angle": -128 },
+      "expectedRequestPayload": [5, 90, 5, 0, 216, 48, 1, 128, 0],
+      "comment": "angle -128 = 0x80 (min negative i8, 256+(-128)=128), padding 0x00"
+    },
+    {
+      "input": { "enabled": false, "angle": 0 },
+      "expectedRequestPayload": [5, 90, 5, 0, 216, 48, 0, 0, 0],
+      "comment": "disabled with angle 0"
     }
   ],
   "readback": {
@@ -36,6 +53,15 @@
     "raceIdHex": "0x30D9",
     "parser": "am35-rotation",
     "responseSample": [5, 90, 4, 0, 217, 48, 0, 0, 0, 90, 1],
-    "expectedParsed": { "angle": 90, "enabled": 1 }
+    "expectedParsed": { "rawAngle": 90, "angle": 90, "enabled": true }
+  },
+  "readbackNegative": {
+    "command": "am35-rotation",
+    "raceId": [217, 48],
+    "raceIdHex": "0x30D9",
+    "parser": "am35-rotation",
+    "responseSample": [5, 90, 4, 0, 217, 48, 0, 0, 0, 255, 1],
+    "expectedParsed": { "rawAngle": 255, "angle": -1, "enabled": true },
+    "comment": "rawAngle 255 (0xFF) → signed-u8 → angle -1 (256+(-1)=255)"
   }
 }

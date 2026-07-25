@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "case": "am35-mouse-light-mode-write",
+  "evidence": "source-confirmed",
+  "description": "AM35 mouse light mode setter writes enabled (bool at offset 6), mode (u8 at offset 7), and speed (u8 at offset 8) via RACE raceId 0x30B3. Frame: 05 5A 05 00 B3 30 [enabled] [mode] [speed]. Total length 9 bytes. No checksum. Mode values: 0=常亮(fixed), 1=呼吸(breathing), 2=霓虹(neon). Speed range 0-4 (5 levels). Source: commands.json am35-mouse-light-mode-write; parser am35-mouse-light-mode reads mode from offset 13, speed from offset 14.",
+  "transport": "am35-direct",
+  "setter": {
+    "command": "am35-mouse-light-mode-write",
+    "raceId": [179, 48],
+    "raceIdHex": "0x30B3",
+    "params": [
+      { "name": "enabled", "offset": 6, "encoding": "bool" },
+      { "name": "mode", "offset": 7, "encoding": "u8" },
+      { "name": "speed", "offset": 8, "encoding": "u8" }
+    ],
+    "checksum": null
+  },
+  "samples": [
+    {
+      "input": { "enabled": true, "mode": 1, "speed": 2 },
+      "expectedRequestPayload": [5, 90, 5, 0, 179, 48, 1, 1, 2],
+      "comment": "enabled=true, mode=1 (breathing), speed=2 (medium)"
+    },
+    {
+      "input": { "enabled": true, "mode": 0, "speed": 0 },
+      "expectedRequestPayload": [5, 90, 5, 0, 179, 48, 1, 0, 0],
+      "comment": "enabled=true, mode=0 (fixed), speed=0 (fastest)"
+    },
+    {
+      "input": { "enabled": true, "mode": 2, "speed": 4 },
+      "expectedRequestPayload": [5, 90, 5, 0, 179, 48, 1, 2, 4],
+      "comment": "enabled=true, mode=2 (neon), speed=4 (slowest)"
+    },
+    {
+      "input": { "enabled": false, "mode": 0, "speed": 0 },
+      "expectedRequestPayload": [5, 90, 5, 0, 179, 48, 0, 0, 0],
+      "comment": "disabled with mode=0, speed=0"
+    }
+  ],
+  "readback": {
+    "command": "am35-mouse-light-mode",
+    "raceId": [12, 10],
+    "raceIdHex": "0x0A0C",
+    "parser": "am35-mouse-light-mode",
+    "responseSample": [5, 90, 6, 0, 12, 10, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0],
+    "expectedParsed": { "mode": 1, "speed": 2, "brightness": 0, "modeName": "呼吸", "speedLabel": "中" }
+  }
+}

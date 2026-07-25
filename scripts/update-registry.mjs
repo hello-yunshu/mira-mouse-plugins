@@ -76,8 +76,11 @@ function writeRegistry(path, plugins) {
   plugins.sort((a, b) => a.pluginId.localeCompare(b.pluginId));
   // 第 3.8 节：update-registry.mjs 只负责写入 unsigned registry。
   // 真实 detached signature 由 scripts/sign-registry.mjs 单独写入。
-  // 仓库中提交的 registry/index.json 必须经过 sign-registry.mjs 处理，
-  // 由 check-architecture.mjs 强制验证 signed:true + signature 结构。
+  // check-architecture.mjs 强制规则：
+  //   - 含 plugins 条目的 registry 必须 signed:true + 真实 signature 结构
+  //   - 空 registry（plugins: []）允许 signed:false（初始状态，等待首次 CI 签名）
+  // 本地不得用 TEST-ONLY 密钥签名（check-architecture.mjs 拒绝 TEST-ONLY keyId），
+  // 生产签名只在 CI 的 publish-registry.yml 中用 REGISTRY_SIGNING_KEY secret 完成。
   return writeFile(path, JSON.stringify({
     schemaVersion: 1,
     signed: false,

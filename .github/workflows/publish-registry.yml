@@ -42,7 +42,17 @@ jobs:
             test "$expected" = "$actual"
             unzip -p "$asset" plugin.json > "$asset.plugin.json"
           done
-          echo "Verified $(find release-asset -name '*.mira-plugin' | wc -l) plugin assets"
+          echo "Verified $(find release-asset -name '*.mira-plugin' | wc -l) plugin assets (SHA-256)"
+      - name: Verify Ed25519 signature for each plugin package
+        run: |
+          set -euo pipefail
+          # 第 3.8 节补充：在 registry 写入前验证每个插件包的 Ed25519 签名。
+          # 拒绝未签名或密钥未受信任的包进入 registry（防止「先信任未验签 manifest」）。
+          for asset in release-asset/*.mira-plugin; do
+            echo "Verifying signature: $asset"
+            node scripts/verify-plugin-package.mjs "$asset" registry/trusted-keys.json > /dev/null
+          done
+          echo "All plugin packages signature-verified against registry/trusted-keys.json"
       - name: Fetch asset URLs from release
         env:
           GH_TOKEN: '${{ github.token }}'
