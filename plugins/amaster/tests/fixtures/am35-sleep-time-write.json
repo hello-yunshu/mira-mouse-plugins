@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "case": "am35-sleep-time-write",
+  "evidence": "reverse-confirmed",
+  "description": "AM35 setSleepTime (RACE raceId 0x3012) writes 6 le-u16 segments. Frame format: 05 5A 1A 00 12 30 [bt1 le-u16] [bt2 le-u16] [bt3 le-u16] 00 00 [tfg1 le-u16] [tfg2 le-u16] [tfg3 le-u16] 00 00 3C 00 1E 00 3C 00 1E 00. Note: BT segments come BEFORE TFG segments in the write frame (read order is TFG first). Total length 30 bytes. Source: disassembly/AM35model.dis setSleepTime (line 1522).",
+  "transport": "am35-direct",
+  "setter": {
+    "command": "am35-sleep-time-write",
+    "raceId": [18, 48],
+    "raceIdHex": "0x3012",
+    "params": [
+      { "name": "btPart1", "offset": 6, "encoding": "le-u16" },
+      { "name": "btPart2", "offset": 8, "encoding": "le-u16" },
+      { "name": "btPart3", "offset": 10, "encoding": "le-u16" },
+      { "name": "tfgPart1", "offset": 14, "encoding": "le-u16" },
+      { "name": "tfgPart2", "offset": 16, "encoding": "le-u16" },
+      { "name": "tfgPart3", "offset": 18, "encoding": "le-u16" }
+    ],
+    "checksum": null
+  },
+  "samples": [
+    {
+      "input": {
+        "tfgPart1": 60, "tfgPart2": 0, "tfgPart3": 0,
+        "btPart1": 30, "btPart2": 0, "btPart3": 0
+      },
+      "expectedRequestPayload": [5, 90, 26, 0, 18, 48, 30, 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 60, 0, 30, 0, 60, 0, 30, 0],
+      "comment": "BT(30,0,0) then TFG(60,0,0); trailing 00 00 3C 00 1E 00 3C 00 1E 00"
+    },
+    {
+      "input": {
+        "tfgPart1": 10, "tfgPart2": 20, "tfgPart3": 30,
+        "btPart1": 5, "btPart2": 10, "btPart3": 15
+      },
+      "expectedRequestPayload": [5, 90, 26, 0, 18, 48, 5, 0, 10, 0, 15, 0, 0, 0, 10, 0, 20, 0, 30, 0, 0, 0, 60, 0, 30, 0, 60, 0, 30, 0],
+      "comment": "All six segments non-zero; sums TFG=60, BT=30"
+    },
+    {
+      "input": {
+        "tfgPart1": 65535, "tfgPart2": 0, "tfgPart3": 0,
+        "btPart1": 65535, "btPart2": 0, "btPart3": 0
+      },
+      "expectedRequestPayload": [5, 90, 26, 0, 18, 48, 255, 255, 0, 0, 0, 0, 0, 0, 255, 255, 0, 0, 0, 0, 0, 0, 60, 0, 30, 0, 60, 0, 30, 0],
+      "comment": "Sentinel input: each group carries a single 65535 segment so sum=65535 -> -1"
+    }
+  ],
+  "readback": {
+    "command": "am35-sleep-time",
+    "raceId": [19, 48],
+    "raceIdHex": "0x3013",
+    "parser": "am35-sleep-time",
+    "responseSample": [5, 90, 2, 0, 19, 48, 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0],
+    "expectedParsed": {
+      "tfgPart1": 60, "tfgPart2": 0, "tfgPart3": 0,
+      "btPart1": 30, "btPart2": 0, "btPart3": 0,
+      "wirelessSleepRawParts": 60,
+      "bluetoothSleepRawParts": 30,
+      "wirelessSleepValue": 60,
+      "bluetoothSleepValue": 30
+    }
+  }
+}

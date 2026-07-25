@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "case": "am35-sleep-time",
+  "evidence": "reverse-confirmed",
+  "description": "AM35 get_sleep_time (RACE raceId 0x3013) returns 6 le-u16 segments: TFG_SEGMENTS at offsets (9,11),(11,13),(13,15) and BT_SEGMENTS at offsets (17,19),(19,21),(21,23). tfg_total = sum(tfg_times); bt_total = sum(bt_times). If total == 65535, sentinel maps to -1. Source: disassembly/AM35model.dis get_sleep_time (line 1862).",
+  "transport": "am35-direct",
+  "reader": {
+    "command": "am35-sleep-time",
+    "raceId": [19, 48],
+    "raceIdHex": "0x3013",
+    "checksum": null
+  },
+  "samples": [
+    {
+      "responsePayload": [5, 90, 2, 0, 19, 48, 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0],
+      "expectedParsed": {
+        "tfgPart1": 60,
+        "tfgPart2": 0,
+        "tfgPart3": 0,
+        "btPart1": 30,
+        "btPart2": 0,
+        "btPart3": 0,
+        "wirelessSleepRawParts": 60,
+        "bluetoothSleepRawParts": 30,
+        "wirelessSleepValue": 60,
+        "bluetoothSleepValue": 30
+      },
+      "comment": "TFG sum=60, BT sum=30; no sentinel"
+    },
+    {
+      "responsePayload": [5, 90, 2, 0, 19, 48, 0, 0, 0, 10, 0, 20, 0, 30, 0, 0, 0, 5, 0, 10, 0, 15, 0, 0],
+      "expectedParsed": {
+        "tfgPart1": 10,
+        "tfgPart2": 20,
+        "tfgPart3": 30,
+        "btPart1": 5,
+        "btPart2": 10,
+        "btPart3": 15,
+        "wirelessSleepRawParts": 60,
+        "bluetoothSleepRawParts": 30,
+        "wirelessSleepValue": 60,
+        "bluetoothSleepValue": 30
+      },
+      "comment": "Three non-zero segments per group; sums match"
+    },
+    {
+      "responsePayload": [5, 90, 2, 0, 19, 48, 0, 0, 0, 255, 255, 0, 0, 0, 0, 0, 0, 255, 255, 0, 0, 0, 0, 0],
+      "expectedParsed": {
+        "tfgPart1": 65535,
+        "tfgPart2": 0,
+        "tfgPart3": 0,
+        "btPart1": 65535,
+        "btPart2": 0,
+        "btPart3": 0,
+        "wirelessSleepRawParts": 65535,
+        "bluetoothSleepRawParts": 65535,
+        "wirelessSleepValue": -1,
+        "bluetoothSleepValue": -1
+      },
+      "comment": "Sum == 65535 triggers sentinel -> -1"
+    }
+  ]
+}
