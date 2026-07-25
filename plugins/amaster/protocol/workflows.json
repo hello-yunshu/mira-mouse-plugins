@@ -259,17 +259,33 @@
     "am35-receiver-set-receiver-lighting": {
       "transport": "am35-receiver",
       "inputs": {
-        "effect": { "kind": "integer", "min": 0, "max": 8 },
+        "enabled": { "kind": "integer", "allowed": [0, 1] },
+        "type": { "kind": "integer", "min": 0, "max": 8 },
+        "color1": { "kind": "color" },
+        "ratio1": { "kind": "integer", "min": 0, "max": 100 },
+        "color2": { "kind": "color" },
+        "ratio2": { "kind": "integer", "min": 0, "max": 100 },
+        "color3": { "kind": "color" },
+        "ratio3": { "kind": "integer", "min": 0, "max": 100 },
         "speed": { "kind": "integer", "min": 0, "max": 4 },
-        "brightness": { "kind": "integer", "min": 0, "max": 4 },
-        "option": { "kind": "integer", "min": 0, "max": 8 },
-        "color": { "kind": "color" }
+        "brightness": { "kind": "integer", "min": 0, "max": 4 }
       },
       "read": { "command": "am35-receiver-light", "parser": "am35-receiver-light" },
       "writeCommand": "am35-receiver-light-write",
       "preserveUnknown": false,
       "settleMs": 30,
-      "verify": { "command": "am35-receiver-light", "parser": "am35-receiver-light", "assertions": [{ "field": "type", "param": "effect" }, { "field": "speed", "param": "speed" }, { "field": "brightness", "param": "brightness" }] }
+      "verify": { "command": "am35-receiver-light", "parser": "am35-receiver-light", "assertions": [
+        { "field": "enabled", "param": "enabled" },
+        { "field": "type", "param": "type" },
+        { "field": "color1", "param": "color1" },
+        { "field": "ratio1", "param": "ratio1" },
+        { "field": "color2", "param": "color2" },
+        { "field": "ratio2", "param": "ratio2" },
+        { "field": "color3", "param": "color3" },
+        { "field": "ratio3", "param": "ratio3" },
+        { "field": "speed", "param": "speed" },
+        { "field": "brightness", "param": "brightness" }
+      ] }
     },
     "am35-direct-set-profile": {
       "transport": "am35-direct",

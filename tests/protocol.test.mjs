@@ -163,12 +163,18 @@ test('AMaster declares complete declarative host capability metadata', async () 
     'capabilities.settings.angleSnap',
     'capabilities.settings.liftCutOff',
   ]);
-  assert.deepEqual(capabilities.lighting.metadata.zones.map((zone) => zone.id), ['mouse', 'receiver']);
+  // Protocol A 与 AM35 接收器灯光以独立 zone 暴露，分别通过
+  // visibleWhen.capabilities.receiverLighting / capabilities.receiverLight 区分。
+  assert.deepEqual(capabilities.lighting.metadata.zones.map((zone) => zone.id), ['mouse', 'receiver', 'receiver-am35']);
   assert.equal(capabilities.lighting.metadata.zones[0].fields[0].mutation, 'set-mouse-lighting');
   assert.deepEqual(Object.keys(capabilities.lighting.metadata.zones[0].fields[0].paramSources).sort(), ['color', 'enabled']);
   assert.equal(capabilities.lighting.metadata.zones[0].fields[1].visibleWhen, undefined);
   assert.equal(capabilities.lighting.metadata.zones[1].fields.length, 5);
   assert.deepEqual(Object.keys(capabilities.lighting.metadata.zones[1].fields[0].paramSources).sort(), ['brightness', 'color', 'effect', 'option', 'speed']);
+  // AM35 receiver-am35 zone 暴露十字段，与 AM35 mutation inputs 严格对齐。
+  assert.equal(capabilities.lighting.metadata.zones[2].fields.length, 10);
+  assert.deepEqual(capabilities.lighting.metadata.zones[2].fields.map((field) => field.id),
+    ['enabled', 'type', 'color1', 'ratio1', 'color2', 'ratio2', 'color3', 'ratio3', 'speed', 'brightness']);
   assert.equal(capabilities.profile.metadata.statusDisplay.valueSource, 'state.profile');
   assert.equal(capabilities.firmware.metadata.fields[0].editor, 'static-readonly');
   assert.deepEqual(

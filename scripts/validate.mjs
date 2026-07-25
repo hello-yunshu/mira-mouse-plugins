@@ -260,16 +260,23 @@ function validateFieldMutationCoverage(name, capabilityId, field) {
   ]);
   if (field.editor !== 'inline-action') covered.add(field.param ?? 'value');
   for (const mutationRef of mutationRefs(field.mutation)) {
+    // 同一 mutationRef 可能存在多个 family-scoped variants（例如
+    // `protocol-a-receiver-set-receiver-lighting` 和
+    // `am35-receiver-set-receiver-lighting`）。运行时按 device family
+    // 只会激活其中一个 variant，因此字段只需覆盖至少一个 variant 的输入，
+    // 不要求覆盖所有 variants 的并集。
     const definitions = Object.entries(pluginData[name].mutations)
       .filter(([id]) => id === mutationRef || id.endsWith(`-${mutationRef}`))
       .map(([, mutation]) => mutation);
     if (definitions.length === 0) fail(`${name}/${capabilityId}/${field.id}: unknown mutation ${mutationRef}`);
-    for (const definition of definitions) {
-      const missing = Object.keys(definition.inputs ?? {}).filter((param) => !covered.has(param));
-      if (missing.length > 0) {
-        fail(`${name}/${capabilityId}/${field.id}: mutation ${mutationRef} is missing declared params ${missing.join(', ')}`);
-      }
-    }
+    const missingByVariant = definitions.map((definition) =>
+      Object.keys(definition.inputs ?? {}).filter((param) => !covered.has(param)),
+    );
+    const coveredAny = missingByVariant.some((missing) => missing.length === 0);
+    if (coveredAny) continue;
+    // 报告 missing 最少的 variant，给出最贴近意图的诊断信息。
+    const minMissing = missingByVariant.reduce((min, current) => (current.length < min.length ? current : min));
+    fail(`${name}/${capabilityId}/${field.id}: mutation ${mutationRef} is missing declared params ${minMissing.join(', ')}`);
   }
 }
 function validateDeclarativeCapability(name, capability) {
