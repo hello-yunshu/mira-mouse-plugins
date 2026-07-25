@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "case": "am35-receiver-light-complete-mapping",
   "evidence": "fixture-verified",
-  "description": "Complete AM35 receiver light response exercising every parser field (enabled, type, color1-3, ratio1-3, speed, brightness). Used to verify that capabilities.json semanticMappings.receiverLighting preserves all fields without loss.",
+  "description": "Complete AM35 receiver light response exercising every parser field (enabled, type, color1-3, ratio1-3, rawSpeed/speed, brightness). Wire speed at offset 19 is 82 (UI speed 2 via lookup table 80-84 -> 0-4). Used to verify that capabilities.json semanticMappings.receiverLighting preserves all fields without loss.",
   "parser": "am35-receiver-light",
-  "payload": [5, 90, 2, 0, 14, 48, 0, 0, 1, 2, 0, 0, 100, 1, 254, 50, 3, 252, 30, 2, 3],
+  "payload": [5, 90, 2, 0, 14, 48, 0, 0, 1, 2, 0, 0, 100, 1, 254, 50, 3, 252, 30, 82, 3],
   "expectedParsed": {
     "enabled": 1,
     "type": 2,
@@ -14,6 +14,7 @@
     "ratio2": 50,
     "color3": "#0000FF",
     "ratio3": 30,
+    "rawSpeed": 82,
     "speed": 2,
     "brightness": 3
   },
@@ -36,8 +37,8 @@
     }
   },
   "fieldCoverage": {
-    "parserFields": ["enabled", "type", "color1", "ratio1", "color2", "ratio2", "color3", "ratio3", "speed", "brightness"],
+    "parserFields": ["enabled", "type", "color1", "ratio1", "color2", "ratio2", "color3", "ratio3", "rawSpeed", "speed", "brightness"],
     "preservedFields": ["enabled", "effect", "type", "color", "color1", "color2", "color3", "ratio1", "ratio2", "ratio3", "speed", "brightness"],
-    "droppedFields": []
+    "droppedFields": ["rawSpeed"]
   }
 }
