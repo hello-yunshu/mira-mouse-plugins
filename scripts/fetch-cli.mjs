@@ -7,6 +7,12 @@
 //   4. 校验 SHA-256（必须与 version.json 完全一致）
 //   5. 解压并返回 mira-plugin 可执行文件路径
 //
+// 本地开发模式（localDev: true）：
+//   当 version.json 的 localDev=true 且当前平台 SHA 仍为 PENDING_RELEASE_PUBLISH 时，
+//   要求 MIRA_PLUGIN_CLI_LOCAL 环境变量指向本地构建的二进制路径（跳过下载+SHA校验）。
+//   这用于 BOOTSTRAP_PROMPT.md 禁止 AI 创建正式 Release 时的本地闭环验证。
+//   生产闭环需要维护者推送 mira-plugin-cli-v1.0.0 tag 触发 release workflow，回填四平台 SHA。
+//
 // 退出码：
 //   0 — 成功，最后一行打印可执行文件绝对路径
 //   1 — 下载/校验/解压失败
@@ -85,9 +91,24 @@ export async function fetchCli() {
     throw new Error(`no CLI binary pinned for target ${target} in ${versionFile}`);
   }
   if (targetInfo.sha256 === 'PENDING_RELEASE_PUBLISH') {
+    // 3.5 节本地开发模式：当 version.json 标记 localDev=true 且当前平台 SHA 仍为
+    // PENDING_RELEASE_PUBLISH 时，允许通过 MIRA_PLUGIN_CLI_LOCAL 环境变量指向
+    // 本地 cargo build --release 构建的二进制路径，跳过下载+SHA 校验。
+    // 这仅用于 BOOTSTRAP 期间的本地闭环验证，生产环境必须回填真实 SHA。
+    if (version.localDev && process.env.MIRA_PLUGIN_CLI_LOCAL && existsSync(process.env.MIRA_PLUGIN_CLI_LOCAL)) {
+      const localPath = process.env.MIRA_PLUGIN_CLI_LOCAL;
+      const versionOutput = execFileSync(localPath, ['--version'], { encoding: 'utf8' }).trim();
+      if (!versionOutput.includes(version.version)) {
+        throw new Error(`local CLI version mismatch: expected ${version.version}, got:\n${versionOutput}`);
+      }
+      console.log(`fetch-cli: using local build (localDev mode, SHA not verified)`);
+      console.log(`fetch-cli: ${versionOutput.replace(/\n/g, ' | ')}`);
+      return localPath;
+    }
     throw new Error(
-      `mira-plugin-cli ${version.version} has not been published yet. ` +
-      `Push tag ${version.releaseTag} to ${version.repository} and update ${versionFile} with real SHA-256 values.`,
+      `mira-plugin-cli ${version.version} has not been published yet for target ${target}. ` +
+      `Push tag ${version.releaseTag} to ${version.repository} and update ${versionFile} with real SHA-256 values. ` +
+      `For local development (localDev=true), set MIRA_PLUGIN_CLI_LOCAL to a locally built mira-plugin binary path.`,
     );
   }
 
