@@ -202,6 +202,60 @@
       "settleMs": 30,
       "verify": { "command": "lighting", "parser": "lighting", "assertions": [{ "field": "effect", "param": "effect" }, { "field": "speed", "param": "speed" }, { "field": "brightness", "param": "brightness" }, { "field": "option", "param": "option" }, { "field": "color", "param": "color" }] }
     },
+    "protocol-a-direct-set-fps": {
+      "transport": "protocol-a",
+      "inputs": { "enabled": { "kind": "boolean" } },
+      "read": { "command": "fps", "parser": "fps" },
+      "writeCommand": "fps-write",
+      "preserveUnknown": true,
+      "settleMs": 30,
+      "verify": { "command": "fps", "parser": "fps", "assertions": [{ "field": "enabled", "param": "enabled" }] }
+    },
+    "protocol-a-receiver-set-fps": {
+      "transport": "protocol-a-receiver",
+      "inputs": { "enabled": { "kind": "boolean" } },
+      "read": { "command": "fps", "parser": "fps" },
+      "writeCommand": "fps-write",
+      "preserveUnknown": true,
+      "settleMs": 30,
+      "verify": { "command": "fps", "parser": "fps", "assertions": [{ "field": "enabled", "param": "enabled" }] }
+    },
+    "protocol-a-direct-set-dpi-button": {
+      "transport": "protocol-a",
+      "inputs": { "enabled": { "kind": "boolean" } },
+      "read": { "command": "dpi-button", "parser": "dpi-button" },
+      "writeCommand": "dpi-button-write",
+      "preserveUnknown": true,
+      "settleMs": 30,
+      "verify": { "command": "dpi-button", "parser": "dpi-button", "assertions": [{ "field": "enabled", "param": "enabled" }] }
+    },
+    "protocol-a-receiver-set-dpi-button": {
+      "transport": "protocol-a-receiver",
+      "inputs": { "enabled": { "kind": "boolean" } },
+      "read": { "command": "dpi-button", "parser": "dpi-button" },
+      "writeCommand": "dpi-button-write",
+      "preserveUnknown": true,
+      "settleMs": 30,
+      "verify": { "command": "dpi-button", "parser": "dpi-button", "assertions": [{ "field": "enabled", "param": "enabled" }] }
+    },
+    "protocol-a-direct-set-character-light": {
+      "transport": "protocol-a",
+      "inputs": { "enabled": { "kind": "boolean" } },
+      "read": { "command": "mouse-light-switch", "parser": "mouse-light-switch" },
+      "writeCommand": "mouse-light-switch-write",
+      "preserveUnknown": true,
+      "settleMs": 30,
+      "verify": { "command": "mouse-light-switch", "parser": "mouse-light-switch", "assertions": [{ "field": "enabled", "param": "enabled" }] }
+    },
+    "protocol-a-receiver-set-character-light": {
+      "transport": "protocol-a-receiver",
+      "inputs": { "enabled": { "kind": "boolean" } },
+      "read": { "command": "mouse-light-switch", "parser": "mouse-light-switch" },
+      "writeCommand": "mouse-light-switch-write",
+      "preserveUnknown": true,
+      "settleMs": 30,
+      "verify": { "command": "mouse-light-switch", "parser": "mouse-light-switch", "assertions": [{ "field": "enabled", "param": "enabled" }] }
+    },
     "am35-receiver-set-receiver-lighting": {
       "transport": "am35-receiver",
       "inputs": {
