@@ -2,46 +2,33 @@
   "schemaVersion": 1,
   "case": "am35-sleep-time-write",
   "evidence": "reverse-confirmed",
-  "description": "AM35 setSleepTime (RACE raceId 0x3012) writes 6 le-u16 segments. Frame format: 05 5A 1A 00 12 30 [bt1 le-u16] [bt2 le-u16] [bt3 le-u16] 00 00 [tfg1 le-u16] [tfg2 le-u16] [tfg3 le-u16] 00 00 3C 00 1E 00 3C 00 1E 00. Note: BT segments come BEFORE TFG segments in the write frame (read order is TFG first). Total length 30 bytes. Source: disassembly/AM35model.dis setSleepTime (line 1522).",
+  "description": "AM35 setSleepTime (RACE raceId 0x3012) writes 6 le-u16 segments via semantic encoding. Each semantic value (-1 = never sleep, or seconds 0..65535) is split into three le-u16 parts via sleep-semantic-triple-le-u16: wire = (semantic == -1) ? 65535 : semantic; base = wire // 3; rem = wire % 3; parts = [base, base, base + rem]. Frame format: 05 5A 1A 00 12 30 [bt1 le-u16] [bt2 le-u16] [bt3 le-u16] 00 00 [tfg1 le-u16] [tfg2 le-u16] [tfg3 le-u16] 00 00 3C 00 1E 00 3C 00 1E 00. Note: BT segments come BEFORE TFG segments in the write frame (read order is TFG first). Total length 30 bytes. Source: disassembly/AM35model.dis setSleepTime (line 1522).",
   "transport": "am35-direct",
   "setter": {
     "command": "am35-sleep-time-write",
     "raceId": [18, 48],
     "raceIdHex": "0x3012",
     "params": [
-      { "name": "btPart1", "offset": 6, "encoding": "le-u16" },
-      { "name": "btPart2", "offset": 8, "encoding": "le-u16" },
-      { "name": "btPart3", "offset": 10, "encoding": "le-u16" },
-      { "name": "tfgPart1", "offset": 14, "encoding": "le-u16" },
-      { "name": "tfgPart2", "offset": 16, "encoding": "le-u16" },
-      { "name": "tfgPart3", "offset": 18, "encoding": "le-u16" }
+      { "name": "bluetoothSleepValue", "offset": 6, "encoding": "sleep-semantic-triple-le-u16" },
+      { "name": "wirelessSleepValue", "offset": 14, "encoding": "sleep-semantic-triple-le-u16" }
     ],
     "checksum": null
   },
   "samples": [
     {
-      "input": {
-        "tfgPart1": 60, "tfgPart2": 0, "tfgPart3": 0,
-        "btPart1": 30, "btPart2": 0, "btPart3": 0
-      },
-      "expectedRequestPayload": [5, 90, 26, 0, 18, 48, 30, 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 60, 0, 30, 0, 60, 0, 30, 0],
-      "comment": "BT(30,0,0) then TFG(60,0,0); trailing 00 00 3C 00 1E 00 3C 00 1E 00"
+      "input": { "wirelessSleepValue": 60, "bluetoothSleepValue": 30 },
+      "expectedRequestPayload": [5, 90, 26, 0, 18, 48, 10, 0, 10, 0, 10, 0, 0, 0, 20, 0, 20, 0, 20, 0, 0, 0, 60, 0, 30, 0, 60, 0, 30, 0],
+      "comment": "BT=30 → [10,10,10] (base=10, rem=0); TFG=60 → [20,20,20] (base=20, rem=0); trailing 00 00 3C 00 1E 00 3C 00 1E 00"
     },
     {
-      "input": {
-        "tfgPart1": 10, "tfgPart2": 20, "tfgPart3": 30,
-        "btPart1": 5, "btPart2": 10, "btPart3": 15
-      },
-      "expectedRequestPayload": [5, 90, 26, 0, 18, 48, 5, 0, 10, 0, 15, 0, 0, 0, 10, 0, 20, 0, 30, 0, 0, 0, 60, 0, 30, 0, 60, 0, 30, 0],
-      "comment": "All six segments non-zero; sums TFG=60, BT=30"
+      "input": { "wirelessSleepValue": 61, "bluetoothSleepValue": 31 },
+      "expectedRequestPayload": [5, 90, 26, 0, 18, 48, 10, 0, 10, 0, 11, 0, 0, 0, 20, 0, 20, 0, 21, 0, 0, 0, 60, 0, 30, 0, 60, 0, 30, 0],
+      "comment": "BT=31 → [10,10,11] (base=10, rem=1); TFG=61 → [20,20,21] (base=20, rem=1)"
     },
     {
-      "input": {
-        "tfgPart1": 65535, "tfgPart2": 0, "tfgPart3": 0,
-        "btPart1": 65535, "btPart2": 0, "btPart3": 0
-      },
-      "expectedRequestPayload": [5, 90, 26, 0, 18, 48, 255, 255, 0, 0, 0, 0, 0, 0, 255, 255, 0, 0, 0, 0, 0, 0, 60, 0, 30, 0, 60, 0, 30, 0],
-      "comment": "Sentinel input: each group carries a single 65535 segment so sum=65535 -> -1"
+      "input": { "wirelessSleepValue": -1, "bluetoothSleepValue": -1 },
+      "expectedRequestPayload": [5, 90, 26, 0, 18, 48, 85, 85, 85, 85, 85, 85, 0, 0, 85, 85, 85, 85, 85, 85, 0, 0, 60, 0, 30, 0, 60, 0, 30, 0],
+      "comment": "Sentinel: -1 → wire=65535 → 65535/3=21845 r0 → parts=[21845, 21845, 21845]; 21845 le-u16 = 0x5555 = [0x55, 0x55] = [85, 85]; so each group is [85,85,85,85,85,85]"
     }
   ],
   "readback": {
