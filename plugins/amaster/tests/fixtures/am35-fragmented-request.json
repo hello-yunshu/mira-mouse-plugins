@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "case": "am35-fragmented-request",
+  "description": "Master Spec 3.2 / Section 7 回归 fixture：出站分片。当 RACE payload 超过 maxPayloadPerPacket=59 时，宿主拆分为多个写报告。AM35 写报告格式：[0x06(reportId), length, type, ...59 字节 payload...]。每片 length 字段（rest[0]）编码该片 payload 长度，type=0。片间延迟 packetIntervalMs=10ms。AM35 无需 payload 内 seq/length（frame 级 length 字段已表达每片长度）。",
+  "transport": "am35-direct",
+  "fragmentConfig": {
+    "fragmentPayload": true,
+    "maxPayloadPerPacket": 59,
+    "packetIntervalMs": 10,
+    "comment": "AM35: writeLength=62, reportId=1 字节, frame header=2 字节 → 每包 59 字节 payload"
+  },
+  "request": {
+    "payloadLength": 100,
+    "payloadPrefix": [5, 90, 94, 0, 207, 48],
+    "comment": "05 5A 5E 00 CF 30 — RACE payload 100 字节，length 字段=94（0x5E 0x00 LE，表示 94 字节参数）。RaceID=0xCF30。后接 94 字节参数数据。"
+  },
+  "expectedFragments": [
+    {
+      "index": 0,
+      "reportId": 6,
+      "rest": [59, 0],
+      "payloadLength": 59,
+      "comment": "首片：length=59，type=0，payload=前 59 字节（含 RACE 头 05 5A 5E 00 CF 30 + 53 字节参数）"
+    },
+    {
+      "index": 1,
+      "reportId": 6,
+      "rest": [41, 0],
+      "payloadLength": 41,
+      "comment": "次片：length=41，type=0，payload=剩余 41 字节参数。片间间隔 10ms。"
+    }
+  ],
+  "expectedBehavior": "plan_request_fragments 将 100 字节 payload 按 59 字节分片：片0=59 字节，片1=41 字节。每片构造完整写报告 [0x06, length, type=0, ...payload...]，依次发送，片间延迟 packetIntervalMs。frame 级 length 字段（lengthFieldOffset=0, 1 字节）自动编码每片 payload 长度。",
+  "evidence": "fixture-confirmed"
+}

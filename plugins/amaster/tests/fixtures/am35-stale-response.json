@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "case": "am35-stale-response",
+  "description": "Master Spec 3.2 / Section 7 回归 fixture：stale-response drain。写新请求前，管道中残留上次请求的响应（RaceID 不匹配）。宿主在写请求前主动 read_timeout 排空 staleDrainReads 次（默认 3），每次 staleDrainTimeoutMs=10ms，丢弃读到的数据。排空后再写请求并读取匹配响应。",
+  "transport": "am35-direct",
+  "staleDrain": {
+    "staleDrainReads": 3,
+    "staleDrainTimeoutMs": 10,
+    "comment": "写请求前循环 read_timeout 3 次，每次 10ms 超时，丢弃数据。"
+  },
+  "stalePackets": [
+    {
+      "reportId": 7,
+      "rest": [9, 0, 5, 90, 2, 0, 201, 48],
+      "comment": "残留响应：RaceID=0xC930（上一次 DPI 查询），与本次请求 RaceID=0xCF30 不匹配。"
+    },
+    {
+      "reportId": 7,
+      "rest": [9, 0, 5, 90, 2, 0, 197, 48],
+      "comment": "残留响应：RaceID=0xC530（更早的 DPI 数据查询）。"
+    }
+  ],
+  "request": {
+    "payload": [5, 90, 2, 0, 207, 48],
+    "raceId": [207, 48],
+    "comment": "05 5A 02 00 CF 30 — 电池查询，RaceID=0xCF30"
+  },
+  "freshResponse": {
+    "reportId": 7,
+    "rest": [9, 0, 5, 90, 2, 0, 207, 48, 100],
+    "comment": "匹配响应：RaceID=0xCF30，电量=100。"
+  },
+  "expectedBehavior": "staleDrainReads=3 时，宿主在写请求前调用 read_timeout 3 次（每次 10ms 超时）。残留响应被读取并丢弃。随后写请求并读取到 RaceID 匹配的新响应。若无 stale 残留，read_timeout 快速超时（10ms），不影响延迟。",
+  "evidence": "fixture-confirmed"
+}

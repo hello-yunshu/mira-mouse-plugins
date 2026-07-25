@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "case": "am35-multi-packet-response",
+  "description": "Master Spec 3.2 / Section 7 回归 fixture：AM35 多包响应组装。首包 response rest 在 offset 3 处出现 0x5B 标记（RACE 0x5A 的多包变体），offset 4..6 为 total_length（小端 2 字节）。宿主循环收取后续包，从 continuation_offset=2（即 payload_off）拼接，截断到 total_length。",
+  "transport": "am35-direct",
+  "frameLayout": {
+    "comment": "response rest（reportId 已 strip）= [length, type, ...payload...]",
+    "lengthFieldOffset": 0,
+    "lengthFieldBytes": 1,
+    "typeFieldOffset": 1,
+    "payloadOffset": 2,
+    "multiPacketMarkerOffset": 3,
+    "multiPacketMarkerValue": 91,
+    "multiPacketTotalLengthOffset": 4,
+    "multiPacketTotalLengthBytes": 2,
+    "multiPacketContinuationOffset": 2,
+    "endian": "le"
+  },
+  "request": {
+    "payload": [5, 90, 2, 0, 207, 48],
+    "raceId": [207, 48],
+    "comment": "05 5A 02 00 CF 30 — 电池查询，RaceID=0xCF30"
+  },
+  "responsePackets": [
+    {
+      "index": 0,
+      "reportId": 7,
+      "rest": [61, 0, 5, 91, 80, 0, 207, 48, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53],
+      "comment": "首包：0x5B 标记在 rest[3]，total_length=80（0x50 0x00 LE）在 rest[4..6]，RaceID=0xCF30 在 rest[6..8]。payload=rest[2..]=59 字节。"
+    },
+    {
+      "index": 1,
+      "reportId": 7,
+      "rest": [21, 0, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73],
+      "comment": "后续包：21 字节数据在 rest[2..]。累计 59+21=80=total_length，组装完成。"
+    }
+  ],
+  "expectedAssembledPayloadLength": 80,
+  "expectedAssembledPayloadPrefix": [5, 91, 80, 0, 207, 48, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  "expectedBehavior": "宿主 MultiPacketAssembler 识别 0x5B 标记，读取 total_length=80，收取 1 个后续包，拼接 payload 后截断到 80 字节。重构为单包 rest 格式返回：[length=80, type=0, ...80 字节 payload...]。",
+  "evidence": "fixture-confirmed"
+}

@@ -42,7 +42,21 @@
       "readMode": "input-report",
       "readDelayMs": 50,
       "readTimeoutMs": 1000,
-      "readRetries": 20
+      "readRetries": 20,
+      "fragmentPayload": true,
+      "maxPayloadPerPacket": 59,
+      "multiPacketMarkerOffset": 3,
+      "multiPacketMarkerValue": 91,
+      "multiPacketTotalLengthOffset": 4,
+      "multiPacketTotalLengthBytes": 2,
+      "multiPacketContinuationOffset": 2,
+      "multiPacketMaxPackets": 16,
+      "multiPacketMaxTotalLength": 4096,
+      "staleDrainReads": 3,
+      "staleDrainTimeoutMs": 10,
+      "initialReadDelayMs": 50,
+      "packetIntervalMs": 10,
+      "retryIntervalMs": 20
     },
     "am35-receiver": {
       "kind": "hid-framed",
@@ -63,7 +77,21 @@
       "readMode": "input-report",
       "readDelayMs": 50,
       "readTimeoutMs": 1000,
-      "readRetries": 20
+      "readRetries": 20,
+      "fragmentPayload": true,
+      "maxPayloadPerPacket": 59,
+      "multiPacketMarkerOffset": 3,
+      "multiPacketMarkerValue": 91,
+      "multiPacketTotalLengthOffset": 4,
+      "multiPacketTotalLengthBytes": 2,
+      "multiPacketContinuationOffset": 2,
+      "multiPacketMaxPackets": 16,
+      "multiPacketMaxTotalLength": 4096,
+      "staleDrainReads": 3,
+      "staleDrainTimeoutMs": 10,
+      "initialReadDelayMs": 50,
+      "packetIntervalMs": 10,
+      "retryIntervalMs": 20
     }
   }
 }
