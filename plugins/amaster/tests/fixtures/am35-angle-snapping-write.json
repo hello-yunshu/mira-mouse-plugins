@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "case": "am35-angle-snapping-write",
+  "evidence": "reverse-confirmed",
+  "description": "AM35 angle snapping setter (set_angle_snapping) uses RACE raceId 0x30D4. Param angleSnap encoded as u8 at offset 6. RACE framing: [0x05, 0x5A, length_le_u16, raceId_le_u16, ...params]. No request checksum. Source: disassembly/AM35model.dis set_angle_snapping. Getter 0x30D5 returns res[9] parsed as u8 (parsers.json am35-angle-snapping).",
+  "transport": "am35-direct",
+  "setter": {
+    "command": "am35-angle-snapping-write",
+    "raceId": [212, 48],
+    "raceIdHex": "0x30D4",
+    "params": [
+      { "name": "angleSnap", "offset": 6, "encoding": "u8" }
+    ],
+    "checksum": null
+  },
+  "samples": [
+    {
+      "input": { "angleSnap": 1 },
+      "expectedRequestPayload": [5, 90, 3, 0, 212, 48, 1]
+    },
+    {
+      "input": { "angleSnap": 0 },
+      "expectedRequestPayload": [5, 90, 3, 0, 212, 48, 0]
+    }
+  ],
+  "readback": {
+    "command": "am35-angle-snapping",
+    "raceId": [213, 48],
+    "raceIdHex": "0x30D5",
+    "parser": "am35-angle-snapping",
+    "responseSample": [5, 90, 3, 0, 213, 48, 0, 0, 0, 1],
+    "expectedParsed": { "angleSnap": 1 }
+  }
+}

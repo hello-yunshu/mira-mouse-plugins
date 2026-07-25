@@ -182,13 +182,13 @@
     "am35-fps": {
       "validWhen": [],
       "fields": {
-        "enabled": { "offset": 8, "kind": "u8" }
+        "enabled": { "offset": 8, "kind": "bool" }
       }
     },
     "am35-dpi-button": {
       "validWhen": [],
       "fields": {
-        "enabled": { "offset": 9, "kind": "u8" }
+        "enabled": { "offset": 9, "kind": "bool" }
       }
     },
     "am35-rotation": {

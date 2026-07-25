@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "case": "am35-dpi-button-write",
+  "evidence": "reverse-confirmed",
+  "description": "AM35 DPI button setter (set_dpi_button) uses RACE raceId 0x30EA. Param enabled encoded as bool-lookup-u8 at offset 6 with lookup {true:24, false:0}. Value 24 (0x18) is the special encoding confirmed by AM35_EVIDENCE section 5 and disassembly/AM35model.dis set_dpi_button. RACE framing: [0x05, 0x5A, length_le_u16, raceId_le_u16, ...params]. No request checksum. Getter 0x30EB returns res[9] parsed as bool (parsers.json am35-dpi-button); parser bool kind treats non-zero (including 24) as true.",
+  "transport": "am35-direct",
+  "setter": {
+    "command": "am35-dpi-button-write",
+    "raceId": [234, 48],
+    "raceIdHex": "0x30EA",
+    "params": [
+      { "name": "enabled", "offset": 6, "encoding": "bool-lookup-u8", "lookup": { "true": 24, "false": 0 } }
+    ],
+    "checksum": null
+  },
+  "samples": [
+    {
+      "input": { "enabled": true },
+      "expectedRequestPayload": [5, 90, 3, 0, 234, 48, 24],
+      "comment": "true encodes as 24 (0x18) per AM35 special encoding"
+    },
+    {
+      "input": { "enabled": false },
+      "expectedRequestPayload": [5, 90, 3, 0, 234, 48, 0],
+      "comment": "false encodes as 0"
+    }
+  ],
+  "readback": {
+    "command": "am35-dpi-button",
+    "raceId": [235, 48],
+    "raceIdHex": "0x30EB",
+    "parser": "am35-dpi-button",
+    "responseSample": [5, 90, 3, 0, 235, 48, 0, 0, 0, 24],
+    "expectedParsed": { "enabled": true },
+    "comment": "readback byte at offset 9 is 24 (0x18); parser bool kind treats non-zero as true"
+  }
+}

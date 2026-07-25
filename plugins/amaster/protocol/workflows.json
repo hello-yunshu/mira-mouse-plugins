@@ -288,6 +288,246 @@
       "preserveUnknown": false,
       "settleMs": 30,
       "verify": { "command": "am35-profile", "parser": "am35-profile", "assertions": [{ "field": "profile", "param": "profile" }] }
+    },
+    "am35-direct-set-debounce": {
+      "transport": "am35-direct",
+      "inputs": {
+        "usbDebounce": { "kind": "integer", "min": 0, "max": 255 },
+        "wirelessDebounce": { "kind": "integer", "min": 0, "max": 255 },
+        "bluetoothDebounce": { "kind": "integer", "min": 0, "max": 255 }
+      },
+      "read": { "command": "am35-debounce", "parser": "am35-debounce" },
+      "writeCommand": "am35-debounce-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-debounce", "parser": "am35-debounce", "assertions": [
+        { "field": "usbDebounce", "param": "usbDebounce" },
+        { "field": "wirelessDebounce", "param": "wirelessDebounce" },
+        { "field": "bluetoothDebounce", "param": "bluetoothDebounce" }
+      ] }
+    },
+    "am35-receiver-set-debounce": {
+      "transport": "am35-receiver",
+      "inputs": {
+        "usbDebounce": { "kind": "integer", "min": 0, "max": 255 },
+        "wirelessDebounce": { "kind": "integer", "min": 0, "max": 255 },
+        "bluetoothDebounce": { "kind": "integer", "min": 0, "max": 255 }
+      },
+      "read": { "command": "am35-debounce", "parser": "am35-debounce" },
+      "writeCommand": "am35-debounce-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-debounce", "parser": "am35-debounce", "assertions": [
+        { "field": "usbDebounce", "param": "usbDebounce" },
+        { "field": "wirelessDebounce", "param": "wirelessDebounce" },
+        { "field": "bluetoothDebounce", "param": "bluetoothDebounce" }
+      ] }
+    },
+    "am35-direct-set-lod": {
+      "transport": "am35-direct",
+      "inputs": { "liftCutOff": { "kind": "integer", "min": 0, "max": 255 } },
+      "read": { "command": "am35-lod", "parser": "am35-lod" },
+      "writeCommand": "am35-lod-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-lod", "parser": "am35-lod", "assertions": [{ "field": "liftCutOff", "param": "liftCutOff" }] }
+    },
+    "am35-receiver-set-lod": {
+      "transport": "am35-receiver",
+      "inputs": { "liftCutOff": { "kind": "integer", "min": 0, "max": 255 } },
+      "read": { "command": "am35-lod", "parser": "am35-lod" },
+      "writeCommand": "am35-lod-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-lod", "parser": "am35-lod", "assertions": [{ "field": "liftCutOff", "param": "liftCutOff" }] }
+    },
+    "am35-direct-set-motion-sync": {
+      "transport": "am35-direct",
+      "inputs": { "motionSync": { "kind": "integer", "min": 0, "max": 255 } },
+      "read": { "command": "am35-motion-sync", "parser": "am35-motion-sync" },
+      "writeCommand": "am35-motion-sync-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-motion-sync", "parser": "am35-motion-sync", "assertions": [{ "field": "motionSync", "param": "motionSync" }] }
+    },
+    "am35-receiver-set-motion-sync": {
+      "transport": "am35-receiver",
+      "inputs": { "motionSync": { "kind": "integer", "min": 0, "max": 255 } },
+      "read": { "command": "am35-motion-sync", "parser": "am35-motion-sync" },
+      "writeCommand": "am35-motion-sync-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-motion-sync", "parser": "am35-motion-sync", "assertions": [{ "field": "motionSync", "param": "motionSync" }] }
+    },
+    "am35-direct-set-angle-snapping": {
+      "transport": "am35-direct",
+      "inputs": { "angleSnap": { "kind": "integer", "min": 0, "max": 255 } },
+      "read": { "command": "am35-angle-snapping", "parser": "am35-angle-snapping" },
+      "writeCommand": "am35-angle-snapping-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-angle-snapping", "parser": "am35-angle-snapping", "assertions": [{ "field": "angleSnap", "param": "angleSnap" }] }
+    },
+    "am35-receiver-set-angle-snapping": {
+      "transport": "am35-receiver",
+      "inputs": { "angleSnap": { "kind": "integer", "min": 0, "max": 255 } },
+      "read": { "command": "am35-angle-snapping", "parser": "am35-angle-snapping" },
+      "writeCommand": "am35-angle-snapping-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-angle-snapping", "parser": "am35-angle-snapping", "assertions": [{ "field": "angleSnap", "param": "angleSnap" }] }
+    },
+    "am35-direct-set-ripple-control": {
+      "transport": "am35-direct",
+      "inputs": { "rippleControl": { "kind": "integer", "min": 0, "max": 255 } },
+      "read": { "command": "am35-ripple-control", "parser": "am35-ripple-control" },
+      "writeCommand": "am35-ripple-control-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-ripple-control", "parser": "am35-ripple-control", "assertions": [{ "field": "rippleControl", "param": "rippleControl" }] }
+    },
+    "am35-receiver-set-ripple-control": {
+      "transport": "am35-receiver",
+      "inputs": { "rippleControl": { "kind": "integer", "min": 0, "max": 255 } },
+      "read": { "command": "am35-ripple-control", "parser": "am35-ripple-control" },
+      "writeCommand": "am35-ripple-control-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-ripple-control", "parser": "am35-ripple-control", "assertions": [{ "field": "rippleControl", "param": "rippleControl" }] }
+    },
+    "am35-direct-set-fps": {
+      "transport": "am35-direct",
+      "inputs": { "enabled": { "kind": "boolean" } },
+      "read": { "command": "am35-fps", "parser": "am35-fps" },
+      "writeCommand": "am35-fps-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-fps", "parser": "am35-fps", "assertions": [{ "field": "enabled", "param": "enabled" }] }
+    },
+    "am35-receiver-set-fps": {
+      "transport": "am35-receiver",
+      "inputs": { "enabled": { "kind": "boolean" } },
+      "read": { "command": "am35-fps", "parser": "am35-fps" },
+      "writeCommand": "am35-fps-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-fps", "parser": "am35-fps", "assertions": [{ "field": "enabled", "param": "enabled" }] }
+    },
+    "am35-direct-set-dpi-button": {
+      "transport": "am35-direct",
+      "inputs": { "enabled": { "kind": "boolean" } },
+      "read": { "command": "am35-dpi-button", "parser": "am35-dpi-button" },
+      "writeCommand": "am35-dpi-button-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-dpi-button", "parser": "am35-dpi-button", "assertions": [{ "field": "enabled", "param": "enabled" }] }
+    },
+    "am35-receiver-set-dpi-button": {
+      "transport": "am35-receiver",
+      "inputs": { "enabled": { "kind": "boolean" } },
+      "read": { "command": "am35-dpi-button", "parser": "am35-dpi-button" },
+      "writeCommand": "am35-dpi-button-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-dpi-button", "parser": "am35-dpi-button", "assertions": [{ "field": "enabled", "param": "enabled" }] }
+    },
+    "am35-direct-set-polling-rate": {
+      "transport": "am35-direct",
+      "inputs": { "rate": { "kind": "integer", "allowed": [125, 250, 500, 1000, 2000, 4000, 8000] } },
+      "read": { "command": "am35-polling-rate", "parser": "am35-polling-rate" },
+      "writeCommand": "am35-polling-rate-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-polling-rate", "parser": "am35-polling-rate", "assertions": [{ "field": "pollingRate", "param": "rate" }] }
+    },
+    "am35-receiver-set-polling-rate": {
+      "transport": "am35-receiver",
+      "inputs": { "rate": { "kind": "integer", "allowed": [125, 250, 500, 1000, 2000, 4000, 8000] } },
+      "read": { "command": "am35-polling-rate", "parser": "am35-polling-rate" },
+      "writeCommand": "am35-polling-rate-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-polling-rate", "parser": "am35-polling-rate", "assertions": [{ "field": "pollingRate", "param": "rate" }] }
+    },
+    "am35-direct-set-rotation": {
+      "transport": "am35-direct",
+      "inputs": {
+        "enabled": { "kind": "integer", "min": 0, "max": 255 },
+        "angle": { "kind": "integer", "min": 0, "max": 255 }
+      },
+      "read": { "command": "am35-rotation", "parser": "am35-rotation" },
+      "writeCommand": "am35-rotation-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-rotation", "parser": "am35-rotation", "assertions": [
+        { "field": "enabled", "param": "enabled" },
+        { "field": "angle", "param": "angle" }
+      ] }
+    },
+    "am35-receiver-set-rotation": {
+      "transport": "am35-receiver",
+      "inputs": {
+        "enabled": { "kind": "integer", "min": 0, "max": 255 },
+        "angle": { "kind": "integer", "min": 0, "max": 255 }
+      },
+      "read": { "command": "am35-rotation", "parser": "am35-rotation" },
+      "writeCommand": "am35-rotation-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-rotation", "parser": "am35-rotation", "assertions": [
+        { "field": "enabled", "param": "enabled" },
+        { "field": "angle", "param": "angle" }
+      ] }
+    },
+    "am35-direct-set-dpi-stage": {
+      "transport": "am35-direct",
+      "inputs": { "stage": { "kind": "integer", "min": 1, "max": 8 } },
+      "read": { "command": "am35-dpi", "parser": "am35-dpi" },
+      "writeCommand": "am35-dpi-stage-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-dpi", "parser": "am35-dpi", "assertions": [{ "field": "currentStage", "param": "stage" }] }
+    },
+    "am35-receiver-set-dpi-stage": {
+      "transport": "am35-receiver",
+      "inputs": { "stage": { "kind": "integer", "min": 1, "max": 8 } },
+      "read": { "command": "am35-dpi", "parser": "am35-dpi" },
+      "writeCommand": "am35-dpi-stage-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-dpi", "parser": "am35-dpi", "assertions": [{ "field": "currentStage", "param": "stage" }] }
+    },
+    "am35-direct-set-dpi-value": {
+      "transport": "am35-direct",
+      "inputs": {
+        "stage": { "kind": "integer", "min": 1, "max": 8 },
+        "dpiX": { "kind": "integer", "min": 50, "max": 30000, "step": 50 },
+        "dpiY": { "kind": "integer", "min": 50, "max": 30000, "step": 50 }
+      },
+      "read": { "command": "am35-dpi", "parser": "am35-dpi" },
+      "writeCommand": "am35-dpi-value-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-dpi", "parser": "am35-dpi", "assertions": [
+        { "field": "dpiX", "param": "dpiX", "indexParam": "stage", "indexBase": 1 },
+        { "field": "dpiY", "param": "dpiY", "indexParam": "stage", "indexBase": 1 }
+      ] }
+    },
+    "am35-receiver-set-dpi-value": {
+      "transport": "am35-receiver",
+      "inputs": {
+        "stage": { "kind": "integer", "min": 1, "max": 8 },
+        "dpiX": { "kind": "integer", "min": 50, "max": 30000, "step": 50 },
+        "dpiY": { "kind": "integer", "min": 50, "max": 30000, "step": 50 }
+      },
+      "read": { "command": "am35-dpi", "parser": "am35-dpi" },
+      "writeCommand": "am35-dpi-value-write",
+      "preserveUnknown": false,
+      "settleMs": 30,
+      "verify": { "command": "am35-dpi", "parser": "am35-dpi", "assertions": [
+        { "field": "dpiX", "param": "dpiX", "indexParam": "stage", "indexBase": 1 },
+        { "field": "dpiY", "param": "dpiY", "indexParam": "stage", "indexBase": 1 }
+      ] }
     }
   }
 }

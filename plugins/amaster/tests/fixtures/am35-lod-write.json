@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "case": "am35-lod-write",
+  "evidence": "reverse-confirmed",
+  "description": "AM35 LOD (lift-off distance) setter (set_lod) uses RACE raceId 0x30CC. Param liftCutOff encoded as u8 at offset 6. RACE framing: [0x05, 0x5A, length_le_u16, raceId_le_u16, ...params]. No request checksum. Source: disassembly/AM35model.dis set_lod. Getter 0x30CD returns res[9] parsed as u8 (parsers.json am35-lod).",
+  "transport": "am35-direct",
+  "setter": {
+    "command": "am35-lod-write",
+    "raceId": [204, 48],
+    "raceIdHex": "0x30CC",
+    "params": [
+      { "name": "liftCutOff", "offset": 6, "encoding": "u8" }
+    ],
+    "checksum": null
+  },
+  "samples": [
+    {
+      "input": { "liftCutOff": 1 },
+      "expectedRequestPayload": [5, 90, 3, 0, 204, 48, 1]
+    },
+    {
+      "input": { "liftCutOff": 2 },
+      "expectedRequestPayload": [5, 90, 3, 0, 204, 48, 2]
+    }
+  ],
+  "readback": {
+    "command": "am35-lod",
+    "raceId": [205, 48],
+    "raceIdHex": "0x30CD",
+    "parser": "am35-lod",
+    "responseSample": [5, 90, 3, 0, 205, 48, 0, 0, 0, 1],
+    "expectedParsed": { "liftCutOff": 1 }
+  }
+}

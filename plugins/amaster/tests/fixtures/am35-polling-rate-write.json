@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "case": "am35-polling-rate-write",
+  "evidence": "reverse-confirmed",
+  "description": "AM35 polling rate setter (set_report_rate) uses RACE raceId 0x3010. Param rate encoded as le-u16 at offset 6. Allowed values: 125, 250, 500, 1000, 2000, 4000, 8000. RACE framing: [0x05, 0x5A, length_le_u16, raceId_le_u16, ...params]. No request checksum. Source: disassembly/AM35model.dis set_report_rate. Getter 0x3011 returns res[9..10] parsed as le-u16 (parsers.json am35-polling-rate).",
+  "transport": "am35-direct",
+  "setter": {
+    "command": "am35-polling-rate-write",
+    "raceId": [16, 48],
+    "raceIdHex": "0x3010",
+    "params": [
+      { "name": "rate", "offset": 6, "encoding": "le-u16" }
+    ],
+    "checksum": null
+  },
+  "samples": [
+    {
+      "input": { "rate": 1000 },
+      "expectedRequestPayload": [5, 90, 4, 0, 16, 48, 232, 3],
+      "comment": "1000 = 0x03E8 little-endian"
+    },
+    {
+      "input": { "rate": 8000 },
+      "expectedRequestPayload": [5, 90, 4, 0, 16, 48, 64, 31],
+      "comment": "8000 = 0x1F40 little-endian"
+    },
+    {
+      "input": { "rate": 125 },
+      "expectedRequestPayload": [5, 90, 4, 0, 16, 48, 125, 0],
+      "comment": "125 = 0x007D little-endian"
+    }
+  ],
+  "readback": {
+    "command": "am35-polling-rate",
+    "raceId": [17, 48],
+    "raceIdHex": "0x3011",
+    "parser": "am35-polling-rate",
+    "responseSample": [5, 90, 4, 0, 17, 48, 0, 0, 0, 232, 3],
+    "expectedParsed": { "pollingRate": 1000 }
+  }
+}

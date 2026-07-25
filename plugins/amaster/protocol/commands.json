@@ -223,5 +223,109 @@
       { "offset": 4, "value": "0xD7" },
       { "offset": 5, "value": "0x30" }
     ], "checksum": null } }
+    ,"am35-debounce-write": { "request": { "length": 9, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x05" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xE8" },
+      { "offset": 5, "value": "0x30" },
+      { "offset": 6, "param": "usbDebounce", "encoding": "u8" },
+      { "offset": 7, "param": "wirelessDebounce", "encoding": "u8" },
+      { "offset": 8, "param": "bluetoothDebounce", "encoding": "u8" }
+    ], "checksum": null } }
+    ,"am35-lod-write": { "request": { "length": 7, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x03" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xCC" },
+      { "offset": 5, "value": "0x30" },
+      { "offset": 6, "param": "liftCutOff", "encoding": "u8" }
+    ], "checksum": null } }
+    ,"am35-motion-sync-write": { "request": { "length": 7, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x03" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xD2" },
+      { "offset": 5, "value": "0x30" },
+      { "offset": 6, "param": "motionSync", "encoding": "u8" }
+    ], "checksum": null } }
+    ,"am35-angle-snapping-write": { "request": { "length": 7, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x03" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xD4" },
+      { "offset": 5, "value": "0x30" },
+      { "offset": 6, "param": "angleSnap", "encoding": "u8" }
+    ], "checksum": null } }
+    ,"am35-ripple-control-write": { "request": { "length": 7, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x03" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xD6" },
+      { "offset": 5, "value": "0x30" },
+      { "offset": 6, "param": "rippleControl", "encoding": "u8" }
+    ], "checksum": null } }
+    ,"am35-fps-write": { "request": { "length": 7, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x03" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xDE" },
+      { "offset": 5, "value": "0x30" },
+      { "offset": 6, "param": "enabled", "encoding": "bool" }
+    ], "checksum": null } }
+    ,"am35-dpi-button-write": { "request": { "length": 7, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x03" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xEA" },
+      { "offset": 5, "value": "0x30" },
+      { "offset": 6, "param": "enabled", "encoding": "bool-lookup-u8", "lookup": { "true": 24, "false": 0 } }
+    ], "checksum": null } }
+    ,"am35-polling-rate-write": { "request": { "length": 8, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x04" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0x10" },
+      { "offset": 5, "value": "0x30" },
+      { "offset": 6, "param": "rate", "encoding": "le-u16" }
+    ], "checksum": null } }
+    ,"am35-rotation-write": { "request": { "length": 9, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x05" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xD8" },
+      { "offset": 5, "value": "0x30" },
+      { "offset": 6, "param": "enabled", "encoding": "u8" },
+      { "offset": 7, "param": "angle", "encoding": "le-u16" }
+    ], "checksum": null } }
+    ,"am35-dpi-stage-write": { "request": { "length": 7, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x03" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xC7" },
+      { "offset": 5, "value": "0x30" },
+      { "offset": 6, "param": "stage", "encoding": "u8" }
+    ], "checksum": null } }
+    ,"am35-dpi-value-write": { "request": { "length": 11, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x07" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xC4" },
+      { "offset": 5, "value": "0x30" },
+      { "offset": 6, "param": "stage", "encoding": "u8" },
+      { "offset": 7, "param": "dpiX", "encoding": "le-u16" },
+      { "offset": 9, "param": "dpiY", "encoding": "le-u16" }
+    ], "checksum": null } }
   }
 }

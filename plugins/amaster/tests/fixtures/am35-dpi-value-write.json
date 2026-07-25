@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "case": "am35-dpi-value-write",
+  "evidence": "reverse-confirmed",
+  "description": "AM35 DPI value setter (set_dpixy) uses RACE raceId 0x30C4. Params stage (u8 at offset 6, 1-based), dpiX (le-u16 at offset 7), dpiY (le-u16 at offset 9). RACE framing: [0x05, 0x5A, length_le_u16, raceId_le_u16, ...params]. No request checksum. Source: disassembly/AM35model.dis set_dpixy. Getter 0x30C5 returns DPI state with dpiX array@11 and dpiY array@27 (parsers.json am35-dpi); verify uses indexParam=stage (1-based) to select the array element.",
+  "transport": "am35-direct",
+  "setter": {
+    "command": "am35-dpi-value-write",
+    "raceId": [196, 48],
+    "raceIdHex": "0x30C4",
+    "params": [
+      { "name": "stage", "offset": 6, "encoding": "u8" },
+      { "name": "dpiX", "offset": 7, "encoding": "le-u16" },
+      { "name": "dpiY", "offset": 9, "encoding": "le-u16" }
+    ],
+    "checksum": null
+  },
+  "samples": [
+    {
+      "input": { "stage": 1, "dpiX": 1600, "dpiY": 1600 },
+      "expectedRequestPayload": [5, 90, 7, 0, 196, 48, 1, 64, 6, 64, 6],
+      "comment": "stage=1, dpiX=1600 (0x0640 LE), dpiY=1600 (0x0640 LE)"
+    },
+    {
+      "input": { "stage": 3, "dpiX": 3200, "dpiY": 1600 },
+      "expectedRequestPayload": [5, 90, 7, 0, 196, 48, 3, 128, 12, 64, 6],
+      "comment": "stage=3, dpiX=3200 (0x0C80 LE), dpiY=1600 (0x0640 LE)"
+    },
+    {
+      "input": { "stage": 5, "dpiX": 800, "dpiY": 800 },
+      "expectedRequestPayload": [5, 90, 7, 0, 196, 48, 5, 32, 3, 32, 3],
+      "comment": "stage=5, dpiX=800 (0x0320 LE), dpiY=800 (0x0320 LE)"
+    }
+  ],
+  "readback": {
+    "command": "am35-dpi",
+    "raceId": [197, 48],
+    "raceIdHex": "0x30C5",
+    "parser": "am35-dpi",
+    "responseSample": [5, 90, 39, 0, 197, 48, 0, 0, 0, 5, 3, 160, 1, 32, 3, 64, 6, 128, 12, 0, 25, 0, 50, 0, 100, 0, 200, 0, 160, 1, 32, 3, 64, 6, 128, 12, 0, 25, 0, 50, 0, 100, 0, 200],
+    "expectedParsed": {
+      "stageCount": 5,
+      "currentStage": 3,
+      "dpiX": [416, 800, 1600, 3200, 6400, 12800, 25600, 51200],
+      "dpiY": [416, 800, 1600, 3200, 6400, 12800, 25600, 51200]
+    },
+    "comment": "dpiX array at offset 11 (8x le-u16): [416, 800, 1600, 3200, 6400, 12800, 25600, 51200]. dpiY array at offset 27 (8x le-u16): same values. verify assertion uses indexParam=stage (1-based) to check dpiX[stage-1] and dpiY[stage-1]."
+  }
+}
