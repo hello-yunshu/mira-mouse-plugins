@@ -149,7 +149,27 @@
     "am35-firmware": {
       "validWhen": [],
       "fields": {
-        "versionLength": { "offset": 7, "kind": "u8" }
+        "versionLength": { "offset": 8, "kind": "u8" },
+        "versionRaw": { "offset": 9, "kind": "bytes", "count": 53 }
+      },
+      "derived": {
+        "versionString": {
+          "kind": "ascii-extract",
+          "source": "versionRaw",
+          "lengthSource": "versionLength"
+        }
+      }
+    },
+    "am35-serial": {
+      "validWhen": [],
+      "fields": {
+        "serialRaw": { "offset": 14, "kind": "bytes", "count": 15 }
+      },
+      "derived": {
+        "serialString": {
+          "kind": "base36",
+          "source": "serialRaw"
+        }
       }
     },
     "am35-profile": {
@@ -176,7 +196,34 @@
     "am35-sleep-time": {
       "validWhen": [],
       "fields": {
-        "sleepValue": { "offset": 9, "kind": "le-u16" }
+        "tfgPart1": { "offset": 9, "kind": "le-u16" },
+        "tfgPart2": { "offset": 11, "kind": "le-u16" },
+        "tfgPart3": { "offset": 13, "kind": "le-u16" },
+        "btPart1": { "offset": 17, "kind": "le-u16" },
+        "btPart2": { "offset": 19, "kind": "le-u16" },
+        "btPart3": { "offset": 21, "kind": "le-u16" }
+      },
+      "derived": {
+        "wirelessSleepRawParts": {
+          "kind": "sum-lookup",
+          "sources": ["tfgPart1", "tfgPart2", "tfgPart3"],
+          "table": {}
+        },
+        "bluetoothSleepRawParts": {
+          "kind": "sum-lookup",
+          "sources": ["btPart1", "btPart2", "btPart3"],
+          "table": {}
+        },
+        "wirelessSleepValue": {
+          "kind": "sum-lookup",
+          "sources": ["tfgPart1", "tfgPart2", "tfgPart3"],
+          "table": { "65535": -1 }
+        },
+        "bluetoothSleepValue": {
+          "kind": "sum-lookup",
+          "sources": ["btPart1", "btPart2", "btPart3"],
+          "table": { "65535": -1 }
+        }
       }
     },
     "am35-fps": {
@@ -217,6 +264,12 @@
       "validWhen": [],
       "fields": {
         "color": { "offset": 17, "kind": "rgb" }
+      }
+    },
+    "am35-dpi-color": {
+      "validWhen": [],
+      "fields": {
+        "color": { "offset": 18, "kind": "rgb" }
       }
     },
     "am35-receiver-light": {
@@ -273,6 +326,40 @@
       "validWhen": [],
       "fields": {
         "rippleControl": { "offset": 9, "kind": "u8" }
+      }
+    },
+    "am35-button-mapping": {
+      "validWhen": [],
+      "fields": {
+        "resId": { "offset": 10, "kind": "u8" },
+        "keyType": { "offset": 11, "kind": "u8" },
+        "cKeyCodeRaw": { "offset": 12, "kind": "bytes", "count": 2 },
+        "stdKeyCode": { "offset": 14, "kind": "u8" },
+        "comboKeyCode": { "offset": 15, "kind": "u8" },
+        "macroNameRaw": { "offset": 12, "kind": "bytes", "count": 16 },
+        "repeatMode": { "offset": 28, "kind": "u8" },
+        "repeatTimes": { "offset": 29, "kind": "u8" },
+        "dpiAction": { "offset": 12, "kind": "u8" },
+        "targetDpiSetting": { "offset": 13, "kind": "le-u16" },
+        "rawRecord": { "offset": 10, "kind": "bytes", "count": 22 }
+      },
+      "derived": {
+        "keyTypeName": {
+          "kind": "lookup",
+          "source": "keyType",
+          "table": {
+            "0x01": "左键", "0x02": "右键", "0x03": "中键",
+            "0x04": "侧键前", "0x05": "侧键后",
+            "0x06": "标准键", "0x07": "滚轮上", "0x08": "宏",
+            "0x09": "滚轮下", "0x0A": "DPI切换-", "0x0B": "DPI切换+",
+            "0x0C": "配置切换", "0x0D": "消费者键",
+            "0x0E": "禁用"
+          }
+        },
+        "macroName": {
+          "kind": "ascii-extract",
+          "source": "macroNameRaw"
+        }
       }
     }
   }

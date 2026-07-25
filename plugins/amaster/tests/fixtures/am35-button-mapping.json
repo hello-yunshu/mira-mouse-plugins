@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "case": "am35-button-mapping",
+  "evidence": "reverse-confirmed",
+  "description": "AM35 button inventory read (FunctionArea.get_key in disassembly/AM35model.dis line 1666). For each button 1-7, sends '05 5A 03 00 C3 30 {button:02X}'. Response validation: len >= 12, keyType must be 1-13 (reject 0, >=14, 255). When resId != keyType, additional data is parsed based on keyType: 6=标准键 (cKeyCodeRaw[12:14], stdKeyCode[14], comboKeyCode[15]), 8=宏 (macroNameRaw[12:28] as ASCII rstrip \\x00, repeatMode[28], repeatTimes[29]), 11=DPI切换+ (dpiAction[12], targetDpiSetting[13:15] le-u16). Single-key failure does not clear the table (onFailure: continue in workflow). Source: disassembly/AM35model.dis get_key (line 1666), request format '05 5A 03 00 C3 30 ' + format(idx, '02X').",
+  "transport": "am35-direct",
+  "reader": {
+    "command": "am35-button-mapping",
+    "raceId": [195, 48],
+    "raceIdHex": "0x30C3",
+    "checksum": null
+  },
+  "samples": [
+    {
+      "params": { "button": 1 },
+      "expectedRequestPayload": [5, 90, 3, 0, 195, 48, 1],
+      "responsePayload": [5, 90, 3, 0, 195, 48, 1, 0, 0, 0, 1, 6, 4, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "expectedParsed": {
+        "resId": 1,
+        "keyType": 6,
+        "keyTypeName": "标准键",
+        "cKeyCodeRaw": [4, 0],
+        "stdKeyCode": 16,
+        "comboKeyCode": 0,
+        "macroNameRaw": [4, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "macroName": "\u0004\u0000\u0010",
+        "repeatMode": 0,
+        "repeatTimes": 0,
+        "dpiAction": 4,
+        "targetDpiSetting": 4096,
+        "rawRecord": [1, 6, 4, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      },
+      "comment": "Standard key (keyType=6): cKeyCodeRaw=[0x04,0x00], stdKeyCode=0x10, comboKeyCode=0. macroName overlaps cKeyCodeRaw at offset 12; ascii-extract yields control chars (EOT NUL DLE) after rstrip trailing NULs."
+    },
+    {
+      "params": { "button": 2 },
+      "expectedRequestPayload": [5, 90, 3, 0, 195, 48, 2],
+      "responsePayload": [5, 90, 3, 0, 195, 48, 2, 0, 0, 0, 2, 8, 70, 105, 114, 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 0, 0],
+      "expectedParsed": {
+        "resId": 2,
+        "keyType": 8,
+        "keyTypeName": "宏",
+        "cKeyCodeRaw": [70, 105],
+        "stdKeyCode": 114,
+        "comboKeyCode": 101,
+        "macroNameRaw": [70, 105, 114, 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "macroName": "Fire",
+        "repeatMode": 1,
+        "repeatTimes": 3,
+        "dpiAction": 70,
+        "targetDpiSetting": 29289,
+        "rawRecord": [2, 8, 70, 105, 114, 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 0, 0]
+      },
+      "comment": "Macro (keyType=8): macroNameRaw='Fire'+12 NULs, ascii-extract rstrip NUL -> 'Fire'. repeatMode=1, repeatTimes=3. Primary test for ascii-extract trailing-null removal."
+    },
+    {
+      "params": { "button": 3 },
+      "expectedRequestPayload": [5, 90, 3, 0, 195, 48, 3],
+      "responsePayload": [5, 90, 3, 0, 195, 48, 3, 0, 0, 0, 3, 11, 1, 64, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "expectedParsed": {
+        "resId": 3,
+        "keyType": 11,
+        "keyTypeName": "DPI切换+",
+        "cKeyCodeRaw": [1, 64],
+        "stdKeyCode": 6,
+        "comboKeyCode": 0,
+        "macroNameRaw": [1, 64, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "macroName": "\u0001@\u0006",
+        "repeatMode": 0,
+        "repeatTimes": 0,
+        "dpiAction": 1,
+        "targetDpiSetting": 1600,
+        "rawRecord": [3, 11, 1, 64, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      },
+      "comment": "DPI switch+ (keyType=0x0B=11): dpiAction=1, targetDpiSetting=1600 (le-u16 [0x40,0x06]=64+1536). Overlapping fields: cKeyCodeRaw=[1,64], stdKeyCode=6."
+    },
+    {
+      "params": { "button": 4 },
+      "expectedRequestPayload": [5, 90, 3, 0, 195, 48, 4],
+      "responsePayload": [5, 90, 3, 0, 195, 48, 4, 0, 0, 0, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "expectedParsed": {
+        "resId": 4,
+        "keyType": 1,
+        "keyTypeName": "左键",
+        "cKeyCodeRaw": [0, 0],
+        "stdKeyCode": 0,
+        "comboKeyCode": 0,
+        "macroNameRaw": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "macroName": "",
+        "repeatMode": 0,
+        "repeatTimes": 0,
+        "dpiAction": 0,
+        "targetDpiSetting": 0,
+        "rawRecord": [4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      },
+      "comment": "Simple type (keyType=1=左键, resId==keyType): no additional data. All data bytes zero; macroName empty after rstrip NUL."
+    },
+    {
+      "params": { "button": 5 },
+      "expectedRequestPayload": [5, 90, 3, 0, 195, 48, 5],
+      "responsePayload": [5, 90, 3, 0, 195, 48, 5, 0],
+      "expectFailure": true,
+      "expectedError": "response length 8 < 12 (minimum required)",
+      "comment": "Short response (length=8 < 12): parser cannot read offset 10. Tests partial read / ReadStatus. Workflow continues via onFailure: continue; button5 output marked failed but other buttons remain intact."
+    }
+  ]
+}
