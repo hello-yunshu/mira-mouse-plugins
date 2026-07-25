@@ -5,10 +5,14 @@
   "releaseTag": "mira-plugin-cli-v1.0.0",
   "repository": "hello-yunshu/mira-mouse",
   "packageFormatVersion": 1,
+  "localDev": true,
+  "localDevComment": "BOOTSTRAP_PROMPT.md 禁止 AI 创建正式 Release，因此当前为本地构建模式：aarch64-apple-darwin 已回填本地构建 SHA；其余三平台待维护者推送 mira-plugin-cli-v1.0.0 tag 触发 .github/workflows/mira-plugin-cli-release.yml 后回填。fetch-cli.mjs 在 localDev=true 且目标 SHA 为 PENDING_RELEASE_PUBLISH 时，要求 MIRA_PLUGIN_CLI_LOCAL 环境变量指向本地构建的二进制。",
   "targets": {
     "aarch64-apple-darwin": {
       "asset": "mira-plugin-aarch64-apple-darwin.tar.gz",
-      "sha256": "PENDING_RELEASE_PUBLISH"
+      "sha256": "63df4a1d377e2b8cc5d981975b405774f02a5ee7201a5f1287d42fcdb4857b91",
+      "localDevBuiltAt": "2026-07-25T09:39:00Z",
+      "localDevBuilder": "cargo build --release --package mira-plugin-cli --target aarch64-apple-darwin --locked"
     },
     "x86_64-apple-darwin": {
       "asset": "mira-plugin-x86_64-apple-darwin.tar.gz",
