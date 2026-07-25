@@ -107,6 +107,32 @@
       { "offset": 4, "value": "0x13" },
       { "offset": 5, "value": "0x30" }
     ], "checksum": null } }
+    ,"am35-sleep-time-write": { "request": { "length": 30, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x1A" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0x12" },
+      { "offset": 5, "value": "0x30" },
+      { "offset": 6, "param": "btPart1", "encoding": "le-u16" },
+      { "offset": 8, "param": "btPart2", "encoding": "le-u16" },
+      { "offset": 10, "param": "btPart3", "encoding": "le-u16" },
+      { "offset": 12, "value": "0x00" },
+      { "offset": 13, "value": "0x00" },
+      { "offset": 14, "param": "tfgPart1", "encoding": "le-u16" },
+      { "offset": 16, "param": "tfgPart2", "encoding": "le-u16" },
+      { "offset": 18, "param": "tfgPart3", "encoding": "le-u16" },
+      { "offset": 20, "value": "0x00" },
+      { "offset": 21, "value": "0x00" },
+      { "offset": 22, "value": "0x3C" },
+      { "offset": 23, "value": "0x00" },
+      { "offset": 24, "value": "0x1E" },
+      { "offset": 25, "value": "0x00" },
+      { "offset": 26, "value": "0x3C" },
+      { "offset": 27, "value": "0x00" },
+      { "offset": 28, "value": "0x1E" },
+      { "offset": 29, "value": "0x00" }
+    ], "checksum": null } }
     ,"am35-fps": { "request": { "length": 6, "bytes": [
       { "offset": 0, "value": "0x05" },
       { "offset": 1, "value": "0x5A" },
@@ -324,6 +350,27 @@
       { "offset": 6, "param": "stage", "encoding": "u8" },
       { "offset": 7, "param": "dpiX", "encoding": "le-u16" },
       { "offset": 9, "param": "dpiY", "encoding": "le-u16" }
+    ], "checksum": null } }
+    ,"am35-dpi-color": { "request": { "length": 10, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x06" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0x0C" },
+      { "offset": 5, "value": "0x0A" },
+      { "offset": 6, "param": "stage", "encoding": "lookup-u8", "lookup": { "1": 33, "2": 34, "3": 35, "4": 36, "5": 37, "6": 38, "7": 39, "8": 40 } },
+      { "offset": 7, "value": "0x62" },
+      { "offset": 8, "value": "0xE8" },
+      { "offset": 9, "value": "0x03" }
+    ], "checksum": null } }
+    ,"am35-button-mapping": { "request": { "length": 7, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x03" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xC3" },
+      { "offset": 5, "value": "0x30" },
+      { "offset": 6, "param": "button", "encoding": "u8" }
     ], "checksum": null } }
   }
 }

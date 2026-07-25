@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "case": "am35-dpi-color",
+  "evidence": "reverse-confirmed",
+  "description": "AM35 DPI color per-stage read (FunctionArea.get_dpi_lights in disassembly/AM35model.dis line 1923). For each stage id 1-8, sends '05 5A 06 00 0C 0A 2<id> 62 E8 03' where the byte at offset 6 is 0x21+id-1 (string concatenation of '2' + str(id), interpreted as hex). Response RGB is at parser offset 17-19 (Python res[18:21] before report-id strip). Source: disassembly/AM35model.dis get_dpi_lights (line 1923), hex_str[36:42] = bytes 18-20.",
+  "transport": "am35-direct",
+  "reader": {
+    "command": "am35-dpi-color",
+    "raceId": [12, 10],
+    "raceIdHex": "0x0A0C",
+    "checksum": null
+  },
+  "samples": [
+    {
+      "params": { "stage": 1 },
+      "expectedRequestPayload": [5, 90, 6, 0, 12, 10, 33, 98, 232, 3],
+      "responsePayload": [5, 90, 6, 0, 12, 10, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 0, 0],
+      "expectedParsed": { "color": "#FF0000" },
+      "comment": "Stage 1: stage_byte=0x21=33, RGB red at offset 17"
+    },
+    {
+      "params": { "stage": 2 },
+      "expectedRequestPayload": [5, 90, 6, 0, 12, 10, 34, 98, 232, 3],
+      "responsePayload": [5, 90, 6, 0, 12, 10, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 0],
+      "expectedParsed": { "color": "#00FF00" },
+      "comment": "Stage 2: stage_byte=0x22=34, RGB green"
+    },
+    {
+      "params": { "stage": 8 },
+      "expectedRequestPayload": [5, 90, 6, 0, 12, 10, 40, 98, 232, 3],
+      "responsePayload": [5, 90, 6, 0, 12, 10, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255],
+      "expectedParsed": { "color": "#0000FF" },
+      "comment": "Stage 8: stage_byte=0x28=40, RGB blue"
+    }
+  ]
+}
