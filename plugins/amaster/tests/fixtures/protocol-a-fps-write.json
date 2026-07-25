@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "case": "protocol-a-fps-write",
+  "evidence": "reverse-confirmed",
+  "description": "FPS setter (setFPS) uses command byte 0x62 (98 decimal). Param 'enabled' encoded as bool at offset 1. Body is 5 zero bytes (offsets 2-6). Request checksum is ff-minus-sum8 over offsets 0..7, written at offset 7. Source: decompiled/mouseApi.py setFPS (line 123). Getter 0xE2 returns res[1] parsed as bool (parsers.json fps).",
+  "setter": {
+    "command": "fps-write",
+    "commandByte": 98,
+    "param": { "name": "enabled", "offset": 1, "encoding": "bool" },
+    "checksum": { "algorithm": "ff-minus-sum8", "start": 0, "endExclusive": 7, "writeOffset": 7 }
+  },
+  "samples": [
+    {
+      "input": { "enabled": true },
+      "expectedRequestHead": [98, 1, 0, 0, 0, 0, 0, 156],
+      "expectedChecksum": 156
+    },
+    {
+      "input": { "enabled": false },
+      "expectedRequestHead": [98, 0, 0, 0, 0, 0, 0, 157],
+      "expectedChecksum": 157
+    }
+  ],
+  "readback": {
+    "command": "fps",
+    "commandByte": 226,
+    "parser": "fps",
+    "responseSample": [226, 1, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0],
+    "expectedParsed": { "enabled": true }
+  }
+}
