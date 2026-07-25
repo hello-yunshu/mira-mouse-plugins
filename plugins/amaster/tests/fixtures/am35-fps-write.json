@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "case": "am35-fps-write",
+  "evidence": "reverse-confirmed",
+  "description": "AM35 FPS setter (set_fps) uses RACE raceId 0x30DE. Param enabled encoded as bool at offset 6 (1=true, 0=false). RACE framing: [0x05, 0x5A, length_le_u16, raceId_le_u16, ...params]. No request checksum. Source: disassembly/AM35model.dis set_fps. Getter 0x30DF returns res[8] parsed as bool (parsers.json am35-fps). Note: AM35 FPS uses a plain bool encoding, unlike the DPI button which uses bool-lookup-u8.",
+  "transport": "am35-direct",
+  "setter": {
+    "command": "am35-fps-write",
+    "raceId": [222, 48],
+    "raceIdHex": "0x30DE",
+    "params": [
+      { "name": "enabled", "offset": 6, "encoding": "bool" }
+    ],
+    "checksum": null
+  },
+  "samples": [
+    {
+      "input": { "enabled": true },
+      "expectedRequestPayload": [5, 90, 3, 0, 222, 48, 1]
+    },
+    {
+      "input": { "enabled": false },
+      "expectedRequestPayload": [5, 90, 3, 0, 222, 48, 0]
+    }
+  ],
+  "readback": {
+    "command": "am35-fps",
+    "raceId": [223, 48],
+    "raceIdHex": "0x30DF",
+    "parser": "am35-fps",
+    "responseSample": [5, 90, 3, 0, 223, 48, 0, 0, 1],
+    "expectedParsed": { "enabled": true }
+  }
+}
