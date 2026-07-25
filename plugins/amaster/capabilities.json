@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "readOnly": ["battery", "profile", "firmware", "device-settings", "receiver-status", "button-mappings"],
-  "enabledWrites": ["current-dpi-stage", "dpi-value", "polling-rate", "sleep-time", "mouse-lighting", "receiver-lighting", "fps", "dpi-button", "character-light"],
+  "enabledWrites": ["current-dpi-stage", "dpi-value", "dpi-color", "polling-rate", "sleep-time", "mouse-lighting", "mouse-light-mode", "mouse-light-color", "receiver-lighting", "fps", "dpi-button", "character-light"],
   "disabledWrites": ["application-layer-light-link", "button-mapping"],
   "forbidden": ["firmware-update", "bootloader", "dfu", "flash-erase", "receiver-pairing", "macros"],
   "pollingRatesHz": [125, 250, 500, 1000, 2000, 4000, 8000],
@@ -11,23 +11,6 @@
       { "output": "mouseLightMode", "fieldMap": { "mode": "effect", "modeName": "effectName" } },
       { "output": "mouseLightColor" },
       { "output": "settings", "fieldMap": { "mouseLightStartColor": "color", "mouseLightEndColor": "endColor", "mouseLightEnabled": "enabled" } }
-    ],
-    "receiverLighting": [
-      {
-        "output": "receiverLight",
-        "fieldMap": {
-          "enabled": "enabled",
-          "type": ["effect", "type"],
-          "color1": ["color", "color1"],
-          "color2": "color2",
-          "color3": "color3",
-          "ratio1": "ratio1",
-          "ratio2": "ratio2",
-          "ratio3": "ratio3",
-          "speed": "speed",
-          "brightness": "brightness"
-        }
-      }
     ]
   }
 }

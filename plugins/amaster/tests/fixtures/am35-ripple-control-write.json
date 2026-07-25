@@ -2,24 +2,24 @@
   "schemaVersion": 1,
   "case": "am35-ripple-control-write",
   "evidence": "reverse-confirmed",
-  "description": "AM35 ripple control setter (set_ripple_ctrl) uses RACE raceId 0x30D6. Param rippleControl encoded as u8 at offset 6. RACE framing: [0x05, 0x5A, length_le_u16, raceId_le_u16, ...params]. No request checksum. Source: disassembly/AM35model.dis set_ripple_ctrl. Getter 0x30D7 returns res[9] parsed as u8 (parsers.json am35-ripple-control).",
+  "description": "AM35 ripple control setter (set_ripple_ctrl) uses RACE raceId 0x30D6. Param rippleControl encoded as bool at offset 6 (true → 0x01, false → 0x00). RACE framing: [0x05, 0x5A, length_le_u16, raceId_le_u16, ...params]. No request checksum. Source: disassembly/AM35model.dis set_ripple_ctrl. Getter 0x30D7 returns res[9] parsed as bool (parsers.json am35-ripple-control).",
   "transport": "am35-direct",
   "setter": {
     "command": "am35-ripple-control-write",
     "raceId": [214, 48],
     "raceIdHex": "0x30D6",
     "params": [
-      { "name": "rippleControl", "offset": 6, "encoding": "u8" }
+      { "name": "rippleControl", "offset": 6, "encoding": "bool" }
     ],
     "checksum": null
   },
   "samples": [
     {
-      "input": { "rippleControl": 1 },
+      "input": { "rippleControl": true },
       "expectedRequestPayload": [5, 90, 3, 0, 214, 48, 1]
     },
     {
-      "input": { "rippleControl": 0 },
+      "input": { "rippleControl": false },
       "expectedRequestPayload": [5, 90, 3, 0, 214, 48, 0]
     }
   ],
@@ -29,6 +29,6 @@
     "raceIdHex": "0x30D7",
     "parser": "am35-ripple-control",
     "responseSample": [5, 90, 3, 0, 215, 48, 0, 0, 0, 1],
-    "expectedParsed": { "rippleControl": 1 }
+    "expectedParsed": { "rippleControl": true }
   }
 }

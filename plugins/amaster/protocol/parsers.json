@@ -241,8 +241,11 @@
     "am35-rotation": {
       "validWhen": [],
       "fields": {
-        "angle": { "offset": 9, "kind": "u8" },
-        "enabled": { "offset": 10, "kind": "u8" }
+        "rawAngle": { "offset": 9, "kind": "u8" },
+        "enabled": { "offset": 10, "kind": "bool" }
+      },
+      "derived": {
+        "angle": { "kind": "signed-u8", "source": "rawAngle" }
       }
     },
     "am35-mouse-light-mode": {
@@ -257,6 +260,17 @@
           "kind": "lookup",
           "source": "mode",
           "table": { "0": "常亮", "1": "呼吸", "2": "霓虹" }
+        },
+        "speedLabel": {
+          "kind": "lookup",
+          "source": "speed",
+          "table": {
+            "0": "最快",
+            "1": "快",
+            "2": "中",
+            "3": "慢",
+            "4": "最慢"
+          }
         }
       }
     },
@@ -313,19 +327,19 @@
     "am35-motion-sync": {
       "validWhen": [],
       "fields": {
-        "motionSync": { "offset": 9, "kind": "u8" }
+        "motionSync": { "offset": 9, "kind": "bool" }
       }
     },
     "am35-angle-snapping": {
       "validWhen": [],
       "fields": {
-        "angleSnap": { "offset": 9, "kind": "u8" }
+        "angleSnap": { "offset": 9, "kind": "bool" }
       }
     },
     "am35-ripple-control": {
       "validWhen": [],
       "fields": {
-        "rippleControl": { "offset": 9, "kind": "u8" }
+        "rippleControl": { "offset": 9, "kind": "bool" }
       }
     },
     "am35-button-mapping": {

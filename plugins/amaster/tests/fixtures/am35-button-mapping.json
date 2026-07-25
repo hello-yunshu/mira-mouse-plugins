@@ -100,7 +100,7 @@
       "expectedRequestPayload": [5, 90, 3, 0, 195, 48, 5],
       "responsePayload": [5, 90, 3, 0, 195, 48, 5, 0],
       "expectFailure": true,
-      "expectedError": "response length 8 < 12 (minimum required)",
+      "expectedError": "byte range out of range",
       "comment": "Short response (length=8 < 12): parser cannot read offset 10. Tests partial read / ReadStatus. Workflow continues via onFailure: continue; button5 output marked failed but other buttons remain intact."
     }
   ]

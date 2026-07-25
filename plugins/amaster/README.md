@@ -13,11 +13,11 @@ Bluetooth support is pending hardware evidence and is marked `blocked` in the
 plugin capabilities.
 
 Protocol A exposes bounded writes for the current DPI stage, the selected
-stage's X/Y DPI, polling rate, mouse character-light color/enabled setting, and
-receiver lighting. Full-state setters preserve their pre-read structure and
-change only declared fields; the short receiver-lighting setter rebuilds the
-exact zero-padded frame used by the source driver. Every mutation verifies target
-fields by reading again.
+stage's X/Y DPI, polling rate, Bluetooth/wireless sleep time, mouse character
+light, FPS mode, DPI button, and receiver lighting. Full-state setters preserve
+their pre-read structure and change only declared fields; the short
+receiver-lighting setter rebuilds the exact zero-padded frame used by the source
+driver. Every mutation verifies target fields by reading again.
 
 Protocol reserves are tracked separately from enabled workflows and mutations in
 [`../../docs/protocol-reserve-inventory.md`](../../docs/protocol-reserve-inventory.md).
@@ -25,10 +25,17 @@ The Protocol A `0x87` light-switch primitive is intentionally reserved and must
 not be exposed as a mouse or receiver lighting switch until its physical target
 is hardware-proven.
 
-AM35 writes, button remapping, firmware operations, pairing, macros, and raw
+AM35 exposes bounded writes for DPI stage/value, DPI per-stage color, polling
+rate, semantic sleep time (with `-1` for "never sleep" split into three
+segments), rotation (signed angle + boolean enabled), debounce (USB/wireless/
+Bluetooth), lift-off distance, motion sync, angle snapping, ripple control
+(boolean toggles), FPS mode, DPI button, profile, mouse lighting mode/speed/
+color, and the receiver lighting 十字段. Each setter pre-reads, preserves
+unmodified fields, writes exact bytes, and verifies target fields by reading
+again. Button remapping writes, firmware operations, pairing, macros, and raw
 reports remain unavailable.
 
-## AM35 Protocol (Preparatory)
+## AM35 Protocol
 
 AM35 (VID `0x0E8D`) protocol definitions were first collected from
 AMasterDriver v1.0.6 reverse analysis and rechecked against the official
@@ -38,20 +45,24 @@ AM Master v1.3.6 macOS package. The current official UI maps `am35` and
 for reads, with a RACE-style inner protocol (`05 5A ...`). Responses are
 matched to the request's RACE command ID so stale reports are ignored.
 
-The runtime engine includes a `hid-race` transport kind that frames
-RACE payloads with a 3-byte header (`[reportId, length, type]`) and
-handles read/write via HID Output/Input reports. `raceType` `0x00` is
-used for direct USB; `0x80` for receiver forwarding.
+The runtime engine provides a brand-agnostic `hid-framed` transport kind that
+frames RACE payloads with a 3-byte header (`[reportId, length, type]`) and
+handles read/write via HID Output/Input reports. `raceType` `0x00` is used for
+direct USB; `0x80` for receiver forwarding. The legacy `hid-race` name is
+accepted as a schema alias for backward compatibility and is normalized to
+`hid-framed` at runtime.
 
-AM35 read workflows cover battery, DPI, polling rate, sleep time, FPS,
-DPI button, rotation, mouse lighting (mode + color), receiver lighting,
-debounce, LOD, motion sync, angle snapping, ripple control, profile,
-and firmware. Write mutations are not yet declared; they will be added
-after hardware validation of the RACE write framing.
+AM35 standard reads cover battery, DPI, polling rate, sleep time, FPS, DPI
+button, rotation, mouse lighting (mode + color), receiver lighting, debounce,
+LOD, motion sync, angle snapping, ripple control, and profile. Inventory reads
+(8 DPI colors, firmware, serial, 7 button mappings) are split from standard
+reads and triggered only when the user opens the details view, not on every
+dashboard refresh. Write mutations are declared and fixture-verified for all
+fields listed above.
 
-All AM35 field offsets are source-confirmed from static analysis but
-not yet hardware-verified. Receiver-lighting named values remain
-documented as unknown pending real device testing; inert research metadata
+All AM35 field offsets are source-confirmed from static analysis but not yet
+hardware-verified. Receiver-lighting named values are exposed as `模式 N`
+until real device testing confirms official semantics; inert research metadata
 must not be placed inside executable protocol JSON files.
 
 ## Adding a specific AMaster-compatible model
