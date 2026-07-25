@@ -230,8 +230,17 @@
         "ratio2": { "offset": 15, "kind": "u8" },
         "color3": { "offset": 16, "kind": "hue-index-be-u16" },
         "ratio3": { "offset": 18, "kind": "u8" },
-        "speed": { "offset": 19, "kind": "u8" },
+        "rawSpeed": { "offset": 19, "kind": "u8" },
         "brightness": { "offset": 20, "kind": "u8" }
+      },
+      "derived": {
+        "speed": {
+          "kind": "lookup",
+          "source": "rawSpeed",
+          "table": {
+            "80": 0, "81": 1, "82": 2, "83": 3, "84": 4
+          }
+        }
       }
     },
     "am35-debounce": {
