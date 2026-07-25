@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "case": "protocol-a-character-light-write",
+  "evidence": "reverse-confirmed",
+  "description": "Character light setter (setMDChar) uses command byte 0x07 (7 decimal) — NOT 0x87, which is the getter (getMDChar). Param 'enabled' encoded as bool at offset 1. Body is 5 zero bytes (offsets 2-6). Request checksum is ff-minus-sum8 over offsets 0..7, written at offset 7. Source: decompiled/mouseApi.py setMDChar (line 178). Getter 0x87 returns res[1] parsed as bool (parsers.json mouse-light-switch).",
+  "setter": {
+    "command": "mouse-light-switch-write",
+    "commandByte": 7,
+    "param": { "name": "enabled", "offset": 1, "encoding": "bool" },
+    "checksum": { "algorithm": "ff-minus-sum8", "start": 0, "endExclusive": 7, "writeOffset": 7 }
+  },
+  "samples": [
+    {
+      "input": { "enabled": true },
+      "expectedRequestHead": [7, 1, 0, 0, 0, 0, 0, 247],
+      "expectedChecksum": 247
+    },
+    {
+      "input": { "enabled": false },
+      "expectedRequestHead": [7, 0, 0, 0, 0, 0, 0, 248],
+      "expectedChecksum": 248
+    }
+  ],
+  "readback": {
+    "command": "mouse-light-switch",
+    "commandByte": 135,
+    "parser": "mouse-light-switch",
+    "responseSample": [135, 1, 0, 0, 0, 0, 0, 120, 0, 0, 0, 0, 0, 0, 0, 0],
+    "expectedParsed": { "enabled": true }
+  }
+}
