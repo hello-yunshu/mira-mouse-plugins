@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "case": "am35-mouse-light-mode-write",
   "evidence": "source-confirmed",
-  "description": "AM35 mouse light mode setter writes enabled (bool at offset 6), mode (u8 at offset 7), and speed (u8 at offset 8) via RACE raceId 0x30B3. Frame: 05 5A 05 00 B3 30 [enabled] [mode] [speed]. Total length 9 bytes. No checksum. Mode values: 0=常亮(fixed/steady on, NOT off), 1=呼吸(breathing), 2=霓虹(neon). Speed range 0-4 (5 levels). Source: commands.json am35-mouse-light-mode-write; parser am35-mouse-light-mode reads mode from offset 13, speed from offset 14. P0-D fix: am35-mode/am35-speed fields declare `params: { enabled: true }` so enabled is always encoded as 1 (true) regardless of mode. The getter (am35-mouse-light-mode parser) does not expose enabled, so the UI must NOT show an enabled toggle for these fields. Mode 0 = steady on, NOT off; previously the broken paramSources.enabled=capabilities.mouseLightMode.mode mapping caused mode=0 to write enabled=false, which incorrectly turned the light off. The enabled=false sample has been removed because the UI no longer offers a way to disable the light through this mutation (the dedicated am35-color/enabled toggle path remains responsible for hard on/off if needed).",
+  "description": "AM35 mouse light mode setter writes enabled (bool at offset 6), mode (u8 at offset 7), and speed (u8 at offset 8) via RACE raceId 0x30B3. Frame: 05 5A 05 00 B3 30 [enabled] [mode] [speed]. Total length 9 bytes. No checksum. Mode values: 0=常亮(fixed/steady on, NOT off), 1=呼吸(breathing), 2=模式2(mode 2, neutralized - reverse engineering name 'neon' has unconfirmed write behavior). Speed range 0-4 (5 levels). Source: commands.json am35-mouse-light-mode-write; parser am35-mouse-light-mode reads mode from offset 13, speed from offset 14. P0-D fix: am35-mode/am35-speed fields declare `params: { enabled: true }` so enabled is always encoded as 1 (true) regardless of mode. The getter (am35-mouse-light-mode parser) does not expose enabled, so the UI must NOT show an enabled toggle for these fields. Mode 0 = steady on, NOT off; previously the broken paramSources.enabled=capabilities.mouseLightMode.mode mapping caused mode=0 to write enabled=false, which incorrectly turned the light off. The enabled=false sample has been removed because the UI no longer offers a way to disable the light through this mutation (the dedicated am35-color/enabled toggle path remains responsible for hard on/off if needed).",
   "transport": "am35-direct",
   "setter": {
     "command": "am35-mouse-light-mode-write",
@@ -29,7 +29,7 @@
     {
       "input": { "mode": 2, "speed": 4 },
       "expectedRequestPayload": [5, 90, 5, 0, 179, 48, 1, 2, 4],
-      "comment": "mode=2 (neon), speed=4 (slowest); enabled byte=1 from params.enabled=true"
+      "comment": "mode=2, speed=4 (slowest); enabled byte=1 from params.enabled=true"
     },
     {
       "input": { "mode": 0, "speed": 4 },

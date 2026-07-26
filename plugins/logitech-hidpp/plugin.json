@@ -317,16 +317,6 @@
           "fourthSlotEligible": false,
           "dedupeKey": "dashboard.lighting",
           "fallbackRegion": "advanced"
-        },
-        {
-          "region": "status",
-          "order": 20,
-          "span": 1,
-          "icon": "lightbulb",
-          "priority": 70,
-          "fourthSlotEligible": false,
-          "dedupeKey": "status.lighting-state",
-          "fallbackRegion": "advanced"
         }
       ],
       "metadata": {

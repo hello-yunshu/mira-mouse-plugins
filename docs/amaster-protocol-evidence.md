@@ -10,7 +10,7 @@
 | Protocol A 查询与接收器转发命令 ID | `decompiled/mouseApi.py`; targeted method/disassembly evidence | IDs recorded in `commands.json` | high | source-confirmed |
 | AM35 外层 0x06/0x07 报告与 59 字节分片 | `disassembly/AM35Global.dis`; `AM35model.dis` | type 0x00 direct, 0x80 receiver | high | source-confirmed |
 | AM35 内层 05 5A 封装与查询 ID | `disassembly/am35_target_methods.txt`; reverse analysis | little-endian length and command ID | high | source-confirmed |
-| AM35 命名鼠标模式 0/1/2 | `disassembly/AM35model.dis`; reverse analysis | steady/breathing/neon | medium | source-confirmed; neon write unknown |
+| AM35 命名鼠标模式 0/1/2 | `disassembly/AM35model.dis`; reverse analysis | steady/breathing/mode 2 (neutralized; reverse engineering name 'neon' has unconfirmed write behavior) | medium | source-confirmed; mode 2 write unknown |
 | 接收器灯光类型值 | control flow is insufficiently resolved | no reliable enumeration | low | unknown; values preserved and unnamed |
 | 应用层接收器链路 | no native follow field found in reviewed evidence | two independent writes would be needed | medium | inferred; writes blocked |
 | Protocol A DPI 设置器 | `decompiled/mouseApi.py` `setMouseDPI()` | command `0x54`; preserve the 64-byte DPI structure and update declared stage/value fields | high | source-confirmed; fixture/build-verified |

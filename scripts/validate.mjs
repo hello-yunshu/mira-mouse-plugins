@@ -58,18 +58,27 @@ const DECLARATIVE_CONTROLS = new Set(['Toggle', 'Segmented', 'Select', 'Slider',
 const DECLARATIVE_METADATA = new Set(['accentSource', 'fields', 'zones', 'stageLayout', 'statusDisplay', 'stateMapping', 'batteryHistory', 'visibleWhen', 'summary']);
 const EDITORS = new Set(['inline-toggle', 'inline-segmented', 'inline-value', 'inline-action', 'modal-select', 'modal-color', 'modal-range', 'modal-number', 'modal-dpi-stage', 'modal-gradient', 'static-readonly']);
 const FORMATS = new Set(['sleep', 'percent', 'hertz', 'connection', 'color', 'default']);
-// P1-B: Placement Contract 字段集合。
-// region 是 placement 的核心字段，决定哪些契约字段必填。
-const PLACEMENT_REGIONS = new Set(['hero', 'control', 'status', 'details', 'advanced', 'hidden']);
+// P1-B / ITERATION-006 §P0-A: Placement Contract 字段集合（跨仓统一）。
+// region 是 placement 的核心字段，仅允许 hero/control/status/details；
+// advanced/inventory/hidden 是 fallbackRegion 的合法值，不再作为 region。
+const PLACEMENT_REGIONS = new Set(['hero', 'control', 'status', 'details']);
 const PLACEMENT_KEYS = new Set([
   'region', 'group', 'order', 'span', 'icon', 'priority',
   'dashboardRole', 'fixedSlot', 'fourthSlotEligible', 'dedupeKey', 'fallbackRegion',
+  'optionalPosition',
 ]);
-const DASHBOARD_ROLES = new Set(['fixed-core', 'contextual']);
-const FALLBACK_REGIONS = new Set(['advanced', 'hidden', 'details']);
+// 跨仓统一：fixed-core | candidate | system（TS 类型、Rust enum、JS validator 同步）。
+const DASHBOARD_ROLES = new Set(['fixed-core', 'candidate', 'system']);
+// 跨仓统一：advanced | inventory | hidden（不再接受 details 作为 fallbackRegion）。
+const FALLBACK_REGIONS = new Set(['advanced', 'inventory', 'hidden']);
+// P0-E：唯一候选槽位位置。未声明时默认 trailing。
+const OPTIONAL_POSITIONS = new Set(['leading', 'trailing']);
 // P1-A: PluginField.presentation 只允许 primary / details 两档，
 // 用于在 LightingZone 等 capability 中区分主要字段与高级字段。
 const FIELD_PRESENTATIONS = new Set(['primary', 'details']);
+// ITERATION-006 §P0-G: PluginField.lightingRole 只允许 effect / primary-color / candidate。
+// effect 固定最左，primary-color 固定最右，candidate 参与中间最多 4 个位置竞争。
+const LIGHTING_ROLES = new Set(['effect', 'primary-color', 'candidate']);
 
 const REQUIRED_FILES = [
   'README.md',
@@ -189,19 +198,24 @@ function validateRuntime(name, runtime) {
   }
 }
 
-// P1-B: Placement Contract Validator。
+// P1-B / ITERATION-006 §P0-A: Placement Contract Validator（跨仓统一）。
 // 校验规则：
-// - region 必填，必须属于 PLACEMENT_REGIONS；
+// - region 必填，必须属于 PLACEMENT_REGIONS（hero/control/status/details）；
 // - order 必填，整数 0..1000；
 // - span 可选，整数 1..4（默认 1）；
 // - group 在 control region 必填，其他 region 可选；
-// - priority 在 control / status region 必填（-1000..1000），其他 region 可选；
+// - priority 在 control / status region 必填（0..100），其他 region 可选；
 // - dedupeKey 在 control / status region 必填（非空字符串），其他 region 可选；
 // - fallbackRegion 在 control / status region 必填，必须属于 FALLBACK_REGIONS，其他 region 可选；
-// - dashboardRole 可选，但若声明必须属于 DASHBOARD_ROLES；
+// - dashboardRole 可选，但若声明必须属于 DASHBOARD_ROLES（fixed-core|candidate|system）；
 // - 当 dashboardRole === 'fixed-core' 时，fixedSlot 必填且为 1..3；
 // - fixedSlot 仅在 dashboardRole === 'fixed-core' 时允许声明；
-// - fourthSlotEligible 可选，必须为 boolean。
+// - fixedSlot=4 一律拒绝；
+// - candidate/system 角色不得声明 fixedSlot；
+// - fourthSlotEligible 可选，必须为 boolean；
+// - fourthSlotEligible=true 要求 dashboardRole='candidate' + priority>=90；
+// - system 角色不得声明 fourthSlotEligible=true（系统入口不参与第四槽位竞争）；
+// - optionalPosition 可选，必须属于 leading|trailing；仅 candidate 角色有意义。
 function validatePlacement(name, capabilityId, placement) {
   if (!placement || typeof placement !== 'object' || Array.isArray(placement)) {
     fail(`${name}/${capabilityId}: invalid placement (must be object)`);
@@ -223,7 +237,7 @@ function validatePlacement(name, capabilityId, placement) {
   }
   const needsDashboardContract = placement.region === 'control' || placement.region === 'status';
   if (needsDashboardContract) {
-    // ITERATION-005 §P1-B / 验收清单 D：priority ∈ [0,100]
+    // ITERATION-006 §P0-A：priority ∈ [0,100]（跨仓统一）。
     if (!Number.isInteger(placement.priority) || placement.priority < 0 || placement.priority > 100) {
       fail(`${name}/${capabilityId}: ${placement.region} placement requires priority (integer 0..100)`);
     }
@@ -234,8 +248,8 @@ function validatePlacement(name, capabilityId, placement) {
       fail(`${name}/${capabilityId}: ${placement.region} placement requires fallbackRegion in ${[...FALLBACK_REGIONS].join('/')}`);
     }
   } else {
-    if (placement.priority !== undefined && (!Number.isInteger(placement.priority) || placement.priority < -1000 || placement.priority > 1000)) {
-      fail(`${name}/${capabilityId}: invalid placement.priority (expected integer -1000..1000)`);
+    if (placement.priority !== undefined && (!Number.isInteger(placement.priority) || placement.priority < 0 || placement.priority > 100)) {
+      fail(`${name}/${capabilityId}: invalid placement.priority (expected integer 0..100)`);
     }
     if (placement.dedupeKey !== undefined && (typeof placement.dedupeKey !== 'string' || placement.dedupeKey.length === 0 || placement.dedupeKey.length > 96)) {
       fail(`${name}/${capabilityId}: invalid placement.dedupeKey`);
@@ -247,6 +261,10 @@ function validatePlacement(name, capabilityId, placement) {
   if (placement.region === 'control' && placement.group === undefined) {
     fail(`${name}/${capabilityId}: control placement requires group`);
   }
+  // fixedSlot=4 一律拒绝。
+  if (placement.fixedSlot === 4) {
+    fail(`${name}/${capabilityId}: fixedSlot=4 is not allowed (use dashboardRole='candidate' + fourthSlotEligible instead)`);
+  }
   if (placement.dashboardRole !== undefined) {
     if (!DASHBOARD_ROLES.has(placement.dashboardRole)) {
       fail(`${name}/${capabilityId}: invalid placement.dashboardRole (expected one of ${[...DASHBOARD_ROLES].join('/')})`);
@@ -254,6 +272,11 @@ function validatePlacement(name, capabilityId, placement) {
     if (placement.dashboardRole === 'fixed-core') {
       if (!Number.isInteger(placement.fixedSlot) || placement.fixedSlot < 1 || placement.fixedSlot > 3) {
         fail(`${name}/${capabilityId}: fixed-core placement requires fixedSlot (integer 1..3)`);
+      }
+    } else {
+      // candidate/system 不得声明 fixedSlot。
+      if (placement.fixedSlot !== undefined) {
+        fail(`${name}/${capabilityId}: dashboardRole='${placement.dashboardRole}' must not declare fixedSlot (only fixed-core may)`);
       }
     }
   }
@@ -263,8 +286,10 @@ function validatePlacement(name, capabilityId, placement) {
   if (placement.fourthSlotEligible !== undefined && typeof placement.fourthSlotEligible !== 'boolean') {
     fail(`${name}/${capabilityId}: placement.fourthSlotEligible must be boolean`);
   }
-  // ITERATION-005 §P1-B：fourthSlotEligible=true 强契约。
-  // 验收清单 D：fourth eligible + priority<90 拒绝；fourthSlotEligible=true 时 role 必须 candidate。
+  // ITERATION-006 §P0-A：fourthSlotEligible=true 强契约。
+  // - dashboardRole 必须 candidate；
+  // - priority >= 90；
+  // - system 角色不得竞争第四项（系统入口不参与第四槽位）。
   if (placement.fourthSlotEligible === true) {
     if (placement.dashboardRole !== 'candidate') {
       fail(`${name}/${capabilityId}: fourthSlotEligible=true requires dashboardRole='candidate', got '${String(placement.dashboardRole)}'`);
@@ -272,6 +297,17 @@ function validatePlacement(name, capabilityId, placement) {
     if (!Number.isInteger(placement.priority) || placement.priority < 90) {
       fail(`${name}/${capabilityId}: fourthSlotEligible=true requires priority>=90, got ${String(placement.priority)}`);
     }
+  }
+  if (placement.dashboardRole === 'system' && placement.fourthSlotEligible === true) {
+    fail(`${name}/${capabilityId}: system role must not declare fourthSlotEligible=true (system entries do not compete for the 4th slot)`);
+  }
+  // P0-E：optionalPosition 只允许 leading|trailing；未声明时默认 trailing。
+  if (placement.optionalPosition !== undefined && !OPTIONAL_POSITIONS.has(placement.optionalPosition)) {
+    fail(`${name}/${capabilityId}: invalid placement.optionalPosition (expected one of ${[...OPTIONAL_POSITIONS].join('/')})`);
+  }
+  // optionalPosition 仅对 candidate 角色有意义；其他角色声明视为错误。
+  if (placement.optionalPosition !== undefined && placement.dashboardRole !== 'candidate') {
+    fail(`${name}/${capabilityId}: optionalPosition is only valid on dashboardRole='candidate', got '${String(placement.dashboardRole)}'`);
   }
 }
 
@@ -309,6 +345,10 @@ function validField(field) {
   if (field.format !== undefined && !FORMATS.has(field.format)) return false;
   // P1-A: presentation 字段只允许 primary / details，用于分层显示。
   if (field.presentation !== undefined && !FIELD_PRESENTATIONS.has(field.presentation)) return false;
+  // ITERATION-006 §P0-F/P0-G: priority ∈ [0,100]（整数）。
+  if (field.priority !== undefined && (!Number.isInteger(field.priority) || field.priority < 0 || field.priority > 100)) return false;
+  // ITERATION-006 §P0-G: lightingRole 只允许 effect / primary-color / candidate。
+  if (field.lightingRole !== undefined && !LIGHTING_ROLES.has(field.lightingRole)) return false;
   if (!validWhen(field.visibleWhen)) return false;
   return field.switch === undefined || (field.switch && typeof field.switch === 'object'
     && validPath(field.switch.source)
@@ -326,7 +366,8 @@ function validSummary(value) {
     && validPath(item.source)
     && (item.unit === undefined || (typeof item.unit === 'string' && item.unit.length <= 12))
     && (item.format === undefined || FORMATS.has(item.format))
-    && (item.options === undefined || validOptions(item.options)));
+    && (item.options === undefined || validOptions(item.options))
+    && (item.priority === undefined || (Number.isInteger(item.priority) && item.priority >= 0 && item.priority <= 100)));
 }
 // statusDisplay 支持两种形态：
 //   1) 单值形态（向后兼容）：{ valueSource, labelKey?, valueOptions?, valueFormat?, onClickField? }
