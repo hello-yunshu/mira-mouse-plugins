@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "case": "basilisk-v3-firmware",
-  "hardwareOnly": true,
+  "hardwareOnly": false,
   "evidence": "hardware-verified",
   "description": "Basilisk V3 firmware response (90-byte payload, report_id stripped by transport)",
   "response": [
