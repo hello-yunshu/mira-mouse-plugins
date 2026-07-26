@@ -74,6 +74,159 @@ test('AM35 fixture validates little-endian command id', async () => {
   const fixture = await read('plugins/amaster/tests/fixtures/am35-fragment.json');
   assert.equal(fixture.payload[4] | (fixture.payload[5] << 8), fixture.expectedCommandIdLittleEndian);
 });
+
+// P0-D: AM35 mouse light mode write must NOT derive `enabled` from `mode`.
+// The am35-mouse-light-mode parser only returns mode/speed/brightness (no
+// enabled), and the write command at offset 6 expects a bool. Previously the
+// broken paramSources.enabled=capabilities.mouseLightMode.mode mapping caused
+// mode=0 (steady on) to write enabled=false, silently turning the light off.
+// Fix: am35-mode/am35-speed fields declare `params: { enabled: true }` and
+// drop paramSources.enabled so enabled is always encoded as 1 (true).
+test('P0-D: AM35 mouse-light-mode fields force enabled=true (no mode-derived bool)', async () => {
+  const manifest = await read('plugins/amaster/plugin.json');
+  const lighting = manifest.capabilities.find((c) => c.id === 'lighting');
+  const mouseZone = lighting.metadata.zones.find((z) => z.id === 'mouse');
+  const modeField = mouseZone.fields.find((f) => f.id === 'am35-mode');
+  const speedField = mouseZone.fields.find((f) => f.id === 'am35-speed');
+
+  // Both fields must declare params.enabled = true (constant) so the write
+  // command always receives enabled=true at offset 6, regardless of mode.
+  assert.equal(modeField.params?.enabled, true, 'am35-mode must declare params.enabled=true');
+  assert.equal(speedField.params?.enabled, true, 'am35-speed must declare params.enabled=true');
+
+  // Neither field may declare paramSources.enabled — that was the bug.
+  assert.equal(modeField.paramSources?.enabled, undefined, 'am35-mode must not map paramSources.enabled (P0-D regression)');
+  assert.equal(speedField.paramSources?.enabled, undefined, 'am35-speed must not map paramSources.enabled (P0-D regression)');
+
+  // The mutation inputs still require enabled (boolean), mode (0..2), speed (0..255).
+  // params + paramSources together must cover all mutation inputs.
+  const workflows = await read('plugins/amaster/protocol/workflows.json');
+  const mutation = workflows.mutations['am35-direct-set-mouse-light-mode'];
+  const requiredInputs = Object.keys(mutation.inputs);
+  for (const field of [modeField, speedField]) {
+    const covered = new Set([
+      ...Object.keys(field.params ?? {}),
+      ...Object.keys(field.paramSources ?? {}),
+      field.param ?? 'value',
+    ]);
+    for (const input of requiredInputs) {
+      assert.ok(covered.has(input), `${field.id}: mutation input ${input} not covered by params/paramSources`);
+    }
+  }
+
+  // exportableFields.mouse-lighting-mode-am35 must NOT expose enabled either,
+  // because the getter does not return it.
+  const exportable = manifest.exportableFields.find((f) => f.id === 'mouse-lighting-mode-am35');
+  assert.equal(exportable.sources?.enabled, undefined, 'exportableFields mouse-lighting-mode-am35 must not expose enabled (getter does not return it)');
+});
+
+test('P0-D: AM35 mouse-light-mode-write fixture enforces enabled byte = 1 for all modes', async () => {
+  const fixture = await read('plugins/amaster/tests/fixtures/am35-mouse-light-mode-write.json');
+  // No sample may carry enabled=false — the UI no longer offers a toggle for it.
+  for (const sample of fixture.samples) {
+    assert.equal(sample.input.enabled, undefined, `sample ${JSON.stringify(sample.input)}: input must not include enabled (now a constant param)`);
+    // enabled byte is at offset 6 of the 9-byte RACE frame.
+    assert.equal(sample.expectedRequestPayload[6], 1, `sample ${JSON.stringify(sample.input)}: enabled byte at offset 6 must be 1`);
+    // Frame prefix: 05 5A 05 00 B3 30
+    assert.deepEqual(sample.expectedRequestPayload.slice(0, 6), [5, 90, 5, 0, 179, 48]);
+  }
+  // Regression: the mode=0 sample must encode enabled=1, NOT 0.
+  const mode0Sample = fixture.samples.find((s) => s.input.mode === 0 && s.input.speed === 0);
+  assert.ok(mode0Sample, 'fixture must include a mode=0, speed=0 sample');
+  assert.equal(mode0Sample.expectedRequestPayload[6], 1, 'mode=0 (steady on) must still write enabled=1');
+  assert.equal(mode0Sample.expectedRequestPayload[7], 0, 'mode byte at offset 7 must be 0');
+  assert.equal(mode0Sample.expectedRequestPayload[8], 0, 'speed byte at offset 8 must be 0');
+  // Mode=2 with speed=4 must also encode enabled=1.
+  const mode2Sample = fixture.samples.find((s) => s.input.mode === 2 && s.input.speed === 4);
+  assert.ok(mode2Sample, 'fixture must include a mode=2, speed=4 sample');
+  assert.equal(mode2Sample.expectedRequestPayload[6], 1, 'mode=2 (neon) must still write enabled=1');
+  // Readback parser returns mode/speed/brightness — no enabled field.
+  assert.equal(fixture.readback.expectedParsed.enabled, undefined, 'parser must not return enabled (it is a write-only bool)');
+});
+
+test('P0-D: AM35 set-mouse-light-mode mutation rejects out-of-range mode/speed', async () => {
+  const { mutations } = await read('plugins/amaster/protocol/workflows.json');
+  const modeInputs = mutations['am35-direct-set-mouse-light-mode'].inputs;
+  assert.deepEqual(modeInputs.mode.allowed, undefined, 'mode uses min/max, not allowed list');
+  assert.equal(modeInputs.mode.min, 0);
+  assert.equal(modeInputs.mode.max, 2);
+  assert.equal(modeInputs.speed.min, 0);
+  assert.equal(modeInputs.speed.max, 255);
+  // speed max is 255 per mutation inputs; the UI options cap at 4 (5 levels),
+  // but the wire encoding accepts the full byte range declared in mutation inputs.
+  assert.equal(modeInputs.enabled.kind, 'boolean');
+});
+
+// P0-E: AM35 sleep-time capability must use family-aware statusDisplay variants.
+// Previously the statusDisplay pointed at the Protocol A path
+// (capabilities.settings.wirelessSleepValue + onClickField protocol-a-wireless)
+// even when the device was in the AM35 family, so the status chip showed the
+// wrong value and tapping it opened the wrong field's editor. Fix: split into
+// two variants gated on `family` so each family gets its own valueSource and
+// onClickField.
+test('P0-E: AM35 sleep-time statusDisplay uses family-aware variants', async () => {
+  const manifest = await read('plugins/amaster/plugin.json');
+  const sleepTime = manifest.capabilities.find((c) => c.id === 'sleep-time');
+  const statusDisplay = sleepTime.metadata.statusDisplay;
+  assert.ok(Array.isArray(statusDisplay.variants), 'sleep-time statusDisplay must use variants');
+  assert.equal(statusDisplay.variants.length, 2);
+  const protocolA = statusDisplay.variants.find((v) => v.visibleWhen.in.includes('protocol-a-direct'));
+  const am35 = statusDisplay.variants.find((v) => v.visibleWhen.in.includes('am35-direct'));
+  assert.ok(protocolA, 'must declare a Protocol A variant');
+  assert.ok(am35, 'must declare an AM35 variant');
+  // Protocol A variant must point at the Protocol A getter/settings path.
+  assert.equal(protocolA.valueSource, 'capabilities.settings.wirelessSleepValue');
+  assert.equal(protocolA.onClickField, 'protocol-a-wireless');
+  assert.equal(protocolA.valueFormat, 'sleep');
+  // AM35 variant must point at the AM35 sleepTime parser output and AM35 field.
+  assert.equal(am35.valueSource, 'capabilities.sleepTime.wirelessSleepValue');
+  assert.equal(am35.onClickField, 'am35-wireless');
+  assert.equal(am35.valueFormat, 'sleep');
+  // onClickField targets must exist in declared fields.
+  const fieldIds = sleepTime.metadata.fields.map((f) => f.id);
+  assert.ok(fieldIds.includes('protocol-a-wireless'), 'protocol-a-wireless field must be declared');
+  assert.ok(fieldIds.includes('am35-wireless'), 'am35-wireless field must be declared');
+});
+// P1-D: read-response base 命令必须由某个 mutation 携带 preReadResponse 使用。
+// read-response 命令模板要求把 pre-read 响应作为 write payload 的 base，再覆盖
+// 显式声明的 byte。如果没有任何 mutation 引用该命令作为 writeCommand，或者
+// 引用它的 mutation 缺少有效的 read 步骤，该命令就是孤立模板，会在运行时
+// 产生全零 base（无 pre-read 响应可复制），必须拒绝。
+test('P1-D: every read-response base command is owned by a mutation with preReadResponse', async () => {
+  const { commands } = await read('plugins/amaster/protocol/commands.json');
+  const { mutations } = await read('plugins/amaster/protocol/workflows.json');
+
+  // Build writeCommand -> mutations[] index.
+  const writeCommandToMutations = new Map();
+  for (const [mutationId, mutation] of Object.entries(mutations)) {
+    if (!mutation.writeCommand) continue;
+    const list = writeCommandToMutations.get(mutation.writeCommand) ?? [];
+    list.push({ mutationId, mutation });
+    writeCommandToMutations.set(mutation.writeCommand, list);
+  }
+
+  const readResponseCommands = Object.entries(commands).filter(
+    ([, command]) => command.request.base === 'read-response',
+  );
+  assert.ok(readResponseCommands.length >= 6, 'expected at least 6 read-response base commands');
+
+  for (const [id, command] of readResponseCommands) {
+    const owners = writeCommandToMutations.get(id) ?? [];
+    assert.ok(owners.length > 0, `${id}: read-response base command must be used as a writeCommand by at least one mutation (orphan template would produce all-zero base)`);
+    for (const { mutationId, mutation } of owners) {
+      assert.ok(mutation.read?.command, `${id}: mutation ${mutationId} uses read-response base but lacks preReadResponse (mutation.read.command)`);
+      assert.ok(commands[mutation.read.command], `${id}: mutation ${mutationId} references unknown preReadResponse command ${mutation.read.command}`);
+      assert.ok(mutation.read?.parser, `${id}: mutation ${mutationId} uses read-response base but lacks preReadResponse (mutation.read.parser)`);
+    }
+  }
+});
+
+test('P1-D: no orphan read-response command remains (profile-write regression)', async () => {
+  const { commands } = await read('plugins/amaster/protocol/commands.json');
+  // The previously-orphan "profile-write" command must stay deleted.
+  assert.equal(commands['profile-write'], undefined, 'profile-write orphan read-response command must remain deleted');
+});
+
 test('research plugins stay read-only and expose evidence-scoped descriptors', async () => {
   const emptyWhitelist = []
   for (const name of emptyWhitelist) {
@@ -218,6 +371,56 @@ test('AMaster declares complete declarative host capability metadata', async () 
   assert.deepEqual(capabilities['button-mappings'].placements[0], {
     region: 'details', order: 40, span: 1, icon: 'info',
   });
+});
+
+// ITERATION-005 §P1-B：Placement Contract 强契约验证。
+// 遍历全部动态发现插件的 control/status placement，断言：
+// - priority ∈ [0,100]
+// - fourthSlotEligible=true 时 dashboardRole='candidate' 且 priority>=90
+// - fixedSlot 仅在 dashboardRole='fixed-core' 时出现，且 ∈ {1,2,3}
+// - control/status 必须声明 dedupeKey 与 fallbackRegion
+test('P1-B: all plugin placements satisfy dashboard contract', async () => {
+  const { readdir } = await import('node:fs/promises');
+  const { existsSync } = await import('node:fs');
+  const { fileURLToPath } = await import('node:url');
+  const pluginDirs = (await readdir(new URL('../plugins/', import.meta.url), { withFileTypes: true }))
+    .filter((e) => e.isDirectory() && existsSync(fileURLToPath(new URL(`../plugins/${e.name}/plugin.json`, import.meta.url))))
+    .map((e) => e.name);
+
+  for (const dir of pluginDirs) {
+    const manifest = await read(`plugins/${dir}/plugin.json`);
+    for (const capability of manifest.capabilities ?? []) {
+      for (const placement of capability.placements ?? []) {
+        const isDashboard = placement.region === 'control' || placement.region === 'status';
+        if (!isDashboard) continue;
+        // priority ∈ [0,100]
+        assert.ok(
+          Number.isInteger(placement.priority) && placement.priority >= 0 && placement.priority <= 100,
+          `${dir}/${capability.id}: priority must be 0..100, got ${String(placement.priority)}`,
+        );
+        // dedupeKey 非空
+        assert.ok(typeof placement.dedupeKey === 'string' && placement.dedupeKey.length > 0,
+          `${dir}/${capability.id}: dedupeKey required`);
+        // fallbackRegion 合法
+        assert.ok(['advanced', 'hidden', 'details'].includes(placement.fallbackRegion),
+          `${dir}/${capability.id}: fallbackRegion invalid`);
+        // fourthSlotEligible=true → candidate + priority>=90
+        if (placement.fourthSlotEligible === true) {
+          assert.equal(placement.dashboardRole, 'candidate',
+            `${dir}/${capability.id}: fourthSlotEligible=true requires dashboardRole='candidate'`);
+          assert.ok(placement.priority >= 90,
+            `${dir}/${capability.id}: fourthSlotEligible=true requires priority>=90, got ${placement.priority}`);
+        }
+        // fixedSlot 仅 fixed-core
+        if (placement.fixedSlot !== undefined) {
+          assert.equal(placement.dashboardRole, 'fixed-core',
+            `${dir}/${capability.id}: fixedSlot requires dashboardRole='fixed-core'`);
+          assert.ok([1, 2, 3].includes(placement.fixedSlot),
+            `${dir}/${capability.id}: fixedSlot must be 1/2/3, got ${placement.fixedSlot}`);
+        }
+      }
+    }
+  }
 });
 
 test('battery history eligibility is declared by each plugin', async () => {

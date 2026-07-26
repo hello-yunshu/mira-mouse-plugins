@@ -58,6 +58,18 @@ const DECLARATIVE_CONTROLS = new Set(['Toggle', 'Segmented', 'Select', 'Slider',
 const DECLARATIVE_METADATA = new Set(['accentSource', 'fields', 'zones', 'stageLayout', 'statusDisplay', 'stateMapping', 'batteryHistory', 'visibleWhen', 'summary']);
 const EDITORS = new Set(['inline-toggle', 'inline-segmented', 'inline-value', 'inline-action', 'modal-select', 'modal-color', 'modal-range', 'modal-number', 'modal-dpi-stage', 'modal-gradient', 'static-readonly']);
 const FORMATS = new Set(['sleep', 'percent', 'hertz', 'connection', 'color', 'default']);
+// P1-B: Placement Contract 字段集合。
+// region 是 placement 的核心字段，决定哪些契约字段必填。
+const PLACEMENT_REGIONS = new Set(['hero', 'control', 'status', 'details', 'advanced', 'hidden']);
+const PLACEMENT_KEYS = new Set([
+  'region', 'group', 'order', 'span', 'icon', 'priority',
+  'dashboardRole', 'fixedSlot', 'fourthSlotEligible', 'dedupeKey', 'fallbackRegion',
+]);
+const DASHBOARD_ROLES = new Set(['fixed-core', 'contextual']);
+const FALLBACK_REGIONS = new Set(['advanced', 'hidden', 'details']);
+// P1-A: PluginField.presentation 只允许 primary / details 两档，
+// 用于在 LightingZone 等 capability 中区分主要字段与高级字段。
+const FIELD_PRESENTATIONS = new Set(['primary', 'details']);
 
 const REQUIRED_FILES = [
   'README.md',
@@ -128,6 +140,7 @@ for (const name of plugins) {
   let statusItems = 0;
   for (const capability of manifest.capabilities ?? []) {
     for (const placement of capability.placements ?? []) {
+      validatePlacement(name, capability.id, placement);
       if (placement.region === 'control') controlGroups.add(placement.group ?? capability.id);
       if (placement.region === 'status') statusItems += 1;
     }
@@ -176,6 +189,92 @@ function validateRuntime(name, runtime) {
   }
 }
 
+// P1-B: Placement Contract Validator。
+// 校验规则：
+// - region 必填，必须属于 PLACEMENT_REGIONS；
+// - order 必填，整数 0..1000；
+// - span 可选，整数 1..4（默认 1）；
+// - group 在 control region 必填，其他 region 可选；
+// - priority 在 control / status region 必填（-1000..1000），其他 region 可选；
+// - dedupeKey 在 control / status region 必填（非空字符串），其他 region 可选；
+// - fallbackRegion 在 control / status region 必填，必须属于 FALLBACK_REGIONS，其他 region 可选；
+// - dashboardRole 可选，但若声明必须属于 DASHBOARD_ROLES；
+// - 当 dashboardRole === 'fixed-core' 时，fixedSlot 必填且为 1..3；
+// - fixedSlot 仅在 dashboardRole === 'fixed-core' 时允许声明；
+// - fourthSlotEligible 可选，必须为 boolean。
+function validatePlacement(name, capabilityId, placement) {
+  if (!placement || typeof placement !== 'object' || Array.isArray(placement)) {
+    fail(`${name}/${capabilityId}: invalid placement (must be object)`);
+  }
+  const unexpected = Object.keys(placement).filter((key) => !PLACEMENT_KEYS.has(key));
+  if (unexpected.length > 0) fail(`${name}/${capabilityId}: unexpected placement keys: ${unexpected.join(', ')}`);
+  if (!PLACEMENT_REGIONS.has(placement.region)) fail(`${name}/${capabilityId}: invalid placement.region ${JSON.stringify(placement.region)}`);
+  if (!Number.isInteger(placement.order) || placement.order < 0 || placement.order > 1000) {
+    fail(`${name}/${capabilityId}: invalid placement.order (expected integer 0..1000)`);
+  }
+  if (placement.span !== undefined && (!Number.isInteger(placement.span) || placement.span < 1 || placement.span > 4)) {
+    fail(`${name}/${capabilityId}: invalid placement.span (expected integer 1..4)`);
+  }
+  if (placement.group !== undefined && !validPath(placement.group)) {
+    fail(`${name}/${capabilityId}: invalid placement.group`);
+  }
+  if (placement.icon !== undefined && !validPath(placement.icon)) {
+    fail(`${name}/${capabilityId}: invalid placement.icon`);
+  }
+  const needsDashboardContract = placement.region === 'control' || placement.region === 'status';
+  if (needsDashboardContract) {
+    // ITERATION-005 §P1-B / 验收清单 D：priority ∈ [0,100]
+    if (!Number.isInteger(placement.priority) || placement.priority < 0 || placement.priority > 100) {
+      fail(`${name}/${capabilityId}: ${placement.region} placement requires priority (integer 0..100)`);
+    }
+    if (typeof placement.dedupeKey !== 'string' || placement.dedupeKey.length === 0 || placement.dedupeKey.length > 96) {
+      fail(`${name}/${capabilityId}: ${placement.region} placement requires dedupeKey (non-empty string, ≤96 chars)`);
+    }
+    if (!FALLBACK_REGIONS.has(placement.fallbackRegion)) {
+      fail(`${name}/${capabilityId}: ${placement.region} placement requires fallbackRegion in ${[...FALLBACK_REGIONS].join('/')}`);
+    }
+  } else {
+    if (placement.priority !== undefined && (!Number.isInteger(placement.priority) || placement.priority < -1000 || placement.priority > 1000)) {
+      fail(`${name}/${capabilityId}: invalid placement.priority (expected integer -1000..1000)`);
+    }
+    if (placement.dedupeKey !== undefined && (typeof placement.dedupeKey !== 'string' || placement.dedupeKey.length === 0 || placement.dedupeKey.length > 96)) {
+      fail(`${name}/${capabilityId}: invalid placement.dedupeKey`);
+    }
+    if (placement.fallbackRegion !== undefined && !FALLBACK_REGIONS.has(placement.fallbackRegion)) {
+      fail(`${name}/${capabilityId}: invalid placement.fallbackRegion`);
+    }
+  }
+  if (placement.region === 'control' && placement.group === undefined) {
+    fail(`${name}/${capabilityId}: control placement requires group`);
+  }
+  if (placement.dashboardRole !== undefined) {
+    if (!DASHBOARD_ROLES.has(placement.dashboardRole)) {
+      fail(`${name}/${capabilityId}: invalid placement.dashboardRole (expected one of ${[...DASHBOARD_ROLES].join('/')})`);
+    }
+    if (placement.dashboardRole === 'fixed-core') {
+      if (!Number.isInteger(placement.fixedSlot) || placement.fixedSlot < 1 || placement.fixedSlot > 3) {
+        fail(`${name}/${capabilityId}: fixed-core placement requires fixedSlot (integer 1..3)`);
+      }
+    }
+  }
+  if (placement.fixedSlot !== undefined && placement.dashboardRole !== 'fixed-core') {
+    fail(`${name}/${capabilityId}: fixedSlot requires dashboardRole=fixed-core`);
+  }
+  if (placement.fourthSlotEligible !== undefined && typeof placement.fourthSlotEligible !== 'boolean') {
+    fail(`${name}/${capabilityId}: placement.fourthSlotEligible must be boolean`);
+  }
+  // ITERATION-005 §P1-B：fourthSlotEligible=true 强契约。
+  // 验收清单 D：fourth eligible + priority<90 拒绝；fourthSlotEligible=true 时 role 必须 candidate。
+  if (placement.fourthSlotEligible === true) {
+    if (placement.dashboardRole !== 'candidate') {
+      fail(`${name}/${capabilityId}: fourthSlotEligible=true requires dashboardRole='candidate', got '${String(placement.dashboardRole)}'`);
+    }
+    if (!Number.isInteger(placement.priority) || placement.priority < 90) {
+      fail(`${name}/${capabilityId}: fourthSlotEligible=true requires priority>=90, got ${String(placement.priority)}`);
+    }
+  }
+}
+
 function validPath(value) { return typeof value === 'string' && value.length > 0 && value.length <= 160; }
 function validOptions(value, max = 32) {
   return Array.isArray(value) && value.length <= max && value.every((item) => item && typeof item === 'object'
@@ -208,6 +307,8 @@ function validField(field) {
   if (field.optionSource !== undefined && !validPath(field.optionSource)) return false;
   if (field.range !== undefined && !validRange(field.range)) return false;
   if (field.format !== undefined && !FORMATS.has(field.format)) return false;
+  // P1-A: presentation 字段只允许 primary / details，用于分层显示。
+  if (field.presentation !== undefined && !FIELD_PRESENTATIONS.has(field.presentation)) return false;
   if (!validWhen(field.visibleWhen)) return false;
   return field.switch === undefined || (field.switch && typeof field.switch === 'object'
     && validPath(field.switch.source)
@@ -226,6 +327,43 @@ function validSummary(value) {
     && (item.unit === undefined || (typeof item.unit === 'string' && item.unit.length <= 12))
     && (item.format === undefined || FORMATS.has(item.format))
     && (item.options === undefined || validOptions(item.options)));
+}
+// statusDisplay 支持两种形态：
+//   1) 单值形态（向后兼容）：{ valueSource, labelKey?, valueOptions?, valueFormat?, onClickField? }
+//   2) variants 形态（family-aware）：{ labelKey?, variants: [{ visibleWhen, valueSource, onClickField?, valueFormat?, valueOptions? }] }
+// 当声明 variants 时，运行时按 visibleWhen 选择激活的 variant，因此每个 variant 都必须
+// 自带 valueSource 与 visibleWhen；onClickField 必须指向 declaredFields 中已声明的字段。
+function validStatusDisplay(display, declaredFields) {
+  if (!display || typeof display !== 'object' || Array.isArray(display)) return false;
+  if (display.labelKey !== undefined && !validPath(display.labelKey)) return false;
+  // 允许（但不强制）variants 与单值字段同时存在；只要其中一组有效即通过。
+  const hasVariants = Array.isArray(display.variants);
+  let variantsOk = true;
+  if (hasVariants) {
+    if (display.variants.length === 0 || display.variants.length > 8) variantsOk = false;
+    for (const variant of display.variants) {
+      if (!variant || typeof variant !== 'object' || Array.isArray(variant)) { variantsOk = false; break; }
+      if (!validWhen(variant.visibleWhen)) variantsOk = false;
+      if (!validPath(variant.valueSource)) variantsOk = false;
+      if (variant.valueOptions !== undefined && !validOptions(variant.valueOptions)) variantsOk = false;
+      if (variant.valueFormat !== undefined && !FORMATS.has(variant.valueFormat)) variantsOk = false;
+      if (variant.onClickField !== undefined && (
+        !validPath(variant.onClickField)
+        || !declaredFields.some((field) => field.id === variant.onClickField)
+      )) variantsOk = false;
+    }
+  }
+  // 单值形态字段
+  const singleOk = validPath(display.valueSource)
+    && (display.valueOptions === undefined || validOptions(display.valueOptions))
+    && (display.valueFormat === undefined || FORMATS.has(display.valueFormat))
+    && (display.onClickField === undefined || (
+      validPath(display.onClickField)
+      && declaredFields.some((field) => field.id === display.onClickField)
+    ));
+  // 如果同时声明了 variants 与单值字段，至少 variants 必须有效；单值字段用作 fallback。
+  if (hasVariants) return variantsOk;
+  return singleOk;
 }
 function validateExportableFields(name, fields) {
   // ITERATION-003 Gate C §7.5：允许同一 exportKey 通过 visibleWhen 区分 family。
@@ -303,18 +441,9 @@ function validateDeclarativeCapability(name, capability) {
     ...(metadata.fields ?? []),
     ...(metadata.zones ?? []).flatMap((zone) => zone.fields ?? []),
   ];
-  if (metadata.statusDisplay !== undefined && (
-    !metadata.statusDisplay
-    || typeof metadata.statusDisplay !== 'object'
-    || !validPath(metadata.statusDisplay.valueSource)
-    || (metadata.statusDisplay.labelKey !== undefined && !validPath(metadata.statusDisplay.labelKey))
-    || (metadata.statusDisplay.valueOptions !== undefined && !validOptions(metadata.statusDisplay.valueOptions))
-    || (metadata.statusDisplay.valueFormat !== undefined && !FORMATS.has(metadata.statusDisplay.valueFormat))
-    || (metadata.statusDisplay.onClickField !== undefined && (
-      !validPath(metadata.statusDisplay.onClickField)
-      || !declaredFields.some((field) => field.id === metadata.statusDisplay.onClickField)
-    ))
-  )) fail(`${name}/${capability.id}: invalid statusDisplay`);
+  if (metadata.statusDisplay !== undefined && !validStatusDisplay(metadata.statusDisplay, declaredFields)) {
+    fail(`${name}/${capability.id}: invalid statusDisplay`);
+  }
   if (metadata.summary !== undefined && !validSummary(metadata.summary)) fail(`${name}/${capability.id}: invalid summary`);
   if (metadata.accentSource !== undefined && !validPath(metadata.accentSource)) fail(`${name}/${capability.id}: invalid accentSource`);
   for (const field of metadata.fields ?? []) validateFieldMutationCoverage(name, capability.id, field);
@@ -770,6 +899,34 @@ for (const [name, data] of Object.entries(pluginData)) {
       for (const patch of memory.patches) {
         if ((patch.param === undefined) === (patch.value === undefined)) fail(`${name}/${id}: memory patch must have exactly one source`);
         if (patch.param !== undefined && !mutation.inputs[patch.param]) fail(`${name}/${id}: memory patch uses undeclared parameter`);
+      }
+    }
+  }
+
+  // P1-D: read-response base 命令必须由某个 mutation 携带 preReadResponse 使用。
+  // read-response 命令模板要求把 pre-read 响应作为 write payload 的 base，再覆盖
+  // 显式声明的 byte。如果没有任何 mutation 引用该命令作为 writeCommand，或者
+  // 引用它的 mutation 缺少有效的 read 步骤，该命令就是孤立模板，会在运行时
+  // 产生全零 base（无 pre-read 响应可复制），必须拒绝。
+  const writeCommandToMutations = new Map();
+  for (const [mutationId, mutation] of Object.entries(mutations)) {
+    if (!mutation.writeCommand) continue;
+    const list = writeCommandToMutations.get(mutation.writeCommand) ?? [];
+    list.push({ mutationId, mutation });
+    writeCommandToMutations.set(mutation.writeCommand, list);
+  }
+  for (const [id, command] of Object.entries(commands)) {
+    if (command.request.base !== 'read-response') continue;
+    const owners = writeCommandToMutations.get(id) ?? [];
+    if (owners.length === 0) {
+      fail(`${name}/${id}: read-response base command must be used as a writeCommand by at least one mutation (orphan template would produce all-zero base)`);
+    }
+    for (const { mutationId, mutation } of owners) {
+      if (!mutation.read?.command || !commands[mutation.read.command]) {
+        fail(`${name}/${id}: mutation ${mutationId} uses read-response base but lacks a valid preReadResponse (mutation.read.command)`);
+      }
+      if (!mutation.read?.parser || !parsers[mutation.read.parser]) {
+        fail(`${name}/${id}: mutation ${mutationId} uses read-response base but lacks a valid preReadResponse (mutation.read.parser)`);
       }
     }
   }
