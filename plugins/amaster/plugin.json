@@ -306,9 +306,21 @@
           }
         ],
         "statusDisplay": {
-          "valueSource": "capabilities.settings.wirelessSleepValue",
-          "valueFormat": "sleep",
-          "onClickField": "protocol-a-wireless"
+          "labelKey": "capability.sleep-time",
+          "variants": [
+            {
+              "visibleWhen": { "path": "family", "in": ["protocol-a-direct", "protocol-a-receiver"] },
+              "valueSource": "capabilities.settings.wirelessSleepValue",
+              "onClickField": "protocol-a-wireless",
+              "valueFormat": "sleep"
+            },
+            {
+              "visibleWhen": { "path": "family", "in": ["am35-direct", "am35-receiver"] },
+              "valueSource": "capabilities.sleepTime.wirelessSleepValue",
+              "onClickField": "am35-wireless",
+              "valueFormat": "sleep"
+            }
+          ]
         }
       }
     },
@@ -484,8 +496,8 @@
                     "am35-receiver"
                   ]
                 },
+                "params": { "enabled": true },
                 "paramSources": {
-                  "enabled": "capabilities.mouseLightMode.mode",
                   "mode": "capabilities.mouseLightMode.mode",
                   "speed": "capabilities.mouseLightMode.speed"
                 }
@@ -528,8 +540,8 @@
                     "am35-receiver"
                   ]
                 },
+                "params": { "enabled": true },
                 "paramSources": {
-                  "enabled": "capabilities.mouseLightMode.mode",
                   "mode": "capabilities.mouseLightMode.mode",
                   "speed": "capabilities.mouseLightMode.speed"
                 }
@@ -796,6 +808,7 @@
                   "offValue": 0
                 },
                 "labelKey": "dashboard.status",
+                "presentation": "primary",
                 "paramSources": {
                   "enabled": "capabilities.receiverLight.enabled",
                   "type": "capabilities.receiverLight.type",
@@ -817,6 +830,7 @@
                 "editor": "modal-select",
                 "labelKey": "receiverLighting.field.type",
                 "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "presentation": "primary",
                 "options": [
                   {
                     "value": 0,
@@ -877,6 +891,7 @@
                 "format": "color",
                 "labelKey": "receiverLighting.field.color",
                 "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "presentation": "primary",
                 "paramSources": {
                   "enabled": "capabilities.receiverLight.enabled",
                   "type": "capabilities.receiverLight.type",
@@ -904,6 +919,7 @@
                 },
                 "labelKey": "receiverLighting.field.ratio",
                 "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "presentation": "primary",
                 "paramSources": {
                   "enabled": "capabilities.receiverLight.enabled",
                   "type": "capabilities.receiverLight.type",
@@ -926,6 +942,7 @@
                 "format": "color",
                 "labelKey": "receiverLighting.field.color",
                 "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "presentation": "details",
                 "paramSources": {
                   "enabled": "capabilities.receiverLight.enabled",
                   "type": "capabilities.receiverLight.type",
@@ -953,6 +970,7 @@
                 },
                 "labelKey": "receiverLighting.field.ratio",
                 "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "presentation": "details",
                 "paramSources": {
                   "enabled": "capabilities.receiverLight.enabled",
                   "type": "capabilities.receiverLight.type",
@@ -975,6 +993,7 @@
                 "format": "color",
                 "labelKey": "receiverLighting.field.color",
                 "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "presentation": "details",
                 "paramSources": {
                   "enabled": "capabilities.receiverLight.enabled",
                   "type": "capabilities.receiverLight.type",
@@ -1002,6 +1021,7 @@
                 },
                 "labelKey": "receiverLighting.field.ratio",
                 "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "presentation": "details",
                 "paramSources": {
                   "enabled": "capabilities.receiverLight.enabled",
                   "type": "capabilities.receiverLight.type",
@@ -1023,6 +1043,7 @@
                 "editor": "modal-select",
                 "labelKey": "receiverLighting.field.speed",
                 "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "presentation": "primary",
                 "options": [
                   {
                     "value": 0,
@@ -1066,6 +1087,7 @@
                 "editor": "modal-select",
                 "labelKey": "receiverLighting.field.brightness",
                 "editTitleKey": "dashboard.editReceiverLightingTitle",
+                "presentation": "primary",
                 "options": [
                   {
                     "value": 0,
@@ -2027,7 +2049,6 @@
       "kind": "object",
       "mutation": "set-mouse-light-mode",
       "sources": {
-        "enabled": "capabilities.mouseLightMode.mode",
         "mode": "capabilities.mouseLightMode.mode",
         "speed": "capabilities.mouseLightMode.speed"
       },
