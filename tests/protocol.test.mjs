@@ -150,19 +150,14 @@ test('AMaster declares complete declarative host capability metadata', async () 
   assert.equal(capabilities['polling-rate'].metadata.fields[0].optionSource, 'state.supportedPollingRates');
   assert.equal(capabilities.lighting.control, 'LightingZone');
   assert.equal(capabilities.lighting.metadata.statusDisplay.labelKey, 'capability.lighting');
-  assert.equal(capabilities.lighting.metadata.statusDisplay.valueSource, 'capabilities.settings.mouseLightEnabled');
-  assert.equal(capabilities.lighting.metadata.statusDisplay.onClickField, 'enabled');
-  assert.equal(
-    capabilities.lighting.metadata.zones.flatMap((zone) => zone.fields)
-      .find((field) => field.id === capabilities.lighting.metadata.statusDisplay.onClickField).editor,
-    'inline-toggle',
-  );
+  // ITERATION-004 §2.3：lighting statusDisplay.valueSource 改为 accent color 路径，
+  // 不再使用 Protocol-A-only 的 capabilities.settings.mouseLightEnabled。
+  // onClickField 已移除，点击状态项通过 controlAction 跳转到灯光控制页。
+  assert.equal(capabilities.lighting.metadata.statusDisplay.valueSource, 'capabilities.mouseLighting.color');
+  assert.equal(capabilities.lighting.metadata.statusDisplay.onClickField, undefined);
   assert.equal(capabilities.dpi.metadata.summary, undefined);
-  assert.deepEqual(capabilities['polling-rate'].metadata.summary.map((item) => item.source), [
-    'capabilities.settings.motionSync',
-    'capabilities.settings.angleSnap',
-    'capabilities.settings.liftCutOff',
-  ]);
+  // ITERATION-004 §2.3：polling-rate 的 summary 已移除（motionSync/angleSnap/liftCutOff 不再塞入回报率页面）。
+  assert.equal(capabilities['polling-rate'].metadata.summary, undefined);
   // Protocol A 与 AM35 接收器灯光以独立 zone 暴露，分别通过
   // visibleWhen.capabilities.receiverLighting / capabilities.receiverLight 区分。
   assert.deepEqual(capabilities.lighting.metadata.zones.map((zone) => zone.id), ['mouse', 'receiver', 'receiver-am35']);
@@ -176,10 +171,11 @@ test('AMaster declares complete declarative host capability metadata', async () 
     path: 'family', in: ['protocol-a-direct', 'protocol-a-receiver'],
   });
   // AM35 mouse zone fields expose mode/speed/color with family gating.
+  // ITERATION-004 §2.3：am35-enabled false toggle 已移除，AM35 mouse zone 现有 3 个字段（mode/speed/color）。
   const am35MouseFields = capabilities.lighting.metadata.zones[0].fields.filter(
     (field) => field.visibleWhen?.in?.includes('am35-direct'),
   );
-  assert.ok(am35MouseFields.length >= 4, 'AM35 mouse zone must expose mode/speed/color fields');
+  assert.ok(am35MouseFields.length >= 3, 'AM35 mouse zone must expose mode/speed/color fields');
   for (const field of am35MouseFields) {
     assert.ok(['set-mouse-light-mode', 'set-mouse-light-color'].includes(field.mutation), `unexpected mutation ${field.mutation}`);
   }
@@ -215,6 +211,8 @@ test('AMaster declares complete declarative host capability metadata', async () 
   }
   assert.deepEqual(capabilities.dpi.placements[0], {
     region: 'control', group: 'performance', order: 10, span: 1, icon: 'gauge',
+    priority: 100, dashboardRole: 'fixed-core', fixedSlot: 1, fourthSlotEligible: false,
+    dedupeKey: 'dashboard.dpi', fallbackRegion: 'advanced',
   });
   assert.deepEqual(capabilities.lighting.placements.map((placement) => placement.region), ['control', 'status']);
   assert.deepEqual(capabilities['button-mappings'].placements[0], {

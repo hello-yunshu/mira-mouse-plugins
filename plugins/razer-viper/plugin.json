@@ -32,7 +32,7 @@
       "control": "ReadOnlyValue",
       "labelKey": "capability.dpi",
       "readOnly": true,
-      "placements": [{ "region": "control", "group": "performance", "order": 10, "span": 1, "icon": "gauge" }],
+      "placements": [{ "region": "control", "group": "performance", "order": 10, "span": 1, "icon": "gauge", "priority": 100, "dashboardRole": "fixed-core", "fixedSlot": 1, "fourthSlotEligible": false, "dedupeKey": "dashboard.dpi", "fallbackRegion": "advanced" }],
       "metadata": {
         "fields": [{ "id": "value", "source": "capabilities.dpi", "editor": "static-readonly", "labelKey": "capability.dpi" }]
       }
@@ -42,7 +42,7 @@
       "control": "ReadOnlyValue",
       "labelKey": "capability.polling-rate",
       "readOnly": true,
-      "placements": [{ "region": "control", "group": "polling", "order": 20, "span": 1, "icon": "wave" }],
+      "placements": [{ "region": "control", "group": "polling", "order": 20, "span": 1, "icon": "wave", "priority": 100, "dashboardRole": "fixed-core", "fixedSlot": 2, "fourthSlotEligible": false, "dedupeKey": "dashboard.polling-rate", "fallbackRegion": "advanced" }],
       "metadata": {
         "fields": [{ "id": "value", "source": "capabilities.pollingRate", "editor": "static-readonly", "format": "hertz", "labelKey": "capability.polling-rate" }]
       }

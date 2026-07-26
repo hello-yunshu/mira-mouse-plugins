@@ -14,16 +14,17 @@
       "control": "ReadOnlyValue",
       "labelKey": "battery",
       "readOnly": true,
+      "placements": [{ "region": "hero", "order": 10, "span": 1, "icon": "battery", "priority": 50, "fallbackRegion": "hidden" }],
       "metadata": {
         "fields": [{ "id": "value", "source": "battery", "editor": "static-readonly", "format": "percent", "labelKey": "battery" }],
         "batteryHistory": { "validConnections": ["wireless"] }
       }
     },
-    { "id": "charging", "control": "ReadOnlyValue", "labelKey": "charging", "readOnly": true },
-    { "id": "dpi", "control": "DpiStages", "labelKey": "dpi", "readOnly": true },
-    { "id": "polling-rate", "control": "Segmented", "labelKey": "pollingRate", "readOnly": true },
-    { "id": "mouse-light", "control": "LightingZone", "labelKey": "mouseLight", "readOnly": true },
-    { "id": "receiver-gradient", "control": "GradientStops", "labelKey": "receiverGradient", "readOnly": true }
+    { "id": "charging", "control": "ReadOnlyValue", "labelKey": "charging", "readOnly": true, "placements": [{ "region": "status", "order": 10, "span": 1, "priority": 60, "fourthSlotEligible": false, "dedupeKey": "status.charging", "fallbackRegion": "advanced" }] },
+    { "id": "dpi", "control": "DpiStages", "labelKey": "dpi", "readOnly": true, "placements": [{ "region": "control", "group": "performance", "order": 10, "span": 1, "icon": "gauge", "priority": 100, "dashboardRole": "fixed-core", "fixedSlot": 1, "fourthSlotEligible": false, "dedupeKey": "dashboard.dpi", "fallbackRegion": "advanced" }] },
+    { "id": "polling-rate", "control": "Segmented", "labelKey": "pollingRate", "readOnly": true, "placements": [{ "region": "control", "group": "polling", "order": 20, "span": 1, "icon": "wave", "priority": 100, "dashboardRole": "fixed-core", "fixedSlot": 2, "fourthSlotEligible": false, "dedupeKey": "dashboard.polling-rate", "fallbackRegion": "advanced" }] },
+    { "id": "mouse-light", "control": "LightingZone", "labelKey": "mouseLight", "readOnly": true, "placements": [{ "region": "control", "group": "lighting", "order": 30, "span": 1, "icon": "lightbulb", "priority": 100, "dashboardRole": "fixed-core", "fixedSlot": 3, "fourthSlotEligible": false, "dedupeKey": "dashboard.lighting", "fallbackRegion": "advanced" }] },
+    { "id": "receiver-gradient", "control": "GradientStops", "labelKey": "receiverGradient", "readOnly": true, "placements": [{ "region": "details", "order": 10, "span": 1, "priority": 30, "fallbackRegion": "advanced" }] }
   ],
   "writesEnabled": false
 }
