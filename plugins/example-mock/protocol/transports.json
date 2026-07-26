@@ -1,1 +1,1 @@
-{ "schemaVersion": 1, "transports": { "mock": { "kind": "fixture", "maxReportLength": 64 } } }
+{ "schemaVersion": 1, "transports": { "mock": { "kind": "hid-feature", "reportId": 0, "writeLength": 64, "readLength": 64, "stripReportIdOnRead": true } } }

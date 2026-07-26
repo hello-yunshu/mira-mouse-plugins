@@ -85,7 +85,13 @@
           "group": "performance",
           "order": 10,
           "span": 1,
-          "icon": "gauge"
+          "icon": "gauge",
+          "priority": 100,
+          "dashboardRole": "fixed-core",
+          "fixedSlot": 1,
+          "fourthSlotEligible": false,
+          "dedupeKey": "dashboard.dpi",
+          "fallbackRegion": "advanced"
         }
       ],
       "metadata": {
@@ -119,7 +125,13 @@
           "group": "polling",
           "order": 20,
           "span": 1,
-          "icon": "wave"
+          "icon": "wave",
+          "priority": 100,
+          "dashboardRole": "fixed-core",
+          "fixedSlot": 2,
+          "fourthSlotEligible": false,
+          "dedupeKey": "dashboard.polling-rate",
+          "fallbackRegion": "advanced"
         }
       ],
       "metadata": {
@@ -138,21 +150,7 @@
         "stateMapping": {
           "pollingRate": "pollingRateHz",
           "supportedPollingRates": "supportedPollingRatesHz"
-        },
-        "summary": [
-          {
-            "labelKey": "summary.motionSync",
-            "source": "capabilities.settings.motionSync"
-          },
-          {
-            "labelKey": "summary.angleSnap",
-            "source": "capabilities.settings.angleSnap"
-          },
-          {
-            "labelKey": "summary.liftCutOff",
-            "source": "capabilities.settings.liftCutOff"
-          }
-        ]
+        }
       }
     },
     {
@@ -165,7 +163,11 @@
           "region": "status",
           "order": 10,
           "span": 1,
-          "icon": "timer"
+          "icon": "timer",
+          "priority": 75,
+          "fourthSlotEligible": false,
+          "dedupeKey": "status.sleep",
+          "fallbackRegion": "advanced"
         }
       ],
       "metadata": {
@@ -320,7 +322,11 @@
           "region": "status",
           "order": 20,
           "span": 1,
-          "icon": "profile"
+          "icon": "profile",
+          "priority": 70,
+          "fourthSlotEligible": false,
+          "dedupeKey": "status.profile",
+          "fallbackRegion": "advanced"
         }
       ],
       "metadata": {
@@ -378,13 +384,23 @@
           "group": "lighting",
           "order": 30,
           "span": 1,
-          "icon": "lightbulb"
+          "icon": "lightbulb",
+          "priority": 100,
+          "dashboardRole": "fixed-core",
+          "fixedSlot": 3,
+          "fourthSlotEligible": false,
+          "dedupeKey": "dashboard.lighting",
+          "fallbackRegion": "advanced"
         },
         {
           "region": "status",
           "order": 30,
           "span": 1,
-          "icon": "lightbulb"
+          "icon": "lightbulb",
+          "priority": 70,
+          "fourthSlotEligible": false,
+          "dedupeKey": "status.lighting-state",
+          "fallbackRegion": "advanced"
         }
       ],
       "metadata": {
@@ -436,31 +452,6 @@
                     "protocol-a-direct",
                     "protocol-a-receiver"
                   ]
-                }
-              },
-              {
-                "id": "am35-enabled",
-                "source": "capabilities.mouseLightMode.mode",
-                "mutation": "set-mouse-light-mode",
-                "param": "enabled",
-                "editor": "inline-toggle",
-                "switch": {
-                  "source": "capabilities.mouseLightMode.mode",
-                  "offValue": 0
-                },
-                "labelKey": "dashboard.status",
-                "editTitleKey": "dashboard.mouseLightMode",
-                "visibleWhen": {
-                  "path": "family",
-                  "in": [
-                    "am35-direct",
-                    "am35-receiver"
-                  ]
-                },
-                "paramSources": {
-                  "enabled": "capabilities.mouseLightMode.mode",
-                  "mode": "capabilities.mouseLightMode.mode",
-                  "speed": "capabilities.mouseLightMode.speed"
                 }
               },
               {
@@ -1115,18 +1106,7 @@
         ],
         "statusDisplay": {
           "labelKey": "capability.lighting",
-          "valueSource": "capabilities.settings.mouseLightEnabled",
-          "valueOptions": [
-            {
-              "value": false,
-              "labelKey": "lighting.off"
-            },
-            {
-              "value": true,
-              "labelKey": "lighting.on"
-            }
-          ],
-          "onClickField": "enabled"
+          "valueSource": "capabilities.mouseLighting.color"
         }
       }
     },
@@ -1425,7 +1405,11 @@
           "region": "status",
           "order": 25,
           "span": 1,
-          "icon": "gauge"
+          "icon": "gauge",
+          "priority": 65,
+          "fourthSlotEligible": false,
+          "dedupeKey": "status.fps",
+          "fallbackRegion": "advanced"
         }
       ],
       "metadata": {
@@ -1471,7 +1455,11 @@
           "region": "status",
           "order": 26,
           "span": 1,
-          "icon": "button"
+          "icon": "button",
+          "priority": 65,
+          "fourthSlotEligible": false,
+          "dedupeKey": "status.dpi-button",
+          "fallbackRegion": "advanced"
         }
       ],
       "metadata": {
@@ -1514,11 +1502,13 @@
       "readOnly": false,
       "placements": [
         {
-          "region": "control",
+          "region": "details",
           "group": "performance",
           "order": 40,
           "span": 1,
-          "icon": "rotate"
+          "icon": "rotate",
+          "priority": 40,
+          "fallbackRegion": "advanced"
         }
       ],
       "metadata": {
@@ -1598,11 +1588,13 @@
       "readOnly": false,
       "placements": [
         {
-          "region": "control",
+          "region": "details",
           "group": "performance",
           "order": 50,
           "span": 1,
-          "icon": "timer"
+          "icon": "timer",
+          "priority": 40,
+          "fallbackRegion": "advanced"
         }
       ],
       "metadata": {
@@ -1701,11 +1693,13 @@
       "readOnly": false,
       "placements": [
         {
-          "region": "control",
+          "region": "details",
           "group": "performance",
           "order": 60,
           "span": 1,
-          "icon": "arrow-up"
+          "icon": "arrow-up",
+          "priority": 40,
+          "fallbackRegion": "advanced"
         }
       ],
       "metadata": {
@@ -1742,11 +1736,13 @@
       "readOnly": false,
       "placements": [
         {
-          "region": "control",
+          "region": "details",
           "group": "performance",
           "order": 70,
           "span": 1,
-          "icon": "sync"
+          "icon": "sync",
+          "priority": 40,
+          "fallbackRegion": "advanced"
         }
       ],
       "metadata": {
@@ -1796,11 +1792,13 @@
       "readOnly": false,
       "placements": [
         {
-          "region": "control",
+          "region": "details",
           "group": "performance",
           "order": 80,
           "span": 1,
-          "icon": "ruler"
+          "icon": "ruler",
+          "priority": 40,
+          "fallbackRegion": "advanced"
         }
       ],
       "metadata": {
@@ -1850,11 +1848,13 @@
       "readOnly": false,
       "placements": [
         {
-          "region": "control",
+          "region": "details",
           "group": "performance",
           "order": 90,
           "span": 1,
-          "icon": "wave"
+          "icon": "wave",
+          "priority": 40,
+          "fallbackRegion": "advanced"
         }
       ],
       "metadata": {
