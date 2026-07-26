@@ -78,13 +78,21 @@
           "group": "configuration",
           "order": 5,
           "span": 1,
-          "icon": "settings"
+          "icon": "settings",
+          "priority": 80,
+          "fourthSlotEligible": false,
+          "dedupeKey": "dashboard.control-mode",
+          "fallbackRegion": "advanced"
         },
         {
           "region": "status",
           "order": 10,
           "span": 1,
-          "icon": "settings"
+          "icon": "settings",
+          "priority": 70,
+          "fourthSlotEligible": false,
+          "dedupeKey": "status.control-mode",
+          "fallbackRegion": "advanced"
         }
       ],
       "metadata": {
@@ -139,7 +147,11 @@
           "group": "configuration",
           "order": 6,
           "span": 1,
-          "icon": "profile"
+          "icon": "profile",
+          "priority": 80,
+          "fourthSlotEligible": false,
+          "dedupeKey": "dashboard.profile-mgmt",
+          "fallbackRegion": "advanced"
         }
       ],
       "metadata": {
@@ -173,7 +185,13 @@
           "group": "performance",
           "order": 10,
           "span": 1,
-          "icon": "gauge"
+          "icon": "gauge",
+          "priority": 100,
+          "dashboardRole": "fixed-core",
+          "fixedSlot": 1,
+          "fourthSlotEligible": false,
+          "dedupeKey": "dashboard.dpi",
+          "fallbackRegion": "advanced"
         }
       ],
       "metadata": {
@@ -214,7 +232,11 @@
           "group": "performance",
           "order": 15,
           "span": 1,
-          "icon": "gauge"
+          "icon": "gauge",
+          "priority": 80,
+          "fourthSlotEligible": false,
+          "dedupeKey": "dashboard.pointer-speed",
+          "fallbackRegion": "advanced"
         }
       ],
       "metadata": {
@@ -246,7 +268,13 @@
           "group": "polling",
           "order": 20,
           "span": 1,
-          "icon": "wave"
+          "icon": "wave",
+          "priority": 100,
+          "dashboardRole": "fixed-core",
+          "fixedSlot": 2,
+          "fourthSlotEligible": false,
+          "dedupeKey": "dashboard.polling-rate",
+          "fallbackRegion": "advanced"
         }
       ],
       "metadata": {
@@ -268,27 +296,7 @@
         "stateMapping": {
           "pollingRate": "pollingRateHz",
           "supportedPollingRates": "supportedPollingRatesHz"
-        },
-        "summary": [
-          {
-            "labelKey": "plugin.label.capability.control-mode",
-            "source": "capabilities.controlMode.mode",
-            "options": [
-              {
-                "value": 1,
-                "labelKey": "controlMode.onboard"
-              },
-              {
-                "value": 2,
-                "labelKey": "controlMode.software"
-              }
-            ]
-          },
-          {
-            "labelKey": "plugin.label.capability.profile-mgmt-current",
-            "source": "capabilities.profileMgmtCurrent.profileIndex"
-          }
-        ]
+        }
       }
     },
     {
@@ -302,13 +310,23 @@
           "group": "lighting",
           "order": 30,
           "span": 1,
-          "icon": "lightbulb"
+          "icon": "lightbulb",
+          "priority": 100,
+          "dashboardRole": "fixed-core",
+          "fixedSlot": 3,
+          "fourthSlotEligible": false,
+          "dedupeKey": "dashboard.lighting",
+          "fallbackRegion": "advanced"
         },
         {
           "region": "status",
           "order": 20,
           "span": 1,
-          "icon": "lightbulb"
+          "icon": "lightbulb",
+          "priority": 70,
+          "fourthSlotEligible": false,
+          "dedupeKey": "status.lighting-state",
+          "fallbackRegion": "advanced"
         }
       ],
       "metadata": {

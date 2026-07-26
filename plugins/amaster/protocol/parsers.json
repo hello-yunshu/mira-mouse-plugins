@@ -259,7 +259,7 @@
         "modeName": {
           "kind": "lookup",
           "source": "mode",
-          "table": { "0": "常亮", "1": "呼吸", "2": "霓虹" }
+          "table": { "0": "常亮", "1": "呼吸", "2": "模式 2" }
         },
         "speedLabel": {
           "kind": "lookup",

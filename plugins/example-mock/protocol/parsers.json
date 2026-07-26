@@ -2,8 +2,9 @@
   "schemaVersion": 1,
   "parsers": {
     "snapshot": {
-      "kind": "fixture-fields",
-      "preserveUnknownFields": true
+      "validWhen": [],
+      "fields": {},
+      "derived": {}
     }
   }
 }

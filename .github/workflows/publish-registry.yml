@@ -43,16 +43,34 @@ jobs:
             unzip -p "$asset" plugin.json > "$asset.plugin.json"
           done
           echo "Verified $(find release-asset -name '*.mira-plugin' | wc -l) plugin assets (SHA-256)"
-      - name: Verify Ed25519 signature for each plugin package
+      - name: Cache mira-plugin-cli
+        uses: actions/cache@v6
+        with:
+          path: .cache/mira-plugin-cli
+          key: mira-plugin-cli-${{ hashFiles('mira-plugin-cli.version.json') }}
+      - name: Fetch mira-plugin CLI (official verifier)
         run: |
           set -euo pipefail
-          # 第 3.8 节补充：在 registry 写入前验证每个插件包的 Ed25519 签名。
-          # 拒绝未签名或密钥未受信任的包进入 registry（防止「先信任未验签 manifest」）。
+          # ITERATION-004 §2.6：Registry 发布前必须调用唯一正式 `mira-plugin verify`。
+          # 不能依赖第二套不完整 Node verifier 作为生产真相。
+          # fetch-cli.mjs 读取 mira-plugin-cli.version.json 下载并校验固定版本二进制。
+          CLI_PATH="$(node scripts/fetch-cli.mjs)"
+          echo "mira-plugin CLI: $CLI_PATH"
+          echo "MIRA_PLUGIN_CLI=$CLI_PATH" >> "$GITHUB_ENV"
+      - name: Verify each plugin package with official mira-plugin verify
+        run: |
+          set -euo pipefail
+          # ITERATION-004 §2.6：正式 CLI verify 覆盖 checksums、signature、trusted key、
+          # key activation/revocation、allowlist、forbidden files、duplicate entries、
+          # path traversal、package format、plugin API、minimum host。
+          # 退出码 0 表示通过，非 0 表示失败（CI 门禁）。
           for asset in release-asset/*.mira-plugin; do
-            echo "Verifying signature: $asset"
-            node scripts/verify-plugin-package.mjs "$asset" registry/trusted-keys.json > /dev/null
+            echo "Official verify: $asset"
+            "$MIRA_PLUGIN_CLI" verify "$asset" \
+              --trusted-keys registry/trusted-keys.json \
+              --require-signature
           done
-          echo "All plugin packages signature-verified against registry/trusted-keys.json"
+          echo "All plugin packages verified by official mira-plugin verify"
       - name: Fetch asset URLs from release
         env:
           GH_TOKEN: '${{ github.token }}'
