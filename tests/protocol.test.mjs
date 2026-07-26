@@ -139,7 +139,7 @@ test('P0-D: AM35 mouse-light-mode-write fixture enforces enabled byte = 1 for al
   // Mode=2 with speed=4 must also encode enabled=1.
   const mode2Sample = fixture.samples.find((s) => s.input.mode === 2 && s.input.speed === 4);
   assert.ok(mode2Sample, 'fixture must include a mode=2, speed=4 sample');
-  assert.equal(mode2Sample.expectedRequestPayload[6], 1, 'mode=2 (neon) must still write enabled=1');
+  assert.equal(mode2Sample.expectedRequestPayload[6], 1, 'mode=2 must still write enabled=1');
   // Readback parser returns mode/speed/brightness — no enabled field.
   assert.equal(fixture.readback.expectedParsed.enabled, undefined, 'parser must not return enabled (it is a write-only bool)');
 });
@@ -367,7 +367,8 @@ test('AMaster declares complete declarative host capability metadata', async () 
     priority: 100, dashboardRole: 'fixed-core', fixedSlot: 1, fourthSlotEligible: false,
     dedupeKey: 'dashboard.dpi', fallbackRegion: 'advanced',
   });
-  assert.deepEqual(capabilities.lighting.placements.map((placement) => placement.region), ['control', 'status']);
+  // ITERATION-006 §P1-A：lighting 下方重复 status placement 已移除（dedupeKey=dashboard.lighting 统一去重）。
+  assert.deepEqual(capabilities.lighting.placements.map((placement) => placement.region), ['control']);
   assert.deepEqual(capabilities['button-mappings'].placements[0], {
     region: 'details', order: 40, span: 1, icon: 'info',
   });
@@ -493,7 +494,8 @@ test('logitech-hidpp exposes a read workflow per device family and writable muta
   assert.equal(lighting.metadata.zones[0].fields[0].mutation, 'set-mouse-lighting');
   assert.equal(lighting.metadata.statusDisplay.valueSource, 'capabilities.mouseLighting.effect');
   assert.deepEqual(Object.keys(lighting.metadata.zones[0].fields[0].paramSources).sort(), ['brightness', 'color', 'effect', 'enabled', 'extraColor', 'speed']);
-  assert.equal(lighting.placements.find((placement) => placement.region === 'status').span, 1);
+  // ITERATION-006 §P1-A：logitech-hidpp lighting 下方重复 status placement 已移除（dedupeKey=dashboard.lighting 统一去重）。
+  assert.equal(lighting.placements.find((placement) => placement.region === 'status'), undefined);
   const families = new Set(devices.devices.map((device) => device.family));
   for (const family of families) {
     assert.ok(workflows.workflows[`${family}-read`], `${family}: missing read workflow`);
