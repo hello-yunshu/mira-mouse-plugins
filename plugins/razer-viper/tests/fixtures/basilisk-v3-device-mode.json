@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "case": "basilisk-v3-device-mode",
-  "hardwareOnly": true,
+  "hardwareOnly": false,
   "evidence": "hardware-verified",
   "description": "Basilisk V3 device-mode response captured from real hardware (report_id stripped by transport).",
   "response": [
