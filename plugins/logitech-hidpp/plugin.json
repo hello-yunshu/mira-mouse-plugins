@@ -332,6 +332,8 @@
                 "mutation": "set-mouse-lighting",
                 "param": "enabled",
                 "editor": "inline-toggle",
+                "lightingRole": "candidate",
+                "priority": 50,
                 "switch": {
                   "source": "capabilities.mouseLighting.enabled",
                   "offValue": false
@@ -355,6 +357,8 @@
                 "mutation": "set-mouse-lighting",
                 "param": "effect",
                 "editor": "modal-select",
+                "lightingRole": "effect",
+                "priority": 100,
                 "labelKey": "receiverLighting.field.effect",
                 "labelSource": "capabilities.mouseLighting.effectName",
                 "options": [
@@ -410,6 +414,8 @@
                 "mutation": "set-mouse-lighting",
                 "param": "speed",
                 "editor": "modal-range",
+                "lightingRole": "candidate",
+                "priority": 80,
                 "range": {
                   "min": 0,
                   "max": 255,
@@ -438,6 +444,8 @@
                 "mutation": "set-mouse-lighting",
                 "param": "brightness",
                 "editor": "modal-range",
+                "lightingRole": "candidate",
+                "priority": 70,
                 "range": {
                   "min": 0,
                   "max": 100,
@@ -466,6 +474,8 @@
                 "mutation": "set-mouse-lighting",
                 "param": "color",
                 "editor": "modal-color",
+                "lightingRole": "primary-color",
+                "priority": 100,
                 "format": "color",
                 "labelKey": "receiverLighting.field.color",
                 "editTitleKey": "dashboard.mouseLightColor",
@@ -487,6 +497,9 @@
                 "mutation": "set-mouse-lighting",
                 "param": "extraColor",
                 "editor": "modal-color",
+                "lightingRole": "candidate",
+                "priority": 40,
+                "presentation": "details",
                 "format": "color",
                 "labelKey": "lighting.extraColor",
                 "visibleWhen": {
