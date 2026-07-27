@@ -1,7 +1,6 @@
 {
   "schemaVersion": 1,
   "case": "snapshot",
-  "hardwareOnly": true,
   "topology": { "receiver": true, "mouse": true },
   "battery": 82,
   "charging": false,

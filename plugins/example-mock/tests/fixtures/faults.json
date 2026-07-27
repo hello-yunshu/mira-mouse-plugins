@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "case": "faults",
-  "hardwareOnly": true,
+  "faultContract": "host-error-classification",
   "cases": [
     { "name": "timeout", "result": "transport-timeout" },
     { "name": "bad-packet", "result": "parser-rejected" },

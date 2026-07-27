@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "case": "basilisk-v3-dpi",
-  "hardwareOnly": true,
   "evidence": "hardware-verified",
   "description": "Basilisk V3 dpi response captured from real hardware (report_id stripped by transport).",
+  "parser": "dpi",
   "response": [
     2, 31, 0, 0, 0, 7, 4, 133, 1, 76,
     56, 76, 56, 0, 0, 0, 0, 0, 0, 0,

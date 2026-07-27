@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "case": "basilisk-v3-battery",
-  "hardwareOnly": true,
   "evidence": "hardware-verified",
   "description": "Basilisk V3 battery-level response captured from real hardware (report_id stripped by transport).",
+  "parser": "battery-level",
   "response": [
     2, 31, 0, 0, 0, 2, 7, 128, 0, 212,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "case": "g705-adjustable-dpi",
-  "hardwareOnly": true,
   "evidence": "hardware-verified",
   "device": "G705 Mouse via 046d:c547 receiver slot 1",
+  "parser": "dpi-get-current",
   "response": [1, 14, 33, 0, 7, 8, 3, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   "expected": {
     "sensorIndex": 0,

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "case": "basilisk-v3-dpi-stages",
-  "hardwareOnly": true,
   "evidence": "hardware-verified",
   "description": "Basilisk V3 dpi-stages response captured from real hardware (report_id stripped by transport).",
+  "parser": "dpi-stages",
   "response": [
     2, 31, 0, 0, 0, 38, 4, 134, 1, 0,
     2, 0, 76, 56, 76, 56, 0, 0, 1, 39,
