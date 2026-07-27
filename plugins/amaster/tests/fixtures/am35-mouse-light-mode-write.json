@@ -19,7 +19,7 @@
     {
       "input": { "mode": 1, "speed": 2 },
       "expectedRequestPayload": [5, 90, 5, 0, 179, 48, 1, 1, 2],
-      "comment": "mode=1 (breathing), speed=2 (medium); enabled byte=1 from params.enabled=true"
+      "comment": "mode=1 (breathing), speed=2 (medium); enabled byte=1 injected from setter.params fixedValue=true (ITERATION-008 §P0-D)"
     },
     {
       "input": { "mode": 0, "speed": 0 },
@@ -29,7 +29,7 @@
     {
       "input": { "mode": 2, "speed": 4 },
       "expectedRequestPayload": [5, 90, 5, 0, 179, 48, 1, 2, 4],
-      "comment": "mode=2, speed=4 (slowest); enabled byte=1 from params.enabled=true"
+      "comment": "mode=2, speed=4 (slowest); enabled byte=1 injected from setter.params fixedValue=true"
     },
     {
       "input": { "mode": 0, "speed": 4 },

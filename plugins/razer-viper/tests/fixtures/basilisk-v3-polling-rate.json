@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "case": "basilisk-v3-polling-rate",
-  "hardwareOnly": false,
+  "hardwareOnly": true,
   "evidence": "hardware-verified",
   "description": "Basilisk V3 polling-rate response captured from real hardware (report_id stripped by transport).",
   "response": [
