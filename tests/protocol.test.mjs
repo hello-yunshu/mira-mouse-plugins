@@ -402,8 +402,8 @@ test('P1-B: all plugin placements satisfy dashboard contract', async () => {
         // dedupeKey 非空
         assert.ok(typeof placement.dedupeKey === 'string' && placement.dedupeKey.length > 0,
           `${dir}/${capability.id}: dedupeKey required`);
-        // fallbackRegion 合法
-        assert.ok(['advanced', 'hidden', 'details'].includes(placement.fallbackRegion),
+        // fallbackRegion 合法（跨仓统一：advanced | inventory | hidden，不再接受 details）
+        assert.ok(['advanced', 'inventory', 'hidden'].includes(placement.fallbackRegion),
           `${dir}/${capability.id}: fallbackRegion invalid`);
         // fourthSlotEligible=true → candidate + priority>=90
         if (placement.fourthSlotEligible === true) {
@@ -419,6 +419,88 @@ test('P1-B: all plugin placements satisfy dashboard contract', async () => {
           assert.ok([1, 2, 3].includes(placement.fixedSlot),
             `${dir}/${capability.id}: fixedSlot must be 1/2/3, got ${placement.fixedSlot}`);
         }
+      }
+    }
+  }
+});
+
+// ITERATION-007 §P0-H：AM35 receiver-am35 十字段灯光 role/priority 契约。
+// 反编译证据继续保持十字段协议（enabled/type/color1/ratio1/color2/ratio2/
+// color3/ratio3/speed/brightness），首页声明 type=effect, color1=primary-color,
+// 其余 candidate。type 最左、color1 最右，中间最多 4 个 candidate。
+test('P0-H: AM35 receiver-am35 zone declares correct lightingRole and priority', async () => {
+  const manifest = await read('plugins/amaster/plugin.json');
+  const lighting = manifest.capabilities.find((c) => c.id === 'lighting');
+  const receiverAm35Zone = lighting.metadata.zones.find((z) => z.id === 'receiver-am35');
+  assert.ok(receiverAm35Zone, 'receiver-am35 zone must exist');
+  // 十字段协议完整保留
+  assert.deepEqual(receiverAm35Zone.fields.map((f) => f.id),
+    ['enabled', 'type', 'color1', 'ratio1', 'color2', 'ratio2', 'color3', 'ratio3', 'speed', 'brightness']);
+  // type=effect priority=100；color1=primary-color priority=100
+  const typeField = receiverAm35Zone.fields.find((f) => f.id === 'type');
+  assert.equal(typeField.lightingRole, 'effect', 'type must be effect');
+  assert.equal(typeField.priority, 100, 'type priority must be 100');
+  const color1Field = receiverAm35Zone.fields.find((f) => f.id === 'color1');
+  assert.equal(color1Field.lightingRole, 'primary-color', 'color1 must be primary-color');
+  assert.equal(color1Field.priority, 100, 'color1 priority must be 100');
+  // enabled/speed/brightness/ratio1=candidate with明确 priority
+  for (const id of ['enabled', 'speed', 'brightness', 'ratio1']) {
+    const field = receiverAm35Zone.fields.find((f) => f.id === id);
+    assert.equal(field.lightingRole, 'candidate', `${id} must be candidate`);
+    assert.ok(typeof field.priority === 'number' && field.priority >= 0 && field.priority < 100,
+      `${id} priority must be < 100 (not effect/primary-color)`);
+  }
+  // 次级颜色/比例必须 presentation=details，不进入首页
+  for (const id of ['color2', 'ratio2', 'color3', 'ratio3']) {
+    const field = receiverAm35Zone.fields.find((f) => f.id === id);
+    assert.equal(field.presentation, 'details', `${id} must be presentation=details`);
+  }
+});
+
+// ITERATION-007 §P0-I：Logitech 灯光迁移。
+// effect=effect priority=100；color=primary-color priority=100；
+// enabled/speed/brightness=candidate with明确 priority；extra-color=details。
+test('P0-I: Logitech mouse-lighting zone declares correct lightingRole and priority', async () => {
+  const manifest = await read('plugins/logitech-hidpp/plugin.json');
+  const lighting = manifest.capabilities.find((c) => c.id === 'mouse-lighting');
+  assert.ok(lighting, 'mouse-lighting capability must exist');
+  const zone = lighting.metadata.zones[0];
+  assert.ok(zone, 'lighting zone must exist');
+  const fieldsById = Object.fromEntries(zone.fields.map((f) => [f.id, f]));
+  // effect=effect priority=100
+  assert.equal(fieldsById.effect.lightingRole, 'effect', 'effect must be effect');
+  assert.equal(fieldsById.effect.priority, 100, 'effect priority must be 100');
+  // color=primary-color priority=100
+  assert.equal(fieldsById.color.lightingRole, 'primary-color', 'color must be primary-color');
+  assert.equal(fieldsById.color.priority, 100, 'color priority must be 100');
+  // enabled/speed/brightness=candidate
+  for (const id of ['enabled', 'speed', 'brightness']) {
+    assert.equal(fieldsById[id].lightingRole, 'candidate', `${id} must be candidate`);
+    assert.ok(typeof fieldsById[id].priority === 'number' && fieldsById[id].priority < 100,
+      `${id} priority must be < 100 (not effect/primary-color)`);
+  }
+  // extra-color=details
+  assert.equal(fieldsById['extra-color'].presentation, 'details', 'extra-color must be details');
+});
+
+// ITERATION-007 §P1-B：status variants 必须 visibleWhen 必填。
+// validate.mjs 已强制要求，此处增加显式契约测试，防止 regression。
+test('P1-B: statusDisplay variants require visibleWhen', async () => {
+  const { readdir } = await import('node:fs/promises');
+  const { existsSync } = await import('node:fs');
+  const { fileURLToPath } = await import('node:url');
+  const pluginDirs = (await readdir(new URL('../plugins/', import.meta.url), { withFileTypes: true }))
+    .filter((e) => e.isDirectory() && existsSync(fileURLToPath(new URL(`../plugins/${e.name}/plugin.json`, import.meta.url))))
+    .map((e) => e.name);
+
+  for (const dir of pluginDirs) {
+    const manifest = await read(`plugins/${dir}/plugin.json`);
+    for (const capability of manifest.capabilities ?? []) {
+      const display = capability.metadata?.statusDisplay;
+      if (!display || !Array.isArray(display.variants)) continue;
+      for (const variant of display.variants) {
+        assert.ok(variant.visibleWhen,
+          `${dir}/${capability.id}: statusDisplay variant requires visibleWhen`);
       }
     }
   }
