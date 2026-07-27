@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "case": "basilisk-v3-serial",
-  "hardwareOnly": true,
   "evidence": "hardware-verified",
   "description": "Basilisk V3 serial response captured from real hardware (report_id stripped by transport). raw bytes encode ASCII string 'BS12345678901234567890'.",
+  "parser": "serial",
   "response": [
     2, 31, 0, 0, 0, 22, 0, 130, 66, 83,
     49, 50, 51, 52, 53, 54, 55, 56, 57, 48,

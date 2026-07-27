@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "case": "g705-unified-battery",
-  "hardwareOnly": true,
   "evidence": "hardware-verified",
   "device": "G705 Mouse via 046d:c547 receiver slot 1",
+  "parser": "unified-battery-get-status",
   "response": [1, 8, 17, 66, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   "expected": {
     "percentage": 66,
