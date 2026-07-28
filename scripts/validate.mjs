@@ -65,7 +65,7 @@ const PLACEMENT_REGIONS = new Set(['hero', 'control', 'status', 'details']);
 const PLACEMENT_KEYS = new Set([
   'region', 'group', 'order', 'span', 'icon', 'priority',
   'dashboardRole', 'fixedSlot', 'fourthSlotEligible', 'dedupeKey', 'fallbackRegion',
-  'optionalPosition',
+  'optionalPosition', 'compactLabelKey',
 ]);
 // 跨仓统一：fixed-core | candidate | system（TS 类型、Rust enum、JS validator 同步）。
 const DASHBOARD_ROLES = new Set(['fixed-core', 'candidate', 'system']);
@@ -261,6 +261,9 @@ function validatePlacement(name, capabilityId, placement) {
   if (placement.region === 'control' && placement.group === undefined) {
     fail(`${name}/${capabilityId}: control placement requires group`);
   }
+  if (placement.compactLabelKey !== undefined && !validPath(placement.compactLabelKey)) {
+    fail(`${name}/${capabilityId}: placement.compactLabelKey must be a non-empty i18n key`);
+  }
   // fixedSlot=4 一律拒绝。
   if (placement.fixedSlot === 4) {
     fail(`${name}/${capabilityId}: fixedSlot=4 is not allowed (use dashboardRole='candidate' + fourthSlotEligible instead)`);
@@ -364,6 +367,9 @@ function validSummary(value) {
   return Array.isArray(value) && value.length <= 4 && value.every((item) => item && typeof item === 'object'
     && (validPath(item.labelKey) || (typeof item.label === 'string' && item.label.length > 0 && item.label.length <= 24))
     && validPath(item.source)
+    && (item.sourceFallbacks === undefined || (Array.isArray(item.sourceFallbacks)
+      && item.sourceFallbacks.length > 0 && item.sourceFallbacks.length <= 8
+      && item.sourceFallbacks.every(validPath)))
     && (item.unit === undefined || (typeof item.unit === 'string' && item.unit.length <= 12))
     && (item.format === undefined || FORMATS.has(item.format))
     && (item.options === undefined || validOptions(item.options))
