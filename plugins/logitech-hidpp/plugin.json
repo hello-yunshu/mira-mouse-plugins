@@ -79,10 +79,13 @@
           "order": 5,
           "span": 1,
           "icon": "settings",
-          "priority": 80,
-          "fourthSlotEligible": false,
+          "priority": 95,
+          "dashboardRole": "candidate",
+          "fourthSlotEligible": true,
           "dedupeKey": "dashboard.control-mode",
-          "fallbackRegion": "advanced"
+          "fallbackRegion": "advanced",
+          "optionalPosition": "leading",
+          "compactLabelKey": "dashboard.tab.configuration"
         },
         {
           "region": "status",
@@ -149,9 +152,11 @@
           "span": 1,
           "icon": "profile",
           "priority": 80,
+          "dashboardRole": "candidate",
           "fourthSlotEligible": false,
           "dedupeKey": "dashboard.profile-mgmt",
-          "fallbackRegion": "advanced"
+          "fallbackRegion": "advanced",
+          "compactLabelKey": "dashboard.tab.configuration"
         }
       ],
       "metadata": {

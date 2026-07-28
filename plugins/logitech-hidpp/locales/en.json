@@ -9,6 +9,7 @@
   "lighting.custom": "Custom",
   "lighting.extraColor": "Secondary color",
   "lighting.editMouseLightingTitle": "Mouse lighting — {{field}}",
+  "dashboard.tab.configuration": "Config",
   "plugin.label.capability.control-mode": "Control mode",
   "plugin.label.capability.mouse-lighting": "Mouse lighting",
   "plugin.label.capability.profile-mgmt-current": "Current profile",
