@@ -24,6 +24,7 @@ jobs:
       - run: node scripts/sync-hidpp-features.mjs --check
       - run: npm run validate
       - run: npm test
+      - run: npm run audit:fixtures
       - run: npm run check:architecture
       - name: Reject forbidden content
         run: |
@@ -99,9 +100,12 @@ jobs:
               exit 0
             fi
           fi
-          # 优先级 4: default main (must be explicit, never silent)
-          echo "ref=main" >> "$GITHUB_OUTPUT"
-          echo "source=default main" >> "$GITHUB_OUTPUT"
+          # 优先级 4: fixed, confirmed-compatible Host SHA. Never silently
+          # follow a moving main branch, which can pair this plugin commit with
+          # an incompatible CLI.
+          FALLBACK_HOST_SHA="5848a3e595437bd8b82e5f1a44c6b6ed6ae8b80f"
+          echo "ref=$FALLBACK_HOST_SHA" >> "$GITHUB_OUTPUT"
+          echo "source=fixed compatible Host SHA" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v7
         with:
           repository: ${{ env.HOST_REPO }}
