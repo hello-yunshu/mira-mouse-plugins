@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "case": "protocol-a-character-light-write",
   "evidence": "reverse-confirmed",
-  "description": "Character light setter (setMDChar) uses command byte 0x07 (7 decimal) — NOT 0x87, which is the getter (getMDChar). Param 'enabled' encoded as bool at offset 1. Body is 5 zero bytes (offsets 2-6). Request checksum is ff-minus-sum8 over offsets 0..7, written at offset 7. Source: decompiled/mouseApi.py setMDChar (line 178). Getter 0x87 returns res[1] parsed as bool (parsers.json mouse-light-switch).",
+  "description": "Character light setter (setMDChar) uses command byte 0x07 (7 decimal) — NOT 0x87, which is the getter (getMDChar). Param 'enabled' encoded as bool at offset 1. Body is 5 zero bytes (offsets 2-6). Request checksum is ff-minus-sum8 over offsets 0..7, written at offset 7. Source: decompiled/mouseApi.py setMDChar (line 178). Getter 0x87 returns res[1] parsed as bool (parsers.json mouse-light-switch). ITERATION-009 §11：新增 sentinel samples（case=sentinel-preserve-*）使用 expectedWrite + expectedPreservedBytes 模式，在 preReadResponse 的 offset 2-6 和 offset 8-11 放置非零 sentinel，证明 setter 只修改 offset 0/1/7，保留其他字节不变。",
   "setter": {
     "command": "mouse-light-switch-write",
     "commandByte": 7,
@@ -21,6 +21,50 @@
       "preReadResponse": [135, 0, 0, 0, 0, 0, 0, 121, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       "expectedRequestHead": [7, 0, 0, 0, 0, 0, 0, 248],
       "expectedChecksum": 248
+    },
+    {
+      "case": "sentinel-preserve-enable-true",
+      "input": { "enabled": true },
+      "preReadResponse": [135, 0, 170, 187, 204, 221, 238, 120, 222, 173, 190, 239, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "expectedWrite": [7, 1, 170, 187, 204, 221, 238, 251, 222, 173, 190, 239, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "expectedChecksum": 251,
+      "expectedPreservedBytes": [
+        { "offset": 2 },
+        { "offset": 3 },
+        { "offset": 4 },
+        { "offset": 5 },
+        { "offset": 6 },
+        { "offset": 8 },
+        { "offset": 9 },
+        { "offset": 10 },
+        { "offset": 11 }
+      ],
+      "readbackCommand": "mouse-light-switch",
+      "readbackResponse": [135, 1, 0, 0, 0, 0, 0, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "expectedAssertions": { "enabled": true },
+      "comment": "ITERATION-009 §11 sentinel fixture：preReadResponse offset 2-6 = 0xAA 0xBB 0xCC 0xDD 0xEE（5 个非零 sentinel），offset 8-11 = 0xDE 0xAD 0xBE 0xEF（4 个非零 sentinel）。input enabled=true（preRead offset 1=0→新值 1）。expectedWrite 证明：offset 0=0x07（setter command），offset 1=0x01（enabled=true，被修改），offset 2-6 保留 sentinel 0xAA 0xBB 0xCC 0xDD 0xEE（未编辑），offset 7=251（0xFB = 0xFF - (7+1+170+187+204+221+238) mod 256，重算），offset 8-11 保留 sentinel 0xDE 0xAD 0xBE 0xEF（未编辑）。readbackResponse offset 1=1（true），expectedAssertions.enabled=true。"
+    },
+    {
+      "case": "sentinel-preserve-enable-false",
+      "input": { "enabled": false },
+      "preReadResponse": [135, 1, 170, 187, 204, 221, 238, 120, 222, 173, 190, 239, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "expectedWrite": [7, 0, 170, 187, 204, 221, 238, 252, 222, 173, 190, 239, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "expectedChecksum": 252,
+      "expectedPreservedBytes": [
+        { "offset": 2 },
+        { "offset": 3 },
+        { "offset": 4 },
+        { "offset": 5 },
+        { "offset": 6 },
+        { "offset": 8 },
+        { "offset": 9 },
+        { "offset": 10 },
+        { "offset": 11 }
+      ],
+      "readbackCommand": "mouse-light-switch",
+      "readbackResponse": [135, 0, 0, 0, 0, 0, 0, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "expectedAssertions": { "enabled": false },
+      "comment": "ITERATION-009 §11 sentinel fixture（关闭方向）：preReadResponse offset 1=1（current enabled=true），offset 2-6=0xAA 0xBB 0xCC 0xDD 0xEE sentinel，offset 8-11=0xDE 0xAD 0xBE 0xEF sentinel。input enabled=false。expectedWrite：offset 0=0x07，offset 1=0x00（被修改），offset 2-6 保留 sentinel，offset 7=252（0xFC = 0xFF - (7+0+170+187+204+221+238) mod 256），offset 8-11 保留 sentinel。readback offset 1=0（false），expectedAssertions.enabled=false。"
     }
   ],
   "readback": {
