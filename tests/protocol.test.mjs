@@ -309,8 +309,29 @@ test('AMaster declares complete declarative host capability metadata', async () 
   assert.equal(capabilities.lighting.metadata.statusDisplay.valueSource, 'capabilities.mouseLighting.color');
   assert.equal(capabilities.lighting.metadata.statusDisplay.onClickField, undefined);
   assert.equal(capabilities.dpi.metadata.summary, undefined);
-  // ITERATION-004 §2.3：polling-rate 的 summary 已移除（motionSync/angleSnap/liftCutOff 不再塞入回报率页面）。
-  assert.equal(capabilities['polling-rate'].metadata.summary, undefined);
+  // 回报率页的三个设备读数由插件声明；路径跟随当前拆分后的 capability
+  // 命名空间。Protocol A 和 AM35 各声明一组来源，Host 只选择实际
+  // 已上报的三项，不内置 A-Master 型号或字段。
+  assert.deepEqual(capabilities['polling-rate'].metadata.summary, [
+    {
+      labelKey: 'summary.motionSync',
+      source: 'capabilities.settings.motionSync',
+      sourceFallbacks: ['capabilities.motionSync.motionSync'],
+      priority: 100,
+    },
+    {
+      labelKey: 'summary.angleSnap',
+      source: 'capabilities.settings.angleSnap',
+      sourceFallbacks: ['capabilities.angleSnap.angleSnap'],
+      priority: 90,
+    },
+    {
+      labelKey: 'summary.liftCutOff',
+      source: 'capabilities.settings.liftCutOff',
+      sourceFallbacks: ['capabilities.lod.liftCutOff'],
+      priority: 80,
+    },
+  ]);
   // Protocol A 与 AM35 接收器灯光以独立 zone 暴露，分别通过
   // visibleWhen.capabilities.receiverLighting / capabilities.receiverLight 区分。
   assert.deepEqual(capabilities.lighting.metadata.zones.map((zone) => zone.id), ['mouse', 'receiver', 'receiver-am35']);
@@ -563,6 +584,7 @@ test('logitech-hidpp exposes a read workflow per device family and writable muta
   const polling = manifest.capabilities.find((capability) => capability.id === 'polling-rate');
   const dpi = manifest.capabilities.find((capability) => capability.id === 'dpi');
   const pointerSpeed = manifest.capabilities.find((capability) => capability.id === 'pointer-speed');
+  const controlMode = manifest.capabilities.find((capability) => capability.id === 'control-mode');
   const profileCurrent = manifest.capabilities.find((capability) => capability.id === 'profile-mgmt-current');
   assert.ok(
     devices.devices[0].selectionPriorityByConnection.usb
@@ -572,7 +594,25 @@ test('logitech-hidpp exposes a read workflow per device family and writable muta
   assert.deepEqual(polling.metadata.fields[0].mutation, ['set-polling-rate', 'set-polling-rate-extended']);
   assert.deepEqual(dpi.metadata.stageLayout.setMutation, ['set-dpi-value', 'set-dpi-value-extended']);
   assert.equal(pointerSpeed.metadata.fields[0].mutation, 'set-pointer-speed');
+  assert.deepEqual(controlMode.placements[0], {
+    region: 'control',
+    group: 'configuration',
+    order: 5,
+    span: 1,
+    icon: 'settings',
+    priority: 95,
+    dashboardRole: 'candidate',
+    fourthSlotEligible: true,
+    dedupeKey: 'dashboard.control-mode',
+    fallbackRegion: 'advanced',
+    optionalPosition: 'leading',
+    compactLabelKey: 'dashboard.tab.configuration',
+  });
   assert.equal(profileCurrent.metadata.fields[0].mutation, 'set-profile-mgmt-current');
+  assert.equal(profileCurrent.placements[0].compactLabelKey, 'dashboard.tab.configuration');
+  const zhLocale = await read('plugins/logitech-hidpp/locales/zh-CN.json');
+  assert.equal(zhLocale['dashboard.tab.configuration'], '配置');
+  assert.ok(Array.from(zhLocale['dashboard.tab.configuration']).length <= 3);
   assert.equal(lighting.metadata.zones[0].fields[0].mutation, 'set-mouse-lighting');
   assert.equal(lighting.metadata.statusDisplay.valueSource, 'capabilities.mouseLighting.effect');
   assert.deepEqual(Object.keys(lighting.metadata.zones[0].fields[0].paramSources).sort(), ['brightness', 'color', 'effect', 'enabled', 'extraColor', 'speed']);
