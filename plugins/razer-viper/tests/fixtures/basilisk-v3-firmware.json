@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "case": "basilisk-v3-firmware",
   "evidence": "hardware-verified",
-  "description": "Basilisk V3 firmware response (90-byte payload, report_id stripped by transport). parser=firmware only returns major/minor; other expected fields are documentary wire-level evidence.",
+  "description": "Basilisk V3 firmware response (90-byte payload, report_id stripped by transport).",
   "parser": "firmware",
   "response": [
     2, 31, 0, 0, 0, 2, 0, 129, 2, 1,
@@ -16,13 +16,14 @@
     0, 0, 0, 0, 0, 0, 0, 0, 128, 0
   ],
   "expected": {
+    "major": 2,
+    "minor": 1
+  },
+  "wireEvidence": {
     "status": 2,
     "transactionId": 31,
     "commandClass": 0,
     "commandId": 129,
-    "major": 2,
-    "minor": 1,
-    "version": "2.1",
     "checksum": 128
   }
 }
