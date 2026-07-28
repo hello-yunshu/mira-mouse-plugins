@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "case": "protocol-a-receiver-battery-offset10-zero",
+  "evidence": "reverse-confirmed",
+  "description": "AM INFINITY MOUSE .100 receiver-status offset 10 = 0 → 接收器电量不可用，不创建虚假 0% 组件。反编译证据：dongle_battery = res[10]。",
+  "parser": "receiver-status",
+  "payload": [1, 0, 17, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "expectedParsed": {
+    "readReady": 1,
+    "mouseBattery": 17,
+    "mouseOnline": true,
+    "sendReady": 1,
+    "receiverBattery": 0
+  },
+  "expectedBehavior": "receiverBattery = 0 → 接收器电量不可用，不创建 receiver 电池组件，不显示 0% 接收器"
+}

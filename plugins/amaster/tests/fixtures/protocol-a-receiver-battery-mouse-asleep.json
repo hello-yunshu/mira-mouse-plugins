@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "case": "protocol-a-receiver-battery-mouse-asleep",
+  "evidence": "reverse-confirmed",
+  "description": "AM INFINITY MOUSE .100 鼠标休眠 (mouseOnline=false)，dedicated battery 命令被 skipIfZero 跳过 → 保留最近 mouse sticky value，receiver 不得顶替 mouse。反编译证据：mouse_online = res[4] (invert)。",
+  "parser": "receiver-status",
+  "payload": [1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "expectedParsed": {
+    "readReady": 1,
+    "mouseBattery": 0,
+    "mouseOnline": false,
+    "sendReady": 1,
+    "receiverBattery": 40
+  },
+  "expectedBehavior": "mouseOnline=false → dedicated battery 被 skipIfZero 跳过，保留最近 mouse sticky value。receiverBattery=40 不得顶替 mouse 成为主 Hero 百分比"
+}
