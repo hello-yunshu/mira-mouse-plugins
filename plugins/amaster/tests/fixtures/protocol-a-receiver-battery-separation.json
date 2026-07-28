@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "case": "protocol-a-receiver-battery-separation",
+  "evidence": "reverse-confirmed",
+  "description": "AM INFINITY MOUSE .100 (protocol-a-receiver) 接收器电量分离测试。0xF7 receiver-poll 响应同时携带 mouseBattery (offset 2 = 17) 和 receiverBattery (offset 10 = 40)。dedicated battery 命令响应 offset 3 = 17。验证鼠标电量与接收器电量独立解析，互不覆盖。反编译证据：mouse_battery = res[2]; dongle_battery = res[10]。",
+  "device": {
+    "vid": "0x3151",
+    "pid": "0x5007",
+    "usagePage": "0xffff",
+    "usage": "0x0002",
+    "family": "protocol-a-receiver",
+    "plugin": "mira.amaster",
+    "pluginVersion": "1.8.0"
+  },
+  "parser": "receiver-status",
+  "payload": [1, 0, 17, 0, 0, 1, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "expectedParsed": {
+    "readReady": 1,
+    "mouseBattery": 17,
+    "mouseOnline": true,
+    "sendReady": 1,
+    "receiverBattery": 40
+  },
+  "dedicatedBattery": {
+    "parser": "battery",
+    "payload": [214, 0, 1, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "expectedParsed": {
+      "charging": 0,
+      "valid": true,
+      "percentage": 17
+    }
+  },
+  "expectedBehavior": "鼠标电量 = 17%（来自 dedicated battery offset 3 和 receiver-status offset 2），接收器电量 = 40%（来自 receiver-status offset 10）。两者独立显示，Hero 主电量使用 mouse 17%，receiver marker 使用 receiver 40%。不得将 offset 2 当作接收器电量，不得将 offset 10 当作鼠标电量，不得做 0..255 归一化。",
+  "reverseEvidence": {
+    "source": "AMasterDriver_v1.0.6_disassembly",
+    "mouseBattery": "res[2] (offset 2)",
+    "receiverBattery": "res[10] (offset 10)"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "case": "protocol-a-receiver-battery-offset10-full",
+  "evidence": "reverse-confirmed",
+  "description": "AM INFINITY MOUSE .100 receiver-status offset 10 = 100 → 接收器满电 100%。反编译证据：dongle_battery = res[10]。",
+  "parser": "receiver-status",
+  "payload": [1, 0, 17, 0, 0, 1, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "expectedParsed": {
+    "readReady": 1,
+    "mouseBattery": 17,
+    "mouseOnline": true,
+    "sendReady": 1,
+    "receiverBattery": 100
+  },
+  "expectedBehavior": "receiverBattery = 100 → 接收器电量 100%，正常显示"
+}
