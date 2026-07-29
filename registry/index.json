@@ -18,14 +18,30 @@
       "yanked": false,
       "notes": "Mira plugin mira.amaster 1.9.0",
       "entrySha": "9a95e1645cb40c89d7d4681b279a74b0d7c30a5795cb00560f2fedd54bbf8bce"
+    },
+    {
+      "pluginId": "mira.logitech-hidpp",
+      "version": "0.9.3",
+      "releaseTag": "plugin/mira.logitech-hidpp/v0.9.3",
+      "url": "https://github.com/hello-yunshu/mira-mouse-plugins/releases/download/plugin/mira.logitech-hidpp/v0.9.3/mira-logitech-hidpp-0.9.3.mira-plugin",
+      "packageSha": "2dedf15ebc05d5e92151037726f0506066ebe8281885bfa3a6343108523b2453",
+      "publisherKeyId": "mira-plugins-2026-002",
+      "pluginApi": ">=1.1.0, <2.0.0",
+      "packageFormatVersion": 1,
+      "minimumHostVersion": null,
+      "publishedAt": "2026-07-29T12:35:21.310Z",
+      "channel": "stable",
+      "yanked": false,
+      "notes": "Mira plugin mira.logitech-hidpp 0.9.3",
+      "entrySha": "7451110d9f0bccc4337d7f075e03f1b9be778ce659c5396ee12699b8c8ead269"
     }
   ],
   "status": "active",
   "signature": {
     "keyId": "mira-plugins-2026-001",
     "algorithm": "ed25519",
-    "signedAt": "2026-07-29T12:35:04.459Z",
-    "payloadSha": "8ba1bd26001496104534f26e223a760ed97bbcf2795cb14b9ca09baecfd2e7ec",
-    "value": "159716936825ae9a6b5d82b2d3ac50c1ba364a39dd0ff9d0c8066b9b143f82163f965862f63dae833e2313db98b1b38502d807eaaf1688ea84a36ef0e915ae02"
+    "signedAt": "2026-07-29T12:35:21.495Z",
+    "payloadSha": "1fe3df9290363d3108134ec1e143c346e732650b6cca135e73ba929a8f8279b6",
+    "value": "a7b9e7757f99f2540d4743347c56d83b8bd7bf0b90788d5f140810ee47c2a29beb986ce688e2feee282ab6f90e38880f881496be044b86b8cf1960936ba4b40f"
   }
 }
