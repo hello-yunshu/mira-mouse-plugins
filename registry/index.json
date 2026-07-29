@@ -34,14 +34,30 @@
       "yanked": false,
       "notes": "Mira plugin mira.logitech-hidpp 0.9.3",
       "entrySha": "7451110d9f0bccc4337d7f075e03f1b9be778ce659c5396ee12699b8c8ead269"
+    },
+    {
+      "pluginId": "mira.razer-viper",
+      "version": "0.3.1",
+      "releaseTag": "plugin/mira.razer-viper/v0.3.1",
+      "url": "https://github.com/hello-yunshu/mira-mouse-plugins/releases/download/plugin/mira.razer-viper/v0.3.1/mira-razer-viper-0.3.1.mira-plugin",
+      "packageSha": "2c196af6722b4e94973aaf95aee5761bfb3561199fa1397b01cf26125cc162cb",
+      "publisherKeyId": "mira-plugins-2026-002",
+      "pluginApi": ">=1.1.0, <2.0.0",
+      "packageFormatVersion": 1,
+      "minimumHostVersion": null,
+      "publishedAt": "2026-07-29T14:29:36.326Z",
+      "channel": "stable",
+      "yanked": false,
+      "notes": "Mira plugin mira.razer-viper 0.3.1",
+      "entrySha": "d031d5d8cb6f183af1330583781f9b741afb5e83f1dd45fbda8cebcb7f21abb4"
     }
   ],
   "status": "active",
   "signature": {
     "keyId": "mira-plugins-2026-001",
     "algorithm": "ed25519",
-    "signedAt": "2026-07-29T12:37:11.318Z",
-    "payloadSha": "e0664d8c21d92b4e1610f258be4832211af849f8177e8ca39cfc18d486f9e053",
-    "value": "e5bc0c69ada35b5e21bc73a3ea3f2cddfb0061762411528f38b71942d0436fb5f0dbf80d5d8828951e447e25b044b9904c967d511476fe583bdf416cfde54c05"
+    "signedAt": "2026-07-29T14:29:36.551Z",
+    "payloadSha": "88ba82ed606c4f02926e0bd688afe8277f3457f8f436d055eae386d9d57fd419",
+    "value": "964dc8ec2ba98d5b1e94c2c545f8ec1793fca4e970c0bcee963dc4fcd610b3d6cd392a1110d39a112b9c230e39917d8aee2af1cbf7097895d52e885ecf2e6b08"
   }
 }
