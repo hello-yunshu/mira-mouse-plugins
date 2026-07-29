@@ -54,7 +54,7 @@ if (!/plugin\/\$\{.*pluginId.*\}\/v\$?\{/.test(releaseYmlRaw) && !/plugin\/<plug
 // Source manifests deliberately keep publisherKeyId unset. The production key
 // identity is part of the release plan and is injected only into the isolated
 // staging copy before signing.
-if (!releaseYmlRaw.includes('const publisherKeyId = "mira-plugins-2026-001"')) {
+if (!releaseYmlRaw.includes('const publisherKeyId = "mira-plugins-2026-002"')) {
   throw new Error('.github/workflows/release.yml must declare the production publisher key in the release plan');
 }
 if (!releaseYmlRaw.includes("PLUGIN_KEY_ID: '${{ matrix.target.publisherKeyId }}'")) {
