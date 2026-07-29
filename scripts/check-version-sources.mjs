@@ -66,6 +66,9 @@ if (/if\s*\(\s*!m\.publisherKeyId/.test(releaseYmlRaw)) {
 if (!ciYmlRaw.includes('sudo apt-get install -y libudev-dev')) {
   throw new Error('.github/workflows/ci.yml must install the Linux hidapi build dependency');
 }
+if (!ciYmlRaw.includes('FALLBACK_HOST_SHA="9f59bcb83b360fb309ea3c3cbb280215d3bbe29b"')) {
+  throw new Error('.github/workflows/ci.yml must pin the Host commit that published mira-plugin-cli 1.0.0');
+}
 
 const cliPin = JSON.parse(await readFile('mira-plugin-cli.version.json', 'utf8'));
 if (cliPin.localDev !== false) {
