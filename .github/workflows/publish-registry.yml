@@ -6,6 +6,12 @@ on:
   workflow_dispatch:
     inputs:
       release_tag: { description: 'Published release tag', required: true, type: string }
+      release_channel:
+        description: 'Published release channel'
+        required: false
+        default: 'stable'
+        type: choice
+        options: ['stable', 'beta']
 permissions:
   contents: write
 concurrency:
@@ -85,6 +91,7 @@ jobs:
       - name: Update registry for all plugins
         env:
           RELEASE_TAG: '${{ github.event.release.tag_name || inputs.release_tag }}'
+          RELEASE_CHANNEL: "${{ inputs.release_channel || (github.event.release.prerelease && 'beta' || 'stable') }}"
         run: |
           set -euo pipefail
           batch=$(node -e '
