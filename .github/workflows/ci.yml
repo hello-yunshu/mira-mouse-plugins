@@ -113,6 +113,9 @@ jobs:
           ref: ${{ steps.host-ref.outputs.ref }}
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libudev-dev
       - name: Cache mira-plugin CLI
         id: cli-cache
         uses: actions/cache@v6
