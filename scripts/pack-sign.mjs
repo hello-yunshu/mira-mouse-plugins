@@ -69,9 +69,13 @@ async function main() {
     // 签名存在时会因 key 不在 trust store 而报 UnknownKey 错误。
     execFileSync(cli, ['inspect', unsignedPath], { stdio: 'inherit' });
 
-    // 3.5 节：CLI sign 使用 PLUGIN_SIGNING_KEY 或 --key-hex。
+    // 3.5 节：CLI sign 使用公开测试 seed、PLUGIN_SIGNING_KEY 或临时密钥。
     // 生产环境通过环境变量传入 PEM 私钥；CI secret 可能是 base64 编码的 PEM。
-    execFileSync(cli, ['sign', unsignedPath, '--output', outPath], {
+    const signArgs = ['sign', unsignedPath, '--output', outPath];
+    if (process.env.PLUGIN_SIGNING_KEY_HEX) {
+      signArgs.push('--key-hex', process.env.PLUGIN_SIGNING_KEY_HEX);
+    }
+    execFileSync(cli, signArgs, {
       stdio: 'inherit',
       env: { ...process.env },
     });

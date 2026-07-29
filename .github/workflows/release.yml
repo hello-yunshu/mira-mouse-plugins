@@ -110,6 +110,7 @@ jobs:
             const channel = process.argv[3] || "stable";
             const dryRun = process.argv[4] === "true";
             const ghRepo = process.env.GITHUB_REPOSITORY;
+            const publisherKeyId = "mira-plugins-2026-001";
             const out = [];
             for (const id of ids) {
               // 动态发现：枚举 plugins/*/plugin.json，匹配 pluginId
@@ -142,10 +143,6 @@ jobs:
                 console.error(`${id}: evidence=${evidence} not allowed for channel=${channel}`);
                 process.exit(1);
               }
-              if (!m.publisherKeyId || String(m.publisherKeyId).startsWith("TEST-ONLY")) {
-                console.error(`${id}: publisherKeyId must be a production key id`);
-                process.exit(1);
-              }
               const tag = `plugin/${id}/v${m.version}`;
               out.push({
                 pluginId: id,
@@ -154,6 +151,7 @@ jobs:
                 pluginApi: m.pluginApi || null,
                 evidence,
                 channel,
+                publisherKeyId,
                 releaseTag: tag,
                 dryRun,
               });
@@ -226,7 +224,7 @@ jobs:
       - name: Pack and sign plugin
         env:
           PLUGIN_SIGNING_KEY: '${{ secrets.PLUGIN_SIGNING_KEY }}'
-          PLUGIN_KEY_ID: 'mira-plugins-2026-001'
+          PLUGIN_KEY_ID: '${{ matrix.target.publisherKeyId }}'
           PLUGIN_DIR: '${{ matrix.target.dir }}'
         run: |
           set -euo pipefail

@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "keys": [
+    {
+      "keyId": "TEST-ONLY-mira-plugins",
+      "algorithm": "ed25519",
+      "publicKey": "00d34dac6e039baada3d3d9aa65390f2887d09d73b396af8434ecb29c233d666",
+      "activatedAt": "2026-01-01T00:00:00.000Z",
+      "revokedAt": null,
+      "revocationReason": null,
+      "owner": "Mira Plugins Project (local test only)",
+      "purpose": ["plugin-package", "registry"]
+    }
+  ]
+}

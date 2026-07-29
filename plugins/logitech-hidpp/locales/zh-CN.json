@@ -9,6 +9,7 @@
   "lighting.custom": "自定义",
   "lighting.extraColor": "第二色",
   "lighting.editMouseLightingTitle": "鼠标灯光 — {{field}}",
+  "dashboard.tab.configuration": "配置",
   "plugin.label.capability.control-mode": "配置控制",
   "plugin.label.capability.mouse-lighting": "鼠标灯光",
   "plugin.label.capability.profile-mgmt-current": "当前配置文件",

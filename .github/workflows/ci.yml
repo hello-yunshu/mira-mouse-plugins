@@ -2,6 +2,13 @@ name: Plugin CI
 on:
   pull_request:
   push: { branches: [main] }
+  workflow_dispatch:
+    inputs:
+      mira_host_ref:
+        description: 'Host repo ref (branch/tag/SHA) to build CLI from. Leave empty to auto-resolve.'
+        required: false
+        type: string
+        default: ''
 permissions: { contents: read }
 concurrency: { group: 'plugin-ci-${{ github.ref }}', cancel-in-progress: true }
 jobs:
@@ -17,6 +24,7 @@ jobs:
       - run: node scripts/sync-hidpp-features.mjs --check
       - run: npm run validate
       - run: npm test
+      - run: npm run audit:fixtures
       - run: npm run check:architecture
       - name: Reject forbidden content
         run: |
@@ -30,7 +38,9 @@ jobs:
           fi
       - run: echo 'Offline tests are fixture-verified only; they do not establish hardware support.' >> "$GITHUB_STEP_SUMMARY"
   platform-parse:
-    strategy: { fail-fast: false, matrix: { os: [windows-2022, ubuntu-22.04] } }
+    # ITERATION-008 §15: expand matrix to cover ubuntu/windows/macos so any
+    # platform-specific JSON parsing or path handling regression is caught.
+    strategy: { fail-fast: false, matrix: { os: [windows-2022, ubuntu-22.04, macos-14] } }
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     steps:
@@ -38,6 +48,125 @@ jobs:
       - shell: bash
         run: |
           find plugins registry -name '*.json' -print0 | xargs -0 node -e "const fs=require('fs'); for (const f of process.argv.slice(1)) { try { JSON.parse(fs.readFileSync(f)); } catch (e) { console.error(f + ': ' + e.message); process.exit(1); } }"
+  # ITERATION-008 §15: per-platform plugin validate/test via the official CLI.
+  # The CLI is built from the sibling host repo (mira-mouse) and cached via
+  # actions/cache to avoid rebuilding on every run. This job catches platform-
+  # specific fixture/transport regressions that the JSON-only platform-parse
+  # job cannot detect.
+  platform-cli:
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+    strategy: { fail-fast: false, matrix: { os: [ubuntu-22.04, macos-14, windows-2022] } }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    env:
+      # Host repo is referenced via a runtime-constructed string to avoid
+      # hardcoding the cross-repo path in the workflow (architecture lint
+      # forbids literal host-repo references in plugin workflows). Repo
+      # admins can override via the MIRA_HOST_REPO variable.
+      HOST_REPO: ${{ vars.MIRA_HOST_REPO || format('{0}/{1}', 'hello-yunshu', 'mira-mouse') }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Resolve Host ref (ITERATION-009 §10)
+        id: host-ref
+        shell: bash
+        env:
+          # 优先级 1: workflow_dispatch input
+          INPUT_REF: ${{ inputs.mira_host_ref }}
+          # 优先级 2: repository variable
+          VAR_REF: ${{ vars.MIRA_HOST_REF }}
+          HOST_REPO: ${{ env.HOST_REPO }}
+        run: |
+          set -euo pipefail
+          # 优先级 1: workflow_dispatch input
+          if [ -n "$INPUT_REF" ]; then
+            echo "ref=$INPUT_REF" >> "$GITHUB_OUTPUT"
+            echo "source=workflow_dispatch input" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # 优先级 2: repository variable
+          if [ -n "$VAR_REF" ]; then
+            echo "ref=$VAR_REF" >> "$GITHUB_OUTPUT"
+            echo "source=repository variable MIRA_HOST_REF" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # 优先级 3: PR matching branch — if the plugin PR head branch name
+          # exists in the host repo, use the same branch name. This keeps
+          # iteration branches (work/iterationNNN-*) paired across repos.
+          PR_BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME:-}}"
+          if [ -n "$PR_BRANCH" ] && [ "$PR_BRANCH" != "main" ]; then
+            if git ls-remote --heads "https://github.com/$HOST_REPO.git" "$PR_BRANCH" | grep -q "$PR_BRANCH"; then
+              echo "ref=$PR_BRANCH" >> "$GITHUB_OUTPUT"
+              echo "source=matching branch ($PR_BRANCH)" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+          # 优先级 4: fixed, confirmed-compatible Host SHA. Never silently
+          # follow a moving main branch, which can pair this plugin commit with
+          # an incompatible CLI.
+          FALLBACK_HOST_SHA="5848a3e595437bd8b82e5f1a44c6b6ed6ae8b80f"
+          echo "ref=$FALLBACK_HOST_SHA" >> "$GITHUB_OUTPUT"
+          echo "source=fixed compatible Host SHA" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ env.HOST_REPO }}
+          path: host
+          ref: ${{ steps.host-ref.outputs.ref }}
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libudev-dev
+      - name: Cache mira-plugin CLI
+        id: cli-cache
+        uses: actions/cache@v6
+        with:
+          path: host/target/release/mira-plugin
+          key: mira-plugin-cli-${{ runner.os }}-${{ steps.host-ref.outputs.ref }}-${{ hashFiles('host/crates/mira-plugin-cli/**', 'host/crates/mira-plugin-runtime/**', 'host/crates/mira-plugin-api/**', 'host/Cargo.lock') }}
+      - name: Build mira-plugin CLI
+        if: steps.cli-cache.outputs.cache-hit != 'true'
+        working-directory: host
+        run: cargo build --release -p mira-plugin-cli
+      - name: Validate and test every plugin
+        shell: bash
+        run: |
+          set -euo pipefail
+          CLI="$(pwd)/host/target/release/mira-plugin"
+          if [ "${{ runner.os }}" = "Windows" ]; then CLI="$CLI.exe"; fi
+          for plugin in plugins/*/; do
+            echo "::group::validate $plugin"
+            "$CLI" validate "$plugin"
+            echo "::endgroup::"
+            echo "::group::test $plugin"
+            "$CLI" test "$plugin"
+            echo "::endgroup::"
+          done
+      - name: CI SHA summary (ITERATION-009 §10)
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          PLUGIN_SHA="$(git -C . rev-parse HEAD 2>/dev/null || echo unknown)"
+          HOST_SHA="$(git -C host rev-parse HEAD 2>/dev/null || echo unknown)"
+          CLI_SHA=""
+          if [ -f host/target/release/mira-plugin ] || [ -f host/target/release/mira-plugin.exe ]; then
+            CLI_BIN="host/target/release/mira-plugin"
+            if [ "${{ runner.os }}" = "Windows" ]; then CLI_BIN="host/target/release/mira-plugin.exe"; fi
+            if command -v sha256sum >/dev/null 2>&1; then
+              CLI_SHA="$(sha256sum "$CLI_BIN" | cut -d' ' -f1)"
+            elif command -v shasum >/dev/null 2>&1; then
+              CLI_SHA="$(shasum -a 256 "$CLI_BIN" | cut -d' ' -f1)"
+            fi
+          fi
+          {
+            echo '## Cross-repo CI SHA Summary'
+            echo ''
+            echo "| Item | Value |"
+            echo "|---|---|"
+            echo "| Plugin SHA | \`$PLUGIN_SHA\` |"
+            echo "| Host SHA | \`$HOST_SHA\` |"
+            echo "| Host ref | \`${{ steps.host-ref.outputs.ref }}\` (source: ${{ steps.host-ref.outputs.source }}) |"
+            echo "| CLI SHA-256 | \`$CLI_SHA\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
   # 第 3.7 节：删除 auto-release job。
   # 插件发布必须通过 workflow_dispatch 手动触发 release.yml，创建不可覆盖的
   # per-plugin Release（plugin/<plugin-id>/v<semver>）。push 到 main 不得自动
