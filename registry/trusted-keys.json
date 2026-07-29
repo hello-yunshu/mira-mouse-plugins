@@ -10,6 +10,16 @@
       "revocationReason": null,
       "owner": "Mira Plugins Project",
       "purpose": ["plugin-package", "registry"]
+    },
+    {
+      "keyId": "mira-plugins-2026-002",
+      "algorithm": "ed25519",
+      "publicKey": "eb80fdde2dc7ba507b6c8afbbf5a7de82e6219967edf1914ddb979d5601d39b3",
+      "activatedAt": "2026-07-29T00:00:00.000Z",
+      "revokedAt": null,
+      "revocationReason": null,
+      "owner": "Mira Plugins Project",
+      "purpose": ["plugin-package"]
     }
   ]
 }
