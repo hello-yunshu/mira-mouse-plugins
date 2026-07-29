@@ -3,7 +3,7 @@
   "packageFormatVersion": 1,
   "pluginId": "mira.razer-viper",
   "name": "Razer Mice",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "pluginApi": ">=1.1.0, <2.0.0",
   "publisherKeyId": null,
   "evidence": "hardware-verified",

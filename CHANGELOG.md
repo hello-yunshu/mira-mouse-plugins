@@ -10,6 +10,7 @@
 
 ## [Unreleased]
 
+- 将 `mira.razer-viper` 提升至 0.3.1，使用当前共享 Package Format CLI 重新打包，移除旧 0.3.0 资产中会被宿主拒绝的文档文件。
 - 将 `mira.logitech-hidpp` 提升至 0.9.3，发布新的声明式 dashboard placement 契约，避免复用既有 0.9.2 生产版本。
 - 修复 per-plugin Release gate：源 manifest 保持无发布者注入，生产 `publisherKeyId` 仅在隔离 staging 打包阶段写入。
 - 为 AMaster 的 performance、sleep、profile、lighting、firmware、device-settings、receiver 和 button-mapping 能力补全了声明式 UI 元数据，包括按连接方式绑定的 sleep binding。

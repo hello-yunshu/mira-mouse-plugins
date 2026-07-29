@@ -26,7 +26,7 @@
 | [`mira.amaster`](./amaster/) | AMaster / 怒喵兼容设备 | hardware-verified | enabled | Angry Miao 协议支持 |
 | [`mira.example-mock`](./example-mock/) | Mira Example Mock | fixture-verified | disabled | 用于测试运行时的示例 / mock 插件 |
 | [`mira.logitech-hidpp`](./logitech-hidpp/) | Logitech HID++ | hardware-verified | enabled | Logitech HID++ 2.0 协议，包含 Onboard Profiles（`0x8100`）和 Profile Management（`0x8101`） |
-| [`mira.razer-viper`](./razer-viper/) | Razer Viper Research | inferred | disabled | Razer Viper 协议研究笔记 |
+| [`mira.razer-viper`](./razer-viper/) | Razer Mice | hardware-verified | disabled | 已验证设备的只读清单、DPI、回报率、电量、充电、固件和序列号 |
 
 ## 新增插件
 
