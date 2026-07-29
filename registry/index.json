@@ -13,11 +13,11 @@
       "pluginApi": ">=1.1.0, <2.0.0",
       "packageFormatVersion": 1,
       "minimumHostVersion": null,
-      "publishedAt": "2026-07-29T12:35:04.400Z",
-      "channel": "stable",
+      "publishedAt": "2026-07-29T12:37:11.280Z",
+      "channel": "beta",
       "yanked": false,
       "notes": "Mira plugin mira.amaster 1.9.0",
-      "entrySha": "9a95e1645cb40c89d7d4681b279a74b0d7c30a5795cb00560f2fedd54bbf8bce"
+      "entrySha": "69f2b5df81b3941759095575678cb823665b4b587b5d0ea9986eb6498d60c2c1"
     },
     {
       "pluginId": "mira.logitech-hidpp",
@@ -40,8 +40,8 @@
   "signature": {
     "keyId": "mira-plugins-2026-001",
     "algorithm": "ed25519",
-    "signedAt": "2026-07-29T12:35:21.495Z",
-    "payloadSha": "1fe3df9290363d3108134ec1e143c346e732650b6cca135e73ba929a8f8279b6",
-    "value": "a7b9e7757f99f2540d4743347c56d83b8bd7bf0b90788d5f140810ee47c2a29beb986ce688e2feee282ab6f90e38880f881496be044b86b8cf1960936ba4b40f"
+    "signedAt": "2026-07-29T12:37:11.318Z",
+    "payloadSha": "e0664d8c21d92b4e1610f258be4832211af849f8177e8ca39cfc18d486f9e053",
+    "value": "e5bc0c69ada35b5e21bc73a3ea3f2cddfb0061762411528f38b71942d0436fb5f0dbf80d5d8828951e447e25b044b9904c967d511476fe583bdf416cfde54c05"
   }
 }
