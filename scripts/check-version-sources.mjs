@@ -60,6 +60,9 @@ if (!releaseYmlRaw.includes('const publisherKeyId = "mira-plugins-2026-002"')) {
 if (!releaseYmlRaw.includes("PLUGIN_KEY_ID: '${{ matrix.target.publisherKeyId }}'")) {
   throw new Error('.github/workflows/release.yml must pass the planned publisher key to the staging packer');
 }
+if (!/release-plugin:[\s\S]*?permissions:\s*\n\s*contents:\s*write\s*\n\s*actions:\s*write/.test(releaseYmlRaw)) {
+  throw new Error('.github/workflows/release.yml release job must allow Registry workflow dispatch');
+}
 if (/if\s*\(\s*!m\.publisherKeyId/.test(releaseYmlRaw)) {
   throw new Error('.github/workflows/release.yml must not require publisherKeyId before staging injection');
 }
