@@ -16,6 +16,7 @@ const [packageJsonRaw, packageLockJsonRaw, citationRaw, releaseYmlRaw] = await P
   readFile('.github/workflows/release.yml', 'utf8'),
 ]);
 const ciYmlRaw = await readFile('.github/workflows/ci.yml', 'utf8');
+const publishRegistryYmlRaw = await readFile('.github/workflows/publish-registry.yml', 'utf8');
 if (!JSON.parse(packageJsonRaw).scripts?.['validate:plugin']?.includes('scripts/validate-plugin.mjs')) {
   throw new Error('package.json validate:plugin must use the single-plugin argument wrapper');
 }
@@ -62,6 +63,9 @@ if (!releaseYmlRaw.includes("PLUGIN_KEY_ID: '${{ matrix.target.publisherKeyId }}
 }
 if (!/release-plugin:[\s\S]*?permissions:\s*\n\s*contents:\s*write\s*\n\s*actions:\s*write/.test(releaseYmlRaw)) {
   throw new Error('.github/workflows/release.yml release job must allow Registry workflow dispatch');
+}
+if (!publishRegistryYmlRaw.includes('CLI_PATH="$(node scripts/fetch-cli.mjs | tail -n 1)"')) {
+  throw new Error('.github/workflows/publish-registry.yml must capture only the fetch-cli path line');
 }
 if (/if\s*\(\s*!m\.publisherKeyId/.test(releaseYmlRaw)) {
   throw new Error('.github/workflows/release.yml must not require publisherKeyId before staging injection');
