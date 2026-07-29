@@ -278,7 +278,12 @@ jobs:
             echo "Release $TAG already exists; refusing to overwrite (per-plugin releases are immutable)" >&2
             exit 1
           fi
+          release_flags=()
+          if [ "$CHANNEL" = "beta" ]; then
+            release_flags+=(--prerelease)
+          fi
           gh release create "$TAG" "dist/${PLUGIN_ID}/"* --target "$TARGET" \
+            "${release_flags[@]}" \
             --title "Mira Plugin ${PLUGIN_ID} v${VERSION}" \
             --notes "Per-plugin immutable release for ${PLUGIN_ID} v${VERSION}.
 
@@ -292,12 +297,14 @@ jobs:
         env:
           GH_TOKEN: '${{ github.token }}'
           TAG: '${{ matrix.target.releaseTag }}'
+          CHANNEL: '${{ matrix.target.channel }}'
         run: |
           set -euo pipefail
           # 每个 per-plugin Release 独立触发 registry 同步。
           # 不触发 sync-mira（已删除）；插件发布不得修改主仓库。
           gh workflow run publish-registry.yml --repo "$GITHUB_REPOSITORY" \
-            -f release_tag="$TAG"
+            -f release_tag="$TAG" \
+            -f release_channel="$CHANNEL"
       - name: Dry-run summary
         if: ${{ matrix.target.dryRun == true }}
         env:

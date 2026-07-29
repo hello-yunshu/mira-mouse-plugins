@@ -67,6 +67,15 @@ if (!/release-plugin:[\s\S]*?permissions:\s*\n\s*contents:\s*write\s*\n\s*action
 if (!publishRegistryYmlRaw.includes('CLI_PATH="$(node scripts/fetch-cli.mjs | tail -n 1)"')) {
   throw new Error('.github/workflows/publish-registry.yml must capture only the fetch-cli path line');
 }
+if (!releaseYmlRaw.includes('release_flags+=(--prerelease)')) {
+  throw new Error('.github/workflows/release.yml must mark beta plugin Releases as prereleases');
+}
+if (!releaseYmlRaw.includes('-f release_channel="$CHANNEL"')) {
+  throw new Error('.github/workflows/release.yml must pass the plugin release channel to Registry publication');
+}
+if (!publishRegistryYmlRaw.includes('RELEASE_CHANNEL:')) {
+  throw new Error('.github/workflows/publish-registry.yml must preserve the plugin release channel');
+}
 if (/if\s*\(\s*!m\.publisherKeyId/.test(releaseYmlRaw)) {
   throw new Error('.github/workflows/release.yml must not require publisherKeyId before staging injection');
 }
