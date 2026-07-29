@@ -16,6 +16,9 @@ const [packageJsonRaw, packageLockJsonRaw, citationRaw, releaseYmlRaw] = await P
   readFile('.github/workflows/release.yml', 'utf8'),
 ]);
 const ciYmlRaw = await readFile('.github/workflows/ci.yml', 'utf8');
+if (!JSON.parse(packageJsonRaw).scripts?.['validate:plugin']?.includes('scripts/validate-plugin.mjs')) {
+  throw new Error('package.json validate:plugin must use the single-plugin argument wrapper');
+}
 
 assertNoRootVersion('package.json', JSON.parse(packageJsonRaw));
 
