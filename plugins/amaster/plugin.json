@@ -150,7 +150,33 @@
         "stateMapping": {
           "pollingRate": "pollingRateHz",
           "supportedPollingRates": "supportedPollingRatesHz"
-        }
+        },
+        "summary": [
+          {
+            "labelKey": "summary.motionSync",
+            "source": "capabilities.settings.motionSync",
+            "sourceFallbacks": [
+              "capabilities.motionSync.motionSync"
+            ],
+            "priority": 100
+          },
+          {
+            "labelKey": "summary.angleSnap",
+            "source": "capabilities.settings.angleSnap",
+            "sourceFallbacks": [
+              "capabilities.angleSnap.angleSnap"
+            ],
+            "priority": 90
+          },
+          {
+            "labelKey": "summary.liftCutOff",
+            "source": "capabilities.settings.liftCutOff",
+            "sourceFallbacks": [
+              "capabilities.lod.liftCutOff"
+            ],
+            "priority": 80
+          }
+        ]
       }
     },
     {

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "case": "protocol-a-receiver-battery-offset10-invalid",
+  "evidence": "reverse-confirmed",
+  "description": "AM INFINITY MOUSE .100 receiver-status offset 10 = 101 → 协议异常/未报告，不 clamp 到 100%。offset 10 = 255 → 未报告/无效。反编译证据：dongle_battery = res[10]。",
+  "parser": "receiver-status",
+  "payload": [1, 0, 17, 0, 0, 1, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "expectedParsed": {
+    "readReady": 1,
+    "mouseBattery": 17,
+    "mouseOnline": true,
+    "sendReady": 1,
+    "receiverBattery": 101
+  },
+  "expectedBehavior": "receiverBattery = 101 → 协议异常，不 clamp 到 100%，记录诊断日志，不显示接收器电量。offset 10 > 100 同理处理。"
+}

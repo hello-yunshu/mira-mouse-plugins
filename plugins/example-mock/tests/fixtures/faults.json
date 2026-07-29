@@ -1,13 +1,37 @@
 {
   "schemaVersion": 1,
   "case": "faults",
-  "hardwareOnly": false,
+  "faultContract": "host-error-classification",
   "cases": [
-    { "name": "timeout", "result": "transport-timeout" },
-    { "name": "bad-packet", "result": "parser-rejected" },
-    { "name": "unplug", "result": "transaction-cancelled" },
-    { "name": "low-battery", "battery": 9, "result": "threshold-crossed-once" },
-    { "name": "readback-failure", "result": "actual-state-shown-not-success" }
+    {
+      "name": "timeout",
+      "input": { "kind": "transport", "error": "operation timed out" },
+      "result": "transport-timeout"
+    },
+    {
+      "name": "bad-packet",
+      "input": { "kind": "parser", "error": "response rejected" },
+      "result": "parser-rejected"
+    },
+    {
+      "name": "unplug",
+      "input": { "kind": "transport", "error": "device disconnected" },
+      "result": "transaction-cancelled"
+    },
+    {
+      "name": "low-battery",
+      "battery": 9,
+      "input": { "kind": "battery-threshold", "previous": 10, "current": 9, "threshold": 9 },
+      "result": "threshold-crossed-once"
+    },
+    {
+      "name": "readback-failure",
+      "input": {
+        "kind": "readback",
+        "expected": { "pollingRateHz": 1000 },
+        "actual": { "pollingRateHz": 500 }
+      },
+      "result": "actual-state-shown-not-success"
+    }
   ]
 }
-
