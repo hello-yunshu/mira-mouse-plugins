@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "case": "basilisk-v3-charging",
-  "hardwareOnly": false,
   "evidence": "hardware-verified",
   "description": "Basilisk V3 charging-status response captured from real hardware (report_id stripped by transport).",
+  "parser": "charging-status",
   "response": [
     2, 31, 0, 0, 0, 2, 7, 132, 0, 1,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
