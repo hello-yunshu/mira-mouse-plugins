@@ -110,7 +110,7 @@ jobs:
             const channel = process.argv[3] || "stable";
             const dryRun = process.argv[4] === "true";
             const ghRepo = process.env.GITHUB_REPOSITORY;
-            const publisherKeyId = "mira-plugins-2026-001";
+            const publisherKeyId = "mira-plugins-2026-002";
             const out = [];
             for (const id of ids) {
               // 动态发现：枚举 plugins/*/plugin.json，匹配 pluginId
