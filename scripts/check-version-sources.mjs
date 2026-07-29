@@ -15,6 +15,7 @@ const [packageJsonRaw, packageLockJsonRaw, citationRaw, releaseYmlRaw] = await P
   readFile('CITATION.cff', 'utf8'),
   readFile('.github/workflows/release.yml', 'utf8'),
 ]);
+const ciYmlRaw = await readFile('.github/workflows/ci.yml', 'utf8');
 
 assertNoRootVersion('package.json', JSON.parse(packageJsonRaw));
 
@@ -58,6 +59,9 @@ if (!releaseYmlRaw.includes("PLUGIN_KEY_ID: '${{ matrix.target.publisherKeyId }}
 }
 if (/if\s*\(\s*!m\.publisherKeyId/.test(releaseYmlRaw)) {
   throw new Error('.github/workflows/release.yml must not require publisherKeyId before staging injection');
+}
+if (!ciYmlRaw.includes('sudo apt-get install -y libudev-dev')) {
+  throw new Error('.github/workflows/ci.yml must install the Linux hidapi build dependency');
 }
 
 const cliPin = JSON.parse(await readFile('mira-plugin-cli.version.json', 'utf8'));
