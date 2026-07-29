@@ -37,7 +37,7 @@ Plugins never contain native code, scripts, web pages, or WASM. Plugins declare 
 | [`mira.amaster`](plugins/amaster/) | AMaster / Angry Miao compatible devices | hardware-verified | enabled | Protocol A and AM35 paths; mouse lighting and receiver lighting are separate capabilities. |
 | [`mira.logitech-hidpp`](plugins/logitech-hidpp/) | Logitech HID++ 2.0 devices | hardware-verified | enabled | Feature discovery, DPI, report rate, profiles, and lighting capability reads; no fixed model whitelist. |
 | [`mira.example-mock`](plugins/example-mock/) | Runtime sample | fixture-verified | disabled | Test plugin for the host app and runtime. |
-| [`mira.razer-viper`](plugins/razer-viper/) | Razer Viper research draft | inferred | disabled | Research notes and narrow bring-up placeholder. |
+| [`mira.razer-viper`](plugins/razer-viper/) | Verified wired/wireless Razer devices | hardware-verified | disabled | Read-only inventory, DPI, polling rate, battery, charging, firmware, and serial number. |
 
 ## Adding a New Device
 

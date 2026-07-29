@@ -37,7 +37,7 @@
 | [`mira.amaster`](plugins/amaster/) | AMaster / 怒喵兼容设备 | hardware-verified | enabled | Protocol A 与 AM35 路径；鼠标灯光和接收器灯光分开声明。 |
 | [`mira.logitech-hidpp`](plugins/logitech-hidpp/) | Logitech HID++ 2.0 设备 | hardware-verified | enabled | 特性发现、DPI、回报率、配置、灯光能力读取；不靠固定型号白名单。 |
 | [`mira.example-mock`](plugins/example-mock/) | 运行时示例 | fixture-verified | disabled | 用于测试主应用和插件运行时。 |
-| [`mira.razer-viper`](plugins/razer-viper/) | Razer Viper 研究草案 | inferred | disabled | 研究笔记和窄范围 bring-up 占位。 |
+| [`mira.razer-viper`](plugins/razer-viper/) | 已验证的 Razer 有线/无线设备 | hardware-verified | disabled | 只读设备清单、DPI、回报率、电量、充电、固件和序列号。 |
 
 ## 适配新设备
 
