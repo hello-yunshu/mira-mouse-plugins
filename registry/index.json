@@ -1,7 +1,31 @@
 {
   "schemaVersion": 1,
-  "signed": false,
+  "signed": true,
   "publisherKeyId": "mira-plugins-2026-001",
-  "plugins": [],
-  "status": "active"
+  "plugins": [
+    {
+      "pluginId": "mira.amaster",
+      "version": "1.9.0",
+      "releaseTag": "plugin/mira.amaster/v1.9.0",
+      "url": "https://github.com/hello-yunshu/mira-mouse-plugins/releases/download/plugin/mira.amaster/v1.9.0/mira-amaster-1.9.0.mira-plugin",
+      "packageSha": "2c8bdbed8f95c3b4cf16eaf4189a4967ca4e7089067d01f69661daa84feaf7ab",
+      "publisherKeyId": "mira-plugins-2026-002",
+      "pluginApi": ">=1.1.0, <2.0.0",
+      "packageFormatVersion": 1,
+      "minimumHostVersion": null,
+      "publishedAt": "2026-07-29T12:35:04.400Z",
+      "channel": "stable",
+      "yanked": false,
+      "notes": "Mira plugin mira.amaster 1.9.0",
+      "entrySha": "9a95e1645cb40c89d7d4681b279a74b0d7c30a5795cb00560f2fedd54bbf8bce"
+    }
+  ],
+  "status": "active",
+  "signature": {
+    "keyId": "mira-plugins-2026-001",
+    "algorithm": "ed25519",
+    "signedAt": "2026-07-29T12:35:04.459Z",
+    "payloadSha": "8ba1bd26001496104534f26e223a760ed97bbcf2795cb14b9ca09baecfd2e7ec",
+    "value": "159716936825ae9a6b5d82b2d3ac50c1ba364a39dd0ff9d0c8066b9b143f82163f965862f63dae833e2313db98b1b38502d807eaaf1688ea84a36ef0e915ae02"
+  }
 }
