@@ -102,7 +102,6 @@ const lines = [
     (row) =>
       `| ${row.plugin} | ${row.fixture} | ${row.type} | ${row.evidence} | ${row.offline ? "yes" : "no"} | ${row.hardwareOnly ? "yes" : "no"} | ${row.hardwareOnly ? "yes" : "no"} | ${row.final} |`,
   ),
-  "",
 ];
 const output = `${lines.join("\n")}\n`;
 

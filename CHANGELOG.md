@@ -10,6 +10,8 @@
 
 ## [Unreleased]
 
+- 将 `mira.logitech-hidpp` 提升至 0.9.3，发布新的声明式 dashboard placement 契约，避免复用既有 0.9.2 生产版本。
+- 修复 per-plugin Release gate：源 manifest 保持无发布者注入，生产 `publisherKeyId` 仅在隔离 staging 打包阶段写入。
 - 为 AMaster 的 performance、sleep、profile、lighting、firmware、device-settings、receiver 和 button-mapping 能力补全了声明式 UI 元数据，包括按连接方式绑定的 sleep binding。
 - 新增了带回读验证的 HID++ software/onboard control-mode mutation 和插件声明的 UI 元数据，允许 host 在没有 Logitech 专属组件的情况下渲染该控件。
 - 新增了声明式 HID++ `0x8100` 元数据，并使用设备上报的 sector size 进行整扇区读取，包括对齐的 final-block 读取和 CRC-CCITT 校验。

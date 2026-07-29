@@ -47,6 +47,35 @@ if (/overwrite_latest/.test(releaseYmlRaw)) {
 if (!/plugin\/\$\{.*pluginId.*\}\/v\$?\{/.test(releaseYmlRaw) && !/plugin\/<plugin-id>\/v<semver>/.test(releaseYmlRaw)) {
   throw new Error('.github/workflows/release.yml must use plugin/<plugin-id>/v<semver> tag format');
 }
+// Source manifests deliberately keep publisherKeyId unset. The production key
+// identity is part of the release plan and is injected only into the isolated
+// staging copy before signing.
+if (!releaseYmlRaw.includes('const publisherKeyId = "mira-plugins-2026-001"')) {
+  throw new Error('.github/workflows/release.yml must declare the production publisher key in the release plan');
+}
+if (!releaseYmlRaw.includes("PLUGIN_KEY_ID: '${{ matrix.target.publisherKeyId }}'")) {
+  throw new Error('.github/workflows/release.yml must pass the planned publisher key to the staging packer');
+}
+if (/if\s*\(\s*!m\.publisherKeyId/.test(releaseYmlRaw)) {
+  throw new Error('.github/workflows/release.yml must not require publisherKeyId before staging injection');
+}
+
+const cliPin = JSON.parse(await readFile('mira-plugin-cli.version.json', 'utf8'));
+if (cliPin.localDev !== false) {
+  throw new Error('mira-plugin-cli.version.json must disable localDev before production plugin releases');
+}
+const requiredCliTargets = [
+  'aarch64-apple-darwin',
+  'x86_64-apple-darwin',
+  'x86_64-unknown-linux-gnu',
+  'x86_64-pc-windows-msvc',
+];
+for (const target of requiredCliTargets) {
+  const pinned = cliPin.targets?.[target];
+  if (!pinned || typeof pinned.asset !== 'string' || !/^[0-9a-f]{64}$/.test(pinned.sha256)) {
+    throw new Error(`mira-plugin-cli.version.json must pin a production asset and SHA-256 for ${target}`);
+  }
+}
 
 let manifestCount = 0;
 for (const name of await readdir('plugins')) {
