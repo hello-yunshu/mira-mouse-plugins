@@ -122,7 +122,7 @@ jobs:
         run: |
           set -euo pipefail
           node scripts/verify-registry.mjs registry/index.json registry/trusted-keys.json
-      - run: npm run validate && npm test
+      - run: npm run validate && npm test && npm run check:architecture
       - name: Commit immutable registry metadata
         env:
           TAG: '${{ github.event.release.tag_name || inputs.release_tag }}'

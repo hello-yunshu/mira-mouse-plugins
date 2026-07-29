@@ -76,6 +76,9 @@ if (!releaseYmlRaw.includes('-f release_channel="$CHANNEL"')) {
 if (!publishRegistryYmlRaw.includes('RELEASE_CHANNEL:')) {
   throw new Error('.github/workflows/publish-registry.yml must preserve the plugin release channel');
 }
+if (!publishRegistryYmlRaw.includes('npm run validate && npm test && npm run check:architecture')) {
+  throw new Error('.github/workflows/publish-registry.yml must run architecture lint before committing Registry metadata');
+}
 if (/if\s*\(\s*!m\.publisherKeyId/.test(releaseYmlRaw)) {
   throw new Error('.github/workflows/release.yml must not require publisherKeyId before staging injection');
 }
