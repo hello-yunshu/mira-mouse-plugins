@@ -54,7 +54,9 @@ jobs:
           # ITERATION-004 §2.6：Registry 发布前必须调用唯一正式 `mira-plugin verify`。
           # 不能依赖第二套不完整 Node verifier 作为生产真相。
           # fetch-cli.mjs 读取 mira-plugin-cli.version.json 下载并校验固定版本二进制。
-          CLI_PATH="$(node scripts/fetch-cli.mjs)"
+          # fetch-cli emits human-readable integrity logs before the final path.
+          # Only the last line is the machine-readable executable path.
+          CLI_PATH="$(node scripts/fetch-cli.mjs | tail -n 1)"
           echo "mira-plugin CLI: $CLI_PATH"
           echo "MIRA_PLUGIN_CLI=$CLI_PATH" >> "$GITHUB_ENV"
       - name: Verify each plugin package with official mira-plugin verify
