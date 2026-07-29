@@ -194,6 +194,7 @@ jobs:
     timeout-minutes: 25
     permissions:
       contents: write
+      actions: write
       id-token: write
       attestations: write
     environment: plugin-release
