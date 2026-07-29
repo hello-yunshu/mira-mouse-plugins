@@ -174,7 +174,7 @@ function checkRegistrySignature(text, rel) {
       if (!entry.pluginApi) missing.push('pluginApi');
       if (!entry.packageFormatVersion) missing.push('packageFormatVersion');
       if (entry.yanked === undefined) missing.push('yanked');
-      if (!entry.minimumHostVersion) missing.push('minimumHostVersion');
+      if (!Object.hasOwn(entry, 'minimumHostVersion')) missing.push('minimumHostVersion');
       if (!entry.publishedAt) missing.push('publishedAt');
       if (!entry.channel) missing.push('channel');
       if (!entry.publisherKeyId) missing.push('publisherKeyId');
