@@ -56,4 +56,3 @@ Summary: 50 fixtures; 50 recognized; 0 unrecognized; 0 hardware-only; 0 unexplai
 | razer-viper | basilisk-v3-polling-rate.json | captured response | response | yes | no | no | offline typed executor |
 | razer-viper | basilisk-v3-serial.json | captured response | response | yes | no | no | offline typed executor |
 | razer-viper | no-match.json | device matcher | contract data | yes | no | no | offline typed executor |
-
