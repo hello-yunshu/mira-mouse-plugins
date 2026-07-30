@@ -64,7 +64,7 @@ function buildEntry(assetUrl, sha256, releaseTag, manifest) {
     publishedAt: new Date().toISOString(),
     channel: process.env.RELEASE_CHANNEL || 'stable',
     yanked: false,
-    notes: 'Mira plugin ' + manifest.pluginId + ' ' + manifest.version,
+    notes: manifest.name + ' ' + manifest.version,
   };
   // entrySha 覆盖除自身外的全部字段，作为 3.8 detached signature 的 payload 基础。
   const { entrySha: _omit, ...entryPayload } = entry;
