@@ -7,7 +7,8 @@
       "writeLength": 20,
       "readLength": 20,
       "stripReportIdOnRead": true,
-      "readTimeoutMs": 250,
+      "readTimeoutMs": 500,
+      "readRetries": 16,
       "errorMatchers": [
         {
           "name": "hidpp2-error",
@@ -41,7 +42,8 @@
       "writeLength": 7,
       "readLength": 7,
       "stripReportIdOnRead": true,
-      "readTimeoutMs": 250,
+      "readTimeoutMs": 500,
+      "readRetries": 16,
       "errorMatchers": [
         {
           "name": "hidpp1-error",
