@@ -927,7 +927,8 @@
               "field": "sector"
             },
             "offset": 0
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "onboard-memory-read",
@@ -947,7 +948,8 @@
               "field": "sector"
             },
             "offset": 16
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "onboard-memory-read",
@@ -967,7 +969,8 @@
               "field": "sector"
             },
             "offset": 32
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "onboard-memory-read",
@@ -987,7 +990,8 @@
               "field": "sector"
             },
             "offset": 48
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "onboard-memory-read",
@@ -1007,7 +1011,8 @@
               "field": "sector"
             },
             "offset": 64
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "onboard-memory-read",
@@ -1027,7 +1032,8 @@
               "field": "sector"
             },
             "offset": 80
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "onboard-memory-read",
@@ -1047,7 +1053,8 @@
               "field": "sector"
             },
             "offset": 96
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "onboard-memory-read",
@@ -1067,7 +1074,8 @@
               "field": "sector"
             },
             "offset": 112
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "onboard-memory-read",
@@ -1087,7 +1095,8 @@
               "field": "sector"
             },
             "offset": 128
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "onboard-memory-read",
@@ -1107,7 +1116,8 @@
               "field": "sector"
             },
             "offset": 144
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "onboard-memory-read",
@@ -1127,7 +1137,8 @@
               "field": "sector"
             },
             "offset": 160
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "onboard-memory-read",
@@ -1147,7 +1158,8 @@
               "field": "sector"
             },
             "offset": 176
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "onboard-memory-read",
@@ -1167,7 +1179,8 @@
               "field": "sector"
             },
             "offset": 192
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "onboard-memory-read",
@@ -1187,7 +1200,8 @@
               "field": "sector"
             },
             "offset": 208
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "onboard-memory-read",
@@ -1207,7 +1221,8 @@
               "field": "sector"
             },
             "offset": 224
-          }
+          },
+          "onFailure": "continue"
         },
         {
           "command": "onboard-memory-read",
@@ -1231,7 +1246,8 @@
               "field": "sectorSize",
               "subtract": 16
             }
-          }
+          },
+          "onFailure": "continue"
         }
       ]
     },
