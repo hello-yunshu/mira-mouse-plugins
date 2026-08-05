@@ -21,19 +21,19 @@
     },
     {
       "pluginId": "mira.logitech-hidpp",
-      "version": "0.9.3",
-      "releaseTag": "plugin/mira.logitech-hidpp/v0.9.3",
-      "url": "https://github.com/hello-yunshu/mira-mouse-plugins/releases/download/plugin/mira.logitech-hidpp/v0.9.3/mira-logitech-hidpp-0.9.3.mira-plugin",
-      "packageSha": "2dedf15ebc05d5e92151037726f0506066ebe8281885bfa3a6343108523b2453",
+      "version": "0.9.4",
+      "releaseTag": "plugin/mira.logitech-hidpp/v0.9.4",
+      "url": "https://github.com/hello-yunshu/mira-mouse-plugins/releases/download/plugin/mira.logitech-hidpp/v0.9.4/mira-logitech-hidpp-0.9.4.mira-plugin",
+      "packageSha": "4d861820fde694c2bcab9365790f47ba4baf7385b3fca67a96e36ae8e7955fff",
       "publisherKeyId": "mira-plugins-2026-002",
       "pluginApi": ">=1.1.0, <2.0.0",
       "packageFormatVersion": 1,
       "minimumHostVersion": null,
-      "publishedAt": "2026-07-29T12:35:21.310Z",
+      "publishedAt": "2026-08-05T11:13:21.414Z",
       "channel": "stable",
       "yanked": false,
-      "notes": "Mira plugin mira.logitech-hidpp 0.9.3",
-      "entrySha": "7451110d9f0bccc4337d7f075e03f1b9be778ce659c5396ee12699b8c8ead269"
+      "notes": "Logitech HID++ 0.9.4",
+      "entrySha": "b963d09a8a3bef98afe44a568c97e51c76646b8161b4db75709f609bbe6cdfb6"
     },
     {
       "pluginId": "mira.razer-viper",
@@ -56,8 +56,8 @@
   "signature": {
     "keyId": "mira-plugins-2026-001",
     "algorithm": "ed25519",
-    "signedAt": "2026-07-29T14:29:36.551Z",
-    "payloadSha": "88ba82ed606c4f02926e0bd688afe8277f3457f8f436d055eae386d9d57fd419",
-    "value": "964dc8ec2ba98d5b1e94c2c545f8ec1793fca4e970c0bcee963dc4fcd610b3d6cd392a1110d39a112b9c230e39917d8aee2af1cbf7097895d52e885ecf2e6b08"
+    "signedAt": "2026-08-05T11:13:21.467Z",
+    "payloadSha": "d598085ad9961b1766a305f16be095cb5feaad595690102567d94c92d795f48d",
+    "value": "cd457a377914d5eedc61fc37efa1eee9db234c065d0efde4ca304d1a3ea2126bf684e277e2e2a1c3ab5611a179b51c0e933939c48faca09ac50583cd10595f04"
   }
 }
