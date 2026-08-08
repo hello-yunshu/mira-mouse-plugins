@@ -328,10 +328,20 @@ function validWhen(value) {
 }
 function validBatteryHistory(value) {
   return value && typeof value === 'object' && !Array.isArray(value)
-    && Object.keys(value).length === 1
+    && Object.keys(value).every((key) => ['validConnections', 'chargingEstimate'].includes(key))
     && Array.isArray(value.validConnections) && value.validConnections.length > 0 && value.validConnections.length <= 4
     && value.validConnections.every((connection) => HOST_DEVICE_CONNECTIONS.has(connection))
-    && new Set(value.validConnections).size === value.validConnections.length;
+    && new Set(value.validConnections).size === value.validConnections.length
+    && (value.chargingEstimate === undefined || (
+      value.chargingEstimate && typeof value.chargingEstimate === 'object' && !Array.isArray(value.chargingEstimate)
+      && Object.keys(value.chargingEstimate).length === 4
+      && value.chargingEstimate.mode === 'local-learning'
+      && validPath(value.chargingEstimate.componentId)
+      && validPath(value.chargingEstimate.groundTruthComponentId)
+      && Array.isArray(value.chargingEstimate.families)
+      && value.chargingEstimate.families.length > 0 && value.chargingEstimate.families.length <= 8
+      && value.chargingEstimate.families.every(validPath)
+    ));
 }
 function validField(field) {
   if (!field || typeof field !== 'object' || !validPath(field.id) || !validPath(field.source) || !EDITORS.has(field.editor)) return false;
