@@ -149,8 +149,8 @@
     "am35-firmware": {
       "validWhen": [],
       "fields": {
-        "versionLength": { "offset": 8, "kind": "u8" },
-        "versionRaw": { "offset": 9, "kind": "bytes", "count": 53 }
+        "versionLength": { "offset": 7, "kind": "u8" },
+        "versionRaw": { "offset": 8, "kind": "bytes", "count": 53 }
       },
       "derived": {
         "versionString": {
@@ -163,7 +163,7 @@
     "am35-serial": {
       "validWhen": [],
       "fields": {
-        "serialRaw": { "offset": 14, "kind": "bytes", "count": 15 }
+        "serialRaw": { "offset": 13, "kind": "bytes", "count": 15 }
       },
       "derived": {
         "serialString": {
@@ -196,12 +196,12 @@
     "am35-sleep-time": {
       "validWhen": [],
       "fields": {
-        "tfgPart1": { "offset": 9, "kind": "le-u16" },
-        "tfgPart2": { "offset": 11, "kind": "le-u16" },
-        "tfgPart3": { "offset": 13, "kind": "le-u16" },
-        "btPart1": { "offset": 17, "kind": "le-u16" },
-        "btPart2": { "offset": 19, "kind": "le-u16" },
-        "btPart3": { "offset": 21, "kind": "le-u16" }
+        "tfgPart1": { "offset": 8, "kind": "le-u16" },
+        "tfgPart2": { "offset": 10, "kind": "le-u16" },
+        "tfgPart3": { "offset": 12, "kind": "le-u16" },
+        "btPart1": { "offset": 16, "kind": "le-u16" },
+        "btPart2": { "offset": 18, "kind": "le-u16" },
+        "btPart3": { "offset": 20, "kind": "le-u16" }
       },
       "derived": {
         "wirelessSleepRawParts": {
@@ -251,9 +251,9 @@
     "am35-mouse-light-mode": {
       "validWhen": [],
       "fields": {
-        "mode": { "offset": 13, "kind": "u8" },
-        "speed": { "offset": 14, "kind": "u8" },
-        "brightness": { "offset": 15, "kind": "u8" }
+        "enabled": { "offset": 13, "kind": "bool" },
+        "mode": { "offset": 14, "kind": "u8" },
+        "speed": { "offset": 15, "kind": "u8" }
       },
       "derived": {
         "modeName": {
@@ -345,17 +345,17 @@
     "am35-button-mapping": {
       "validWhen": [],
       "fields": {
-        "resId": { "offset": 10, "kind": "u8" },
-        "keyType": { "offset": 11, "kind": "u8" },
-        "cKeyCodeRaw": { "offset": 12, "kind": "bytes", "count": 2 },
-        "stdKeyCode": { "offset": 14, "kind": "u8" },
-        "comboKeyCode": { "offset": 15, "kind": "u8" },
-        "macroNameRaw": { "offset": 12, "kind": "bytes", "count": 16 },
-        "repeatMode": { "offset": 28, "kind": "u8" },
-        "repeatTimes": { "offset": 29, "kind": "u8" },
-        "dpiAction": { "offset": 12, "kind": "u8" },
-        "targetDpiSetting": { "offset": 13, "kind": "le-u16" },
-        "rawRecord": { "offset": 10, "kind": "bytes", "count": 22 }
+        "resId": { "offset": 9, "kind": "u8" },
+        "keyType": { "offset": 10, "kind": "u8" },
+        "cKeyCodeRaw": { "offset": 11, "kind": "bytes", "count": 2 },
+        "stdKeyCode": { "offset": 13, "kind": "u8" },
+        "comboKeyCode": { "offset": 14, "kind": "u8" },
+        "macroNameRaw": { "offset": 11, "kind": "bytes", "count": 16 },
+        "repeatMode": { "offset": 27, "kind": "u8" },
+        "repeatTimes": { "offset": 28, "kind": "u8" },
+        "dpiAction": { "offset": 11, "kind": "u8" },
+        "targetDpiSetting": { "offset": 12, "kind": "le-u16" },
+        "rawRecord": { "offset": 9, "kind": "bytes", "count": 22 }
       },
       "derived": {
         "keyTypeName": {

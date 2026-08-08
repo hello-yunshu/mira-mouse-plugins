@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "case": "am35-sleep-time",
-  "evidence": "reverse-confirmed",
-  "description": "AM35 get_sleep_time (RACE raceId 0x3013) returns 6 le-u16 segments: TFG_SEGMENTS at offsets (9,11),(11,13),(13,15) and BT_SEGMENTS at offsets (17,19),(19,21),(21,23). tfg_total = sum(tfg_times); bt_total = sum(bt_times). If total == 65535, sentinel maps to -1. Source: disassembly/AM35model.dis get_sleep_time (line 1862).",
+  "evidence": "source-confirmed",
+  "description": "AM35 get_sleep_time reads raw-report TFG slices 9:11/11:13/13:15 and BT slices 17:19/19:21/21:23. After the Host strips only Report ID, parser rest offsets are TFG 8/10/12 and BT 16/18/20. Fixtures use asymmetric 61/31 totals plus the -1 sentinel so a one-byte shift cannot self-validate. Source: AM Master macOS 1.3.8. Package SHA-256: b5824f7cc76dfc3b8ec98f56ebd0ab65491b7353b26bf2bb83647f3150ee21e8. Reverse evidence: AM_Master_1.3.8_reverse_core/disassembly/AM35_offset_targets.dis/FunctionArea.get_sleep_time.",
   "transport": "am35-direct",
   "reader": {
     "command": "am35-sleep-time",
@@ -12,39 +12,23 @@
   },
   "samples": [
     {
-      "responsePayload": [5, 90, 2, 0, 19, 48, 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0],
+      "responsePayload": [5, 90, 2, 0, 19, 48, 0, 0, 1, 0, 20, 0, 40, 0, 0, 0, 1, 0, 10, 0, 20, 0],
       "expectedParsed": {
-        "tfgPart1": 60,
-        "tfgPart2": 0,
-        "tfgPart3": 0,
-        "btPart1": 30,
-        "btPart2": 0,
-        "btPart3": 0,
-        "wirelessSleepRawParts": 60,
-        "bluetoothSleepRawParts": 30,
-        "wirelessSleepValue": 60,
-        "bluetoothSleepValue": 30
-      },
-      "comment": "TFG sum=60, BT sum=30; no sentinel"
-    },
-    {
-      "responsePayload": [5, 90, 2, 0, 19, 48, 0, 0, 0, 10, 0, 20, 0, 30, 0, 0, 0, 5, 0, 10, 0, 15, 0, 0],
-      "expectedParsed": {
-        "tfgPart1": 10,
+        "tfgPart1": 1,
         "tfgPart2": 20,
-        "tfgPart3": 30,
-        "btPart1": 5,
+        "tfgPart3": 40,
+        "btPart1": 1,
         "btPart2": 10,
-        "btPart3": 15,
-        "wirelessSleepRawParts": 60,
-        "bluetoothSleepRawParts": 30,
-        "wirelessSleepValue": 60,
-        "bluetoothSleepValue": 30
+        "btPart3": 20,
+        "wirelessSleepRawParts": 61,
+        "bluetoothSleepRawParts": 31,
+        "wirelessSleepValue": 61,
+        "bluetoothSleepValue": 31
       },
-      "comment": "Three non-zero segments per group; sums match"
+      "comment": "Asymmetric wireless=61 and bluetooth=31 with all six segments non-zero."
     },
     {
-      "responsePayload": [5, 90, 2, 0, 19, 48, 0, 0, 0, 255, 255, 0, 0, 0, 0, 0, 0, 255, 255, 0, 0, 0, 0, 0],
+      "responsePayload": [5, 90, 2, 0, 19, 48, 0, 0, 255, 255, 0, 0, 0, 0, 0, 0, 255, 255, 0, 0, 0, 0],
       "expectedParsed": {
         "tfgPart1": 65535,
         "tfgPart2": 0,
@@ -57,7 +41,7 @@
         "wirelessSleepValue": -1,
         "bluetoothSleepValue": -1
       },
-      "comment": "Sum == 65535 triggers sentinel -> -1"
+      "comment": "Both totals map the official 65535 sentinel to -1."
     }
   ]
 }

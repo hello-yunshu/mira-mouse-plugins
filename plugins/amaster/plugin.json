@@ -3,7 +3,7 @@
   "packageFormatVersion": 1,
   "pluginId": "mira.amaster",
   "name": "AMaster Mouse Plugin",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "pluginApi": ">=1.1.0, <2.0.0",
   "publisherKeyId": null,
   "evidence": "source-confirmed",
@@ -495,6 +495,32 @@
                 }
               },
               {
+                "id": "am35-enabled",
+                "source": "capabilities.mouseLightMode.enabled",
+                "mutation": "set-mouse-light-mode",
+                "param": "enabled",
+                "editor": "inline-toggle",
+                "lightingRole": "candidate",
+                "priority": 90,
+                "switch": {
+                  "source": "capabilities.mouseLightMode.enabled",
+                  "offValue": false
+                },
+                "labelKey": "dashboard.status",
+                "visibleWhen": {
+                  "path": "family",
+                  "in": [
+                    "am35-direct",
+                    "am35-receiver"
+                  ]
+                },
+                "paramSources": {
+                  "enabled": "capabilities.mouseLightMode.enabled",
+                  "mode": "capabilities.mouseLightMode.mode",
+                  "speed": "capabilities.mouseLightMode.speed"
+                }
+              },
+              {
                 "id": "am35-mode",
                 "source": "capabilities.mouseLightMode.mode",
                 "mutation": "set-mouse-light-mode",
@@ -526,8 +552,8 @@
                     "am35-receiver"
                   ]
                 },
-                "params": { "enabled": true },
                 "paramSources": {
+                  "enabled": "capabilities.mouseLightMode.enabled",
                   "mode": "capabilities.mouseLightMode.mode",
                   "speed": "capabilities.mouseLightMode.speed"
                 }
@@ -572,8 +598,8 @@
                     "am35-receiver"
                   ]
                 },
-                "params": { "enabled": true },
                 "paramSources": {
+                  "enabled": "capabilities.mouseLightMode.enabled",
                   "mode": "capabilities.mouseLightMode.mode",
                   "speed": "capabilities.mouseLightMode.speed"
                 }
@@ -2105,6 +2131,7 @@
       "kind": "object",
       "mutation": "set-mouse-light-mode",
       "sources": {
+        "enabled": "capabilities.mouseLightMode.enabled",
         "mode": "capabilities.mouseLightMode.mode",
         "speed": "capabilities.mouseLightMode.speed"
       },

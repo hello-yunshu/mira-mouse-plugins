@@ -10,6 +10,7 @@
 
 ## [Unreleased]
 
+- 将 `mira.amaster` 提升至 1.9.2 并对齐 AM Master macOS 1.3.8：修正 AM35 鼠标灯光 switch/type/speed 语义，补齐颜色 `C0 30` 内部 postWrite，并修正 sleep、button inventory、firmware 与 serial 的 Report ID 归一偏移。
 - 将 `mira.logitech-hidpp` 提升至 0.9.5：放宽 `hidpp2-long`/`hidpp2-short` 读取超时（250→500ms）并将重试次数提高到 16；为 `hidpp2-device-onboard-read` 的 16 个 `onboard-memory-read` 步骤声明 `onFailure: continue`，单个 chunk 超时不再中断整次设备读取。配合宿主侧 Full 快照对缺失能力键的粘性保留，Windows 上灯光面板不再因读取中断而偶发消失。
 - 将 `mira.logitech-hidpp` 提升至 0.9.4，在 `hidpp2-long` 传输上声明短报告 HID++ 1.0 错误帧匹配器（`[0x10, idx, 0x8f, ...]`）。此前该错误帧只在 `hidpp2-short` 上被识别，long 传输读取（如唤醒后的设备读取）会把接收器的短报告错误帧误判为响应不匹配而空耗至超时；现在会立即以明确的传输错误返回。
 - 将 `mira.razer-viper` 提升至 0.3.1，使用当前共享 Package Format CLI 重新打包，移除旧 0.3.0 资产中会被宿主拒绝的文档文件。

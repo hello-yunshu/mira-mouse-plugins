@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "case": "am35-button-mapping",
-  "evidence": "reverse-confirmed",
-  "description": "AM35 button inventory read (FunctionArea.get_key in disassembly/AM35model.dis line 1666). For each button 1-7, sends '05 5A 03 00 C3 30 {button:02X}'. Response validation: len >= 12, keyType must be 1-13 (reject 0, >=14, 255). When resId != keyType, additional data is parsed based on keyType: 6=标准键 (cKeyCodeRaw[12:14], stdKeyCode[14], comboKeyCode[15]), 8=宏 (macroNameRaw[12:28] as ASCII rstrip \\x00, repeatMode[28], repeatTimes[29]), 11=DPI切换+ (dpiAction[12], targetDpiSetting[13:15] le-u16). Single-key failure does not clear the table (onFailure: continue in workflow). Source: disassembly/AM35model.dis get_key (line 1666), request format '05 5A 03 00 C3 30 ' + format(idx, '02X').",
+  "evidence": "source-confirmed",
+  "description": "AM35 button inventory C3 30 reads official raw-report indexes resId=10, keyType=11 and payload from 12. After the Host strips Report ID, rest offsets are resId=9, keyType=10, payload=11, macro repeat=27/28 and DPI target=12. A failed button remains isolated because every inventory workflow step uses onFailure: continue. Source: AM Master macOS 1.3.8. Package SHA-256: b5824f7cc76dfc3b8ec98f56ebd0ab65491b7353b26bf2bb83647f3150ee21e8. Reverse evidence: AM_Master_1.3.8_reverse_core/disassembly/AM35_offset_targets.dis/FunctionArea.get_key.",
   "transport": "am35-direct",
   "reader": {
     "command": "am35-button-mapping",
@@ -14,7 +14,7 @@
     {
       "params": { "button": 1 },
       "expectedRequestPayload": [5, 90, 3, 0, 195, 48, 1],
-      "responsePayload": [5, 90, 3, 0, 195, 48, 1, 0, 0, 0, 1, 6, 4, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "responsePayload": [5, 90, 3, 0, 195, 48, 1, 0, 0, 1, 6, 4, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       "expectedParsed": {
         "resId": 1,
         "keyType": 6,
@@ -30,12 +30,12 @@
         "targetDpiSetting": 4096,
         "rawRecord": [1, 6, 4, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
       },
-      "comment": "Standard key (keyType=6): cKeyCodeRaw=[0x04,0x00], stdKeyCode=0x10, comboKeyCode=0. macroName overlaps cKeyCodeRaw at offset 12; ascii-extract yields control chars (EOT NUL DLE) after rstrip trailing NULs."
+      "comment": "Standard key exercises the normalized data start at rest offset 11."
     },
     {
       "params": { "button": 2 },
       "expectedRequestPayload": [5, 90, 3, 0, 195, 48, 2],
-      "responsePayload": [5, 90, 3, 0, 195, 48, 2, 0, 0, 0, 2, 8, 70, 105, 114, 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 0, 0],
+      "responsePayload": [5, 90, 3, 0, 195, 48, 2, 0, 0, 2, 8, 70, 105, 114, 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 0, 0],
       "expectedParsed": {
         "resId": 2,
         "keyType": 8,
@@ -51,12 +51,12 @@
         "targetDpiSetting": 29289,
         "rawRecord": [2, 8, 70, 105, 114, 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 0, 0]
       },
-      "comment": "Macro (keyType=8): macroNameRaw='Fire'+12 NULs, ascii-extract rstrip NUL -> 'Fire'. repeatMode=1, repeatTimes=3. Primary test for ascii-extract trailing-null removal."
+      "comment": "Macro name and repeat mode/times exercise normalized rest offsets 11, 27 and 28."
     },
     {
       "params": { "button": 3 },
       "expectedRequestPayload": [5, 90, 3, 0, 195, 48, 3],
-      "responsePayload": [5, 90, 3, 0, 195, 48, 3, 0, 0, 0, 3, 11, 1, 64, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "responsePayload": [5, 90, 3, 0, 195, 48, 3, 0, 0, 3, 11, 1, 64, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       "expectedParsed": {
         "resId": 3,
         "keyType": 11,
@@ -72,12 +72,12 @@
         "targetDpiSetting": 1600,
         "rawRecord": [3, 11, 1, 64, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
       },
-      "comment": "DPI switch+ (keyType=0x0B=11): dpiAction=1, targetDpiSetting=1600 (le-u16 [0x40,0x06]=64+1536). Overlapping fields: cKeyCodeRaw=[1,64], stdKeyCode=6."
+      "comment": "DPI action and target 1600 exercise rest offsets 11 and 12."
     },
     {
       "params": { "button": 4 },
       "expectedRequestPayload": [5, 90, 3, 0, 195, 48, 4],
-      "responsePayload": [5, 90, 3, 0, 195, 48, 4, 0, 0, 0, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "responsePayload": [5, 90, 3, 0, 195, 48, 4, 0, 0, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       "expectedParsed": {
         "resId": 4,
         "keyType": 1,
@@ -93,7 +93,7 @@
         "targetDpiSetting": 0,
         "rawRecord": [4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
       },
-      "comment": "Simple type (keyType=1=左键, resId==keyType): no additional data. All data bytes zero; macroName empty after rstrip NUL."
+      "comment": "Simple mouse key remains readable without any write capability."
     },
     {
       "params": { "button": 5 },
@@ -101,7 +101,7 @@
       "responsePayload": [5, 90, 3, 0, 195, 48, 5, 0],
       "expectFailure": true,
       "expectedError": "byte range out of range",
-      "comment": "Short response (length=8 < 12): parser cannot read offset 10. Tests partial read / ReadStatus. Workflow continues via onFailure: continue; button5 output marked failed but other buttons remain intact."
+      "comment": "Short response fails this button only; workflow onFailure: continue preserves other button outputs."
     }
   ]
 }

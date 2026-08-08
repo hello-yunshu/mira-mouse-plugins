@@ -21,26 +21,25 @@ driver. Every mutation verifies target fields by reading again.
 
 Protocol reserves are tracked separately from enabled workflows and mutations in
 [`../../docs/protocol-reserve-inventory.md`](../../docs/protocol-reserve-inventory.md).
-The Protocol A `0x87` light-switch primitive is intentionally reserved and must
-not be exposed as a mouse or receiver lighting switch until its physical target
-is hardware-proven.
+The Protocol A `0x87` primitive is used only through the existing bounded
+character-light mutations and must not be conflated with receiver lighting.
 
-AM35 exposes bounded writes for DPI stage/value, DPI per-stage color, polling
-rate, semantic sleep time (with `-1` for "never sleep" split into three
-segments), rotation (signed angle + boolean enabled), debounce (USB/wireless/
-Bluetooth), lift-off distance, motion sync, angle snapping, ripple control
-(boolean toggles), FPS mode, DPI button, profile, mouse lighting mode/speed/
-color, and the receiver lighting 十字段. Each setter pre-reads, preserves
-unmodified fields, writes exact bytes, and verifies target fields by reading
-again. Button remapping writes, firmware operations, pairing, macros, and raw
-reports remain unavailable.
+AM35 exposes source-confirmed, fixture-verified bounded writes for DPI
+stage/value, DPI per-stage color, polling rate, semantic sleep time (with `-1`
+for "never sleep" split into three segments), rotation (signed angle + boolean
+enabled), debounce (USB/wireless/Bluetooth), lift-off distance, motion sync,
+angle snapping, ripple control (boolean toggles), FPS mode, DPI button, profile,
+mouse lighting mode/speed/color, and the receiver lighting 十字段. Each setter
+pre-reads, preserves unmodified fields, writes exact bytes, and verifies target
+fields by reading again. Button remapping writes, firmware operations, pairing,
+macros, and raw reports remain unavailable.
 
 ## AM35 Protocol
 
 AM35 (VID `0x0E8D`) protocol definitions were first collected from
 AMasterDriver v1.0.6 reverse analysis and rechecked against the official
-AM Master v1.3.6 macOS package. The current official UI maps `am35` and
-`am35_d` to AM Infinity Mouse .97. The protocol uses HID Output Report
+AM Master macOS 1.3.8 package dated 2026-06-23. The current official UI maps
+`am35` and `am35_d` to AM Infinity Mouse .97. The protocol uses HID Output Report
 (ID `0x06`) for writes and `get_input_report` on Input Report (ID `0x07`)
 for reads, with a RACE-style inner protocol (`05 5A ...`). Responses are
 matched to the request's RACE command ID so stale reports are ignored.
@@ -60,10 +59,19 @@ reads and triggered only when the user opens the details view, not on every
 dashboard refresh. Write mutations are declared and fixture-verified for all
 fields listed above.
 
+AM Master 1.3.8 confirms that the mouse-light mode getter returns three
+independent values: switch, type, and speed. Mira therefore exposes an AM35
+enabled toggle and preserves all three current values whenever any one is
+changed. A mouse-color write is followed internally by the official fixed
+`C0 30` apply frame before final readback; that apply primitive is not exposed
+as a capability or standalone mutation. Transport and command IDs are
+source-confirmed against the same 1.3.8 package.
+
 All AM35 field offsets are source-confirmed from static analysis but not yet
-hardware-verified. Receiver-lighting named values are exposed as `模式 N`
-until real device testing confirms official semantics; inert research metadata
-must not be placed inside executable protocol JSON files.
+hardware-verified on an AM Infinity Mouse .97. Receiver-lighting named values
+are exposed as `模式 N` until real device testing confirms official semantics;
+inert research metadata must not be placed inside executable protocol JSON
+files.
 
 ## Adding a specific AMaster-compatible model
 

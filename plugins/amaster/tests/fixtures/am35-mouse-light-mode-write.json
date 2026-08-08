@@ -2,14 +2,14 @@
   "schemaVersion": 1,
   "case": "am35-mouse-light-mode-write",
   "evidence": "source-confirmed",
-  "description": "AM35 mouse light mode setter writes enabled (bool at offset 6), mode (u8 at offset 7), and speed (u8 at offset 8) via RACE raceId 0x30B3. Frame: 05 5A 05 00 B3 30 [enabled] [mode] [speed]. Total length 9 bytes. No checksum. Mode values: 0=常亮(fixed/steady on, NOT off), 1=呼吸(breathing), 2=模式2(mode 2, neutralized - reverse engineering name 'neon' has unconfirmed write behavior). Speed range 0-4 (5 levels). Source: commands.json am35-mouse-light-mode-write; parser am35-mouse-light-mode reads mode from offset 13, speed from offset 14. P0-D fix: am35-mode/am35-speed fields declare `params: { enabled: true }` so enabled is always encoded as 1 (true) regardless of mode. The getter (am35-mouse-light-mode parser) does not expose enabled, so the UI must NOT show an enabled toggle for these fields. Mode 0 = steady on, NOT off; previously the broken paramSources.enabled=capabilities.mouseLightMode.mode mapping caused mode=0 to write enabled=false, which incorrectly turned the light off. The enabled=false sample has been removed because the UI no longer offers a way to disable the light through this mutation (the dedicated am35-color/enabled toggle path remains responsible for hard on/off if needed).",
+  "description": "AM35 mouse light mode is switch/type/speed. Getter rest offsets are enabled@13, mode@14, speed@15 after the Host strips only Report ID; setter B3 30 writes enabled/mode/speed at request offsets 6/7/8. Mode is limited to 0..2 and speed to the official UI values 0..4. Source: AM Master macOS 1.3.8. Package SHA-256: b5824f7cc76dfc3b8ec98f56ebd0ab65491b7353b26bf2bb83647f3150ee21e8. Reverse evidence: AM_Master_1.3.8_reverse_core/disassembly/AM35_audit_targets.dis/FunctionArea.get_light_set and AM_Master_1.3.8_reverse_core/disassembly/AM35_light_mode_write.dis/FunctionArea.save_light_set.",
   "transport": "am35-direct",
   "setter": {
     "command": "am35-mouse-light-mode-write",
     "raceId": [179, 48],
     "raceIdHex": "0x30B3",
     "params": [
-      { "name": "enabled", "offset": 6, "encoding": "bool", "fixedValue": true },
+      { "name": "enabled", "offset": 6, "encoding": "bool" },
       { "name": "mode", "offset": 7, "encoding": "u8" },
       { "name": "speed", "offset": 8, "encoding": "u8" }
     ],
@@ -17,24 +17,19 @@
   },
   "samples": [
     {
-      "input": { "mode": 1, "speed": 2 },
+      "input": { "enabled": true, "mode": 1, "speed": 2 },
       "expectedRequestPayload": [5, 90, 5, 0, 179, 48, 1, 1, 2],
-      "comment": "mode=1 (breathing), speed=2 (medium); enabled byte=1 injected from setter.params fixedValue=true (ITERATION-008 §P0-D)"
+      "comment": "Enabled breathing mode at medium speed."
     },
     {
-      "input": { "mode": 0, "speed": 0 },
-      "expectedRequestPayload": [5, 90, 5, 0, 179, 48, 1, 0, 0],
-      "comment": "P0-D regression: mode=0 (steady on, NOT off), speed=0 (fastest); enabled byte MUST be 1, not 0. Previously the broken paramSources.enabled=mode mapping produced [.. 0, 0, 0] which incorrectly disabled the light when mode=0."
+      "input": { "enabled": false, "mode": 0, "speed": 0 },
+      "expectedRequestPayload": [5, 90, 5, 0, 179, 48, 0, 0, 0],
+      "comment": "Off is encoded independently from mode 0: B3 30 00 00 00."
     },
     {
-      "input": { "mode": 2, "speed": 4 },
+      "input": { "enabled": true, "mode": 2, "speed": 4 },
       "expectedRequestPayload": [5, 90, 5, 0, 179, 48, 1, 2, 4],
-      "comment": "mode=2, speed=4 (slowest); enabled byte=1 injected from setter.params fixedValue=true"
-    },
-    {
-      "input": { "mode": 0, "speed": 4 },
-      "expectedRequestPayload": [5, 90, 5, 0, 179, 48, 1, 0, 4],
-      "comment": "P0-D boundary: mode=0 (steady on) with speed=4 (slowest); confirms enabled byte=1 across all mode values"
+      "comment": "Upper source-confirmed UI bounds for mode and speed."
     }
   ],
   "readback": {
@@ -42,7 +37,7 @@
     "raceId": [12, 10],
     "raceIdHex": "0x0A0C",
     "parser": "am35-mouse-light-mode",
-    "responseSample": [5, 90, 6, 0, 12, 10, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0],
-    "expectedParsed": { "mode": 1, "speed": 2, "brightness": 0, "modeName": "呼吸", "speedLabel": "中" }
+    "responseSample": [5, 90, 6, 0, 12, 10, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2],
+    "expectedParsed": { "enabled": true, "mode": 1, "speed": 2, "modeName": "呼吸", "speedLabel": "中" }
   }
 }

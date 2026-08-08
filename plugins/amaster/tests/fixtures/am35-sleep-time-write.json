@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "case": "am35-sleep-time-write",
-  "evidence": "reverse-confirmed",
-  "description": "AM35 setSleepTime (RACE raceId 0x3012) writes 6 le-u16 segments via semantic encoding. Each semantic value (-1 = never sleep, or seconds 0..65535) is split into three le-u16 parts via sleep-semantic-triple-le-u16: wire = (semantic == -1) ? 65535 : semantic; base = wire // 3; rem = wire % 3; parts = [base, base, base + rem]. Frame format: 05 5A 1A 00 12 30 [bt1 le-u16] [bt2 le-u16] [bt3 le-u16] 00 00 [tfg1 le-u16] [tfg2 le-u16] [tfg3 le-u16] 00 00 3C 00 1E 00 3C 00 1E 00. Note: BT segments come BEFORE TFG segments in the write frame (read order is TFG first). Total length 30 bytes. Source: disassembly/AM35model.dis setSleepTime (line 1522).",
+  "evidence": "source-confirmed",
+  "description": "AM35 setSleepTime (RACE raceId 0x3012) writes 6 le-u16 segments via semantic encoding. Each semantic value (-1 = never sleep, or seconds 0..65535) is split into three le-u16 parts via sleep-semantic-triple-le-u16: wire = (semantic == -1) ? 65535 : semantic; base = wire // 3; rem = wire % 3; parts = [base, base, base + rem]. Frame format: 05 5A 1A 00 12 30 [bt1 le-u16] [bt2 le-u16] [bt3 le-u16] 00 00 [tfg1 le-u16] [tfg2 le-u16] [tfg3 le-u16] 00 00 3C 00 1E 00 3C 00 1E 00. BT segments come before TFG segments in the write frame, while readback returns TFG at normalized rest offsets 8/10/12 and BT at 16/18/20. Source: AM Master macOS 1.3.8. Package SHA-256: b5824f7cc76dfc3b8ec98f56ebd0ab65491b7353b26bf2bb83647f3150ee21e8.",
   "transport": "am35-direct",
   "setter": {
     "command": "am35-sleep-time-write",
@@ -36,7 +36,7 @@
     "raceId": [19, 48],
     "raceIdHex": "0x3013",
     "parser": "am35-sleep-time",
-    "responseSample": [5, 90, 2, 0, 19, 48, 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0],
+    "responseSample": [5, 90, 2, 0, 19, 48, 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, 0],
     "expectedParsed": {
       "tfgPart1": 60, "tfgPart2": 0, "tfgPart3": 0,
       "btPart1": 30, "btPart2": 0, "btPart3": 0,

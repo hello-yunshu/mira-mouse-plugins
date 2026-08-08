@@ -622,13 +622,14 @@
       "inputs": {
         "enabled": { "kind": "boolean" },
         "mode": { "kind": "integer", "min": 0, "max": 2 },
-        "speed": { "kind": "integer", "min": 0, "max": 255 }
+        "speed": { "kind": "integer", "min": 0, "max": 4 }
       },
       "read": { "command": "am35-mouse-light-mode", "parser": "am35-mouse-light-mode" },
       "writeCommand": "am35-mouse-light-mode-write",
       "preserveUnknown": false,
       "settleMs": 30,
       "verify": { "command": "am35-mouse-light-mode", "parser": "am35-mouse-light-mode", "assertions": [
+        { "field": "enabled", "param": "enabled" },
         { "field": "mode", "param": "mode" },
         { "field": "speed", "param": "speed" }
       ] }
@@ -638,13 +639,14 @@
       "inputs": {
         "enabled": { "kind": "boolean" },
         "mode": { "kind": "integer", "min": 0, "max": 2 },
-        "speed": { "kind": "integer", "min": 0, "max": 255 }
+        "speed": { "kind": "integer", "min": 0, "max": 4 }
       },
       "read": { "command": "am35-mouse-light-mode", "parser": "am35-mouse-light-mode" },
       "writeCommand": "am35-mouse-light-mode-write",
       "preserveUnknown": false,
       "settleMs": 30,
       "verify": { "command": "am35-mouse-light-mode", "parser": "am35-mouse-light-mode", "assertions": [
+        { "field": "enabled", "param": "enabled" },
         { "field": "mode", "param": "mode" },
         { "field": "speed", "param": "speed" }
       ] }
@@ -657,7 +659,10 @@
       "read": { "command": "am35-mouse-light-color", "parser": "am35-mouse-light-color" },
       "writeCommand": "am35-mouse-light-color-write",
       "preserveUnknown": false,
-      "settleMs": 30,
+      "settleMs": 0,
+      "postWrites": [
+        { "command": "am35-mouse-light-apply", "settleMs": 30 }
+      ],
       "verify": { "command": "am35-mouse-light-color", "parser": "am35-mouse-light-color", "assertions": [
         { "field": "color", "param": "color" }
       ] }
@@ -670,7 +675,10 @@
       "read": { "command": "am35-mouse-light-color", "parser": "am35-mouse-light-color" },
       "writeCommand": "am35-mouse-light-color-write",
       "preserveUnknown": false,
-      "settleMs": 30,
+      "settleMs": 0,
+      "postWrites": [
+        { "command": "am35-mouse-light-apply", "settleMs": 30 }
+      ],
       "verify": { "command": "am35-mouse-light-color", "parser": "am35-mouse-light-color", "assertions": [
         { "field": "color", "param": "color" }
       ] }

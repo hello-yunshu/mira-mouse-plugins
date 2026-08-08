@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "case": "am35-firmware",
+  "evidence": "source-confirmed",
+  "description": "Official get_version reads versionLength at raw index 8 and version bytes from raw index 9. After the Host strips Report ID, the parser uses rest offsets 7 and 8. Source: AM Master macOS 1.3.8. Package SHA-256: b5824f7cc76dfc3b8ec98f56ebd0ab65491b7353b26bf2bb83647f3150ee21e8. Reverse evidence: AM_Master_1.3.8_reverse_core/disassembly/AM35_offset_targets.dis/FunctionArea.get_version.",
+  "transport": "am35-direct",
+  "command": "am35-firmware",
+  "parser": "am35-firmware",
+  "payload": [
+    5, 90, 3, 0, 7, 28, 0, 6,
+    118, 49, 46, 51, 46, 56,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0
+  ],
+  "expectedParsed": {
+    "versionLength": 6,
+    "versionString": "v1.3.8"
+  }
+}
