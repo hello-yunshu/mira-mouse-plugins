@@ -103,7 +103,7 @@ jobs:
           # 优先级 4: fixed, confirmed-compatible Host SHA. Never silently
           # follow a moving main branch, which can pair this plugin commit with
           # an incompatible CLI.
-          FALLBACK_HOST_SHA="9f59bcb83b360fb309ea3c3cbb280215d3bbe29b"
+          FALLBACK_HOST_SHA="6487ac389f92cccfd86d27a77aa99677692b2871"
           echo "ref=$FALLBACK_HOST_SHA" >> "$GITHUB_OUTPUT"
           echo "source=fixed compatible Host SHA" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v7
