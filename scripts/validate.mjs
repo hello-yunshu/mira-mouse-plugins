@@ -52,6 +52,53 @@ if (pluginFilter) {
 }
 
 const fail = (message) => { throw new Error(message); };
+
+export function validatePostWrites(name, id, mutation, { commands, parsers, transports }) {
+  const postWrites = mutation.postWrites ?? [];
+  if (!Array.isArray(postWrites)) fail(`${name}/${id}: postWrites must be an array`);
+  for (const [index, postWrite] of postWrites.entries()) {
+    const context = `${name}/${id}: postWrite ${index + 1}`;
+    if (!postWrite || typeof postWrite !== 'object' || Array.isArray(postWrite)) {
+      fail(`${context} must be an object`);
+    }
+    if (typeof postWrite.command !== 'string' || !commands[postWrite.command]) {
+      fail(`${context} references missing command`);
+    }
+    if (commands[postWrite.command].request.base === 'read-response') {
+      fail(`${context} command must be a direct write`);
+    }
+    if (postWrite.transport !== undefined && !transports[postWrite.transport]) {
+      fail(`${context} references missing transport`);
+    }
+    if (!Number.isInteger(postWrite.settleMs) || postWrite.settleMs < 0 || postWrite.settleMs > 1000) {
+      fail(`${context} has invalid settle delay`);
+    }
+    const skipIfZero = postWrite.skipIfZero ?? [];
+    if (!Array.isArray(skipIfZero) || skipIfZero.some((guard) => !guard?.output || !guard?.field)) {
+      fail(`${context} has invalid skip guard`);
+    }
+    if (postWrite.verify !== undefined) {
+      const verify = postWrite.verify;
+      if (!verify || typeof verify !== 'object' || Array.isArray(verify)) {
+        fail(`${context} verify must be an object`);
+      }
+      if (!commands[verify.command] || !parsers[verify.parser]) {
+        fail(`${context} has invalid verification read`);
+      }
+      if (verify.transport !== undefined && !transports[verify.transport]) {
+        fail(`${context} verify references missing transport`);
+      }
+      if (!Array.isArray(verify.assertions)) {
+        fail(`${context} verify assertions must be an array`);
+      }
+      for (const assertion of verify.assertions) {
+        if (!mutation.inputs?.[assertion?.param]) {
+          fail(`${context} assertion uses undeclared parameter`);
+        }
+      }
+    }
+  }
+}
 const HOST_DEVICE_CONNECTIONS = new Set(['usb', 'wireless', 'bluetooth', 'virtual']);
 const VALUE_FORMATS = new Set(['sleep', 'color']);
 const DECLARATIVE_CONTROLS = new Set(['Toggle', 'Segmented', 'Select', 'Slider', 'Number', 'Color', 'GradientStops', 'DpiStages', 'LightingZone', 'ReadOnlyValue', 'Action']);
@@ -933,6 +980,7 @@ for (const [name, data] of Object.entries(pluginData)) {
     for (const guard of mutation.skipIfZero ?? []) {
       if (!guard.output || !guard.field) fail(`${name}/${id}: invalid skip guard`);
     }
+    validatePostWrites(name, id, mutation, { commands, parsers, transports });
     for (const guard of mutation.skipIfNonZero ?? []) {
       if (!guard.output || !guard.field) fail(`${name}/${id}: invalid skip-if-non-zero guard`);
     }

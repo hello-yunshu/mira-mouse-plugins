@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "case": "am35-mouse-light-color-write",
   "evidence": "source-confirmed",
-  "description": "AM35 mouse light color setter writes a single RGB color repeated 12 times via RACE raceId 0x0A0D. Frame: 05 5A 2C 00 0D 0A 00 62 01 24 00 10 [color×12]. Total length 48 bytes (12 header + 36 RGB data). No checksum. The 'repeat: 12' field in ByteDefinition (commands.json) causes the 3-byte RGB encoding to be repeated 12 times, matching the device's expectation of 12 color slots in a single write frame. Source: commands.json am35-mouse-light-color-write; parser am35-mouse-light-color reads color from offset 17.",
+  "description": "AM35 mouse color writes the 0D 0A color frame first, then the fixed C0 30 apply frame, then reads back color. The apply command is an internal postWrite on both direct and receiver mutations, never a capability or standalone mutation. Source: AM Master macOS 1.3.8. Package SHA-256: b5824f7cc76dfc3b8ec98f56ebd0ab65491b7353b26bf2bb83647f3150ee21e8. Reverse evidence: AM_Master_1.3.8_reverse_core/disassembly/AM35_audit_targets.dis/FunctionArea.save_light.",
   "transport": "am35-direct",
   "setter": {
     "command": "am35-mouse-light-color-write",
@@ -13,21 +13,26 @@
     ],
     "checksum": null
   },
+  "postWrite": {
+    "command": "am35-mouse-light-apply",
+    "expectedRequestPayload": [5, 90, 9, 0, 192, 48, 128, 1, 16, 1, 255, 255, 255],
+    "settleMs": 30
+  },
+  "operationOrder": [
+    "am35-mouse-light-color-write",
+    "am35-mouse-light-apply",
+    "am35-mouse-light-color"
+  ],
   "samples": [
     {
       "input": { "color": "#FF8800" },
       "expectedRequestPayload": [5, 90, 44, 0, 13, 10, 0, 98, 1, 36, 0, 16, 255, 136, 0, 255, 136, 0, 255, 136, 0, 255, 136, 0, 255, 136, 0, 255, 136, 0, 255, 136, 0, 255, 136, 0, 255, 136, 0, 255, 136, 0, 255, 136, 0, 255, 136, 0],
-      "comment": "color #FF8800 (R=255, G=136, B=0) repeated 12 times = 36 bytes"
+      "comment": "Color frame contains #FF8800 repeated across all 12 slots before the fixed apply frame."
     },
     {
       "input": { "color": "#FF0000" },
       "expectedRequestPayload": [5, 90, 44, 0, 13, 10, 0, 98, 1, 36, 0, 16, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0],
-      "comment": "color #FF0000 (pure red) repeated 12 times"
-    },
-    {
-      "input": { "color": "#00FF00" },
-      "expectedRequestPayload": [5, 90, 44, 0, 13, 10, 0, 98, 1, 36, 0, 16, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0, 0, 255, 0],
-      "comment": "color #00FF00 (pure green) repeated 12 times"
+      "comment": "Pure red repeated 12 times."
     }
   ],
   "readback": {

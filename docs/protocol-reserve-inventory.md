@@ -29,9 +29,9 @@
 
 | Category | Entries |
 |---|---|
-| Commands | 46 total; 42 enabled by read workflows, mutations, or transports; 4 reserved. |
-| Parsers | 29 total; 28 enabled by read workflows, mutations, or transports; 1 reserved. |
-| Mutations | 15 enabled. |
+| Commands | 66 total; 66 enabled by read workflows, mutations, postWrites, or transports; 0 reserved. |
+| Parsers | 32 total; 32 enabled by read workflows, mutations, or transports; 0 reserved. |
+| Mutations | 52 enabled. |
 
 已启用但不直接面向 UI 的项：
 
@@ -42,15 +42,10 @@
 | `receiver-set-length` | command | Internal `protocol-a-receiver` payload-length setup. |
 | `receiver-read` | command | Internal `protocol-a-receiver` payload read. |
 | `receiver-status` | parser | Internal `protocol-a-receiver` status parser. |
+| `am35-mouse-light-apply` | command | 仅作为 `set-mouse-light-color` direct/receiver mutation 的内部 postWrite；不得直接影响 UI。 |
 
-保留的协议原语：
-
-| Entry | Kind | Reason to keep | Activation rule |
-|---|---|---|---|
-| `mouse-light-switch` | command/parser | Protocol A `0x87` 存在于 source-confirmed 命令集中，但硬件写入/回读显示它不等价于当前接收器链路上的鼠标灯光开关。 | Do not add to read workflows or mutations until the physical target is proven and the output name is unambiguous. |
-| `mouse-light-switch-write` | command | 同一 `0x87` 原语的写入模板。 | Do not expose as `set-mouse-light-switch`; mouse lighting on/off currently uses `set-mouse-lighting` with `settings.mouseLightEnabled` readback. |
-| `profile-write` | command | 保留的旧 Protocol A profile 写入模板，用于未来 profile 编辑研究。 | Add only with a matching read command, bounded profile range, and readback assertion. |
-| `am35-serial` | command | AM35 序列号查询材料，用于未来设备身份工作。 | Add only after the response parser and privacy behavior are defined. |
+保留的协议原语：无。这里的“已启用”只表示被声明式执行路径引用，
+不等于直接暴露给 UI；内部 transport/postWrite 项仍受上表边界约束。
 
 AMaster 灯光边界：
 

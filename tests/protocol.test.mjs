@@ -75,86 +75,136 @@ test('AM35 fixture validates little-endian command id', async () => {
   assert.equal(fixture.payload[4] | (fixture.payload[5] << 8), fixture.expectedCommandIdLittleEndian);
 });
 
-// P0-D: AM35 mouse light mode write must NOT derive `enabled` from `mode`.
-// The am35-mouse-light-mode parser only returns mode/speed/brightness (no
-// enabled), and the write command at offset 6 expects a bool. Previously the
-// broken paramSources.enabled=capabilities.mouseLightMode.mode mapping caused
-// mode=0 (steady on) to write enabled=false, silently turning the light off.
-// Fix: am35-mode/am35-speed fields declare `params: { enabled: true }` and
-// drop paramSources.enabled so enabled is always encoded as 1 (true).
-test('P0-D: AM35 mouse-light-mode fields force enabled=true (no mode-derived bool)', async () => {
+test('AM35 1.3.8 mouse-light parser and UI preserve switch/type/speed independently', async () => {
+  const parsers = await read('plugins/amaster/protocol/parsers.json');
+  const fields = parsers.parsers['am35-mouse-light-mode'].fields;
+  assert.deepEqual(fields, {
+    enabled: { offset: 13, kind: 'bool' },
+    mode: { offset: 14, kind: 'u8' },
+    speed: { offset: 15, kind: 'u8' },
+  });
+  assert.equal(fields.brightness, undefined, '1.3.8 getter has no brightness field');
+
   const manifest = await read('plugins/amaster/plugin.json');
   const lighting = manifest.capabilities.find((c) => c.id === 'lighting');
   const mouseZone = lighting.metadata.zones.find((z) => z.id === 'mouse');
+  const enabledField = mouseZone.fields.find((f) => f.id === 'am35-enabled');
   const modeField = mouseZone.fields.find((f) => f.id === 'am35-mode');
   const speedField = mouseZone.fields.find((f) => f.id === 'am35-speed');
-
-  // Both fields must declare params.enabled = true (constant) so the write
-  // command always receives enabled=true at offset 6, regardless of mode.
-  assert.equal(modeField.params?.enabled, true, 'am35-mode must declare params.enabled=true');
-  assert.equal(speedField.params?.enabled, true, 'am35-speed must declare params.enabled=true');
-
-  // Neither field may declare paramSources.enabled — that was the bug.
-  assert.equal(modeField.paramSources?.enabled, undefined, 'am35-mode must not map paramSources.enabled (P0-D regression)');
-  assert.equal(speedField.paramSources?.enabled, undefined, 'am35-speed must not map paramSources.enabled (P0-D regression)');
-
-  // The mutation inputs still require enabled (boolean), mode (0..2), speed (0..255).
-  // params + paramSources together must cover all mutation inputs.
-  const workflows = await read('plugins/amaster/protocol/workflows.json');
-  const mutation = workflows.mutations['am35-direct-set-mouse-light-mode'];
-  const requiredInputs = Object.keys(mutation.inputs);
-  for (const field of [modeField, speedField]) {
-    const covered = new Set([
-      ...Object.keys(field.params ?? {}),
-      ...Object.keys(field.paramSources ?? {}),
-      field.param ?? 'value',
-    ]);
-    for (const input of requiredInputs) {
-      assert.ok(covered.has(input), `${field.id}: mutation input ${input} not covered by params/paramSources`);
-    }
+  assert.ok(enabledField, 'AM35 enabled toggle must be exposed');
+  assert.equal(enabledField.source, 'capabilities.mouseLightMode.enabled');
+  assert.equal(enabledField.param, 'enabled');
+  for (const field of [enabledField, modeField, speedField]) {
+    assert.equal(field.params?.enabled, undefined, `${field.id}: enabled must not be fixed true`);
+    assert.deepEqual(Object.keys(field.paramSources).sort(), ['enabled', 'mode', 'speed']);
   }
-
-  // exportableFields.mouse-lighting-mode-am35 must NOT expose enabled either,
-  // because the getter does not return it.
   const exportable = manifest.exportableFields.find((f) => f.id === 'mouse-lighting-mode-am35');
-  assert.equal(exportable.sources?.enabled, undefined, 'exportableFields mouse-lighting-mode-am35 must not expose enabled (getter does not return it)');
+  assert.equal(exportable.sources.enabled, 'capabilities.mouseLightMode.enabled');
 });
 
-test('P0-D: AM35 mouse-light-mode-write fixture enforces enabled byte = 1 for all modes', async () => {
-  const fixture = await read('plugins/amaster/tests/fixtures/am35-mouse-light-mode-write.json');
-  // No sample may carry enabled=false — the UI no longer offers a toggle for it.
-  for (const sample of fixture.samples) {
-    assert.equal(sample.input.enabled, undefined, `sample ${JSON.stringify(sample.input)}: input must not include enabled (now a constant param)`);
-    // enabled byte is at offset 6 of the 9-byte RACE frame.
-    assert.equal(sample.expectedRequestPayload[6], 1, `sample ${JSON.stringify(sample.input)}: enabled byte at offset 6 must be 1`);
-    // Frame prefix: 05 5A 05 00 B3 30
-    assert.deepEqual(sample.expectedRequestPayload.slice(0, 6), [5, 90, 5, 0, 179, 48]);
-  }
-  // Regression: the mode=0 sample must encode enabled=1, NOT 0.
-  const mode0Sample = fixture.samples.find((s) => s.input.mode === 0 && s.input.speed === 0);
-  assert.ok(mode0Sample, 'fixture must include a mode=0, speed=0 sample');
-  assert.equal(mode0Sample.expectedRequestPayload[6], 1, 'mode=0 (steady on) must still write enabled=1');
-  assert.equal(mode0Sample.expectedRequestPayload[7], 0, 'mode byte at offset 7 must be 0');
-  assert.equal(mode0Sample.expectedRequestPayload[8], 0, 'speed byte at offset 8 must be 0');
-  // Mode=2 with speed=4 must also encode enabled=1.
-  const mode2Sample = fixture.samples.find((s) => s.input.mode === 2 && s.input.speed === 4);
-  assert.ok(mode2Sample, 'fixture must include a mode=2, speed=4 sample');
-  assert.equal(mode2Sample.expectedRequestPayload[6], 1, 'mode=2 must still write enabled=1');
-  // Readback parser returns mode/speed/brightness — no enabled field.
-  assert.equal(fixture.readback.expectedParsed.enabled, undefined, 'parser must not return enabled (it is a write-only bool)');
-});
-
-test('P0-D: AM35 set-mouse-light-mode mutation rejects out-of-range mode/speed', async () => {
+test('AM35 mouse-light mutation verifies all fields and encodes the off state', async () => {
   const { mutations } = await read('plugins/amaster/protocol/workflows.json');
-  const modeInputs = mutations['am35-direct-set-mouse-light-mode'].inputs;
-  assert.deepEqual(modeInputs.mode.allowed, undefined, 'mode uses min/max, not allowed list');
-  assert.equal(modeInputs.mode.min, 0);
-  assert.equal(modeInputs.mode.max, 2);
-  assert.equal(modeInputs.speed.min, 0);
-  assert.equal(modeInputs.speed.max, 255);
-  // speed max is 255 per mutation inputs; the UI options cap at 4 (5 levels),
-  // but the wire encoding accepts the full byte range declared in mutation inputs.
-  assert.equal(modeInputs.enabled.kind, 'boolean');
+  for (const id of ['am35-direct-set-mouse-light-mode', 'am35-receiver-set-mouse-light-mode']) {
+    const mutation = mutations[id];
+    assert.deepEqual(mutation.inputs, {
+      enabled: { kind: 'boolean' },
+      mode: { kind: 'integer', min: 0, max: 2 },
+      speed: { kind: 'integer', min: 0, max: 4 },
+    });
+    assert.deepEqual(
+      mutation.verify.assertions.map(({ field, param }) => [field, param]),
+      [['enabled', 'enabled'], ['mode', 'mode'], ['speed', 'speed']],
+    );
+  }
+  const fixture = await read('plugins/amaster/tests/fixtures/am35-mouse-light-mode-write.json');
+  const off = fixture.samples.find((sample) => sample.input.enabled === false);
+  assert.ok(off, 'fixture must include an explicit off sample');
+  assert.deepEqual(off.expectedRequestPayload, [5, 90, 5, 0, 179, 48, 0, 0, 0]);
+  assert.deepEqual(fixture.readback.expectedParsed, {
+    enabled: true, mode: 1, speed: 2, modeName: '呼吸', speedLabel: '中',
+  });
+  assert.deepEqual(
+    [Boolean(fixture.readback.responseSample[13]), fixture.readback.responseSample[14], fixture.readback.responseSample[15]],
+    [fixture.readback.expectedParsed.enabled, fixture.readback.expectedParsed.mode, fixture.readback.expectedParsed.speed],
+  );
+});
+
+test('AM35 color writes use the source-confirmed internal C0 30 postWrite', async () => {
+  const { commands } = await read('plugins/amaster/protocol/commands.json');
+  const { mutations } = await read('plugins/amaster/protocol/workflows.json');
+  const manifest = await read('plugins/amaster/plugin.json');
+  const apply = commands['am35-mouse-light-apply'];
+  assert.equal(apply.request.length, 13);
+  assert.deepEqual(apply.request.bytes.map((byte) => Number(byte.value)), [5, 90, 9, 0, 192, 48, 128, 1, 16, 1, 255, 255, 255]);
+  assert.equal(apply.request.base, undefined);
+  for (const id of ['am35-direct-set-mouse-light-color', 'am35-receiver-set-mouse-light-color']) {
+    assert.equal(mutations[id].settleMs, 0, id);
+    assert.deepEqual(mutations[id].postWrites, [{ command: 'am35-mouse-light-apply', settleMs: 30 }], id);
+    assert.equal(mutations[id].verify.command, 'am35-mouse-light-color', id);
+  }
+  assert.equal(mutations['am35-mouse-light-apply'], undefined, 'apply must not be a standalone mutation');
+  assert.equal(JSON.stringify(manifest.capabilities).includes('am35-mouse-light-apply'), false, 'apply must not be a capability');
+  const fixture = await read('plugins/amaster/tests/fixtures/am35-mouse-light-color-write.json');
+  assert.deepEqual(fixture.postWrite.expectedRequestPayload, [5, 90, 9, 0, 192, 48, 128, 1, 16, 1, 255, 255, 255]);
+  assert.deepEqual(fixture.operationOrder, ['am35-mouse-light-color-write', 'am35-mouse-light-apply', 'am35-mouse-light-color']);
+});
+
+test('AM35 1.3.8 inventory offsets and asymmetric fixtures match stripped Report ID semantics', async () => {
+  const { parsers } = await read('plugins/amaster/protocol/parsers.json');
+  assert.deepEqual(Object.values(parsers['am35-sleep-time'].fields).map((field) => field.offset), [8, 10, 12, 16, 18, 20]);
+  assert.deepEqual(
+    Object.fromEntries(Object.entries(parsers['am35-button-mapping'].fields).map(([id, field]) => [id, field.offset])),
+    { resId: 9, keyType: 10, cKeyCodeRaw: 11, stdKeyCode: 13, comboKeyCode: 14, macroNameRaw: 11, repeatMode: 27, repeatTimes: 28, dpiAction: 11, targetDpiSetting: 12, rawRecord: 9 },
+  );
+  assert.deepEqual(parsers['am35-firmware'].fields, {
+    versionLength: { offset: 7, kind: 'u8' },
+    versionRaw: { offset: 8, kind: 'bytes', count: 53 },
+  });
+  assert.deepEqual(parsers['am35-serial'].fields.serialRaw, { offset: 13, kind: 'bytes', count: 15 });
+
+  const sleep = await read('plugins/amaster/tests/fixtures/am35-sleep-time.json');
+  assert.deepEqual(
+    sleep.samples.map((sample) => [sample.expectedParsed.wirelessSleepValue, sample.expectedParsed.bluetoothSleepValue]),
+    [[61, 31], [-1, -1]],
+  );
+  const leU16 = (bytes, offset) => bytes[offset] | (bytes[offset + 1] << 8);
+  for (const sample of sleep.samples) {
+    const wirelessRaw = [8, 10, 12].reduce((sum, offset) => sum + leU16(sample.responsePayload, offset), 0);
+    const bluetoothRaw = [16, 18, 20].reduce((sum, offset) => sum + leU16(sample.responsePayload, offset), 0);
+    assert.equal(sample.expectedParsed.wirelessSleepValue, wirelessRaw === 65535 ? -1 : wirelessRaw);
+    assert.equal(sample.expectedParsed.bluetoothSleepValue, bluetoothRaw === 65535 ? -1 : bluetoothRaw);
+  }
+  const buttons = await read('plugins/amaster/tests/fixtures/am35-button-mapping.json');
+  assert.deepEqual(buttons.samples.slice(0, 4).map((sample) => sample.expectedParsed.keyType), [6, 8, 11, 1]);
+  for (const sample of buttons.samples.filter((candidate) => !candidate.expectFailure)) {
+    assert.equal(sample.responsePayload[9], sample.expectedParsed.resId);
+    assert.equal(sample.responsePayload[10], sample.expectedParsed.keyType);
+  }
+  assert.equal(buttons.samples[1].responsePayload[27], buttons.samples[1].expectedParsed.repeatMode);
+  assert.equal(buttons.samples[1].responsePayload[28], buttons.samples[1].expectedParsed.repeatTimes);
+  assert.equal(leU16(buttons.samples[2].responsePayload, 12), buttons.samples[2].expectedParsed.targetDpiSetting);
+  assert.equal(buttons.samples.at(-1).expectFailure, true);
+  const inventorySteps = (await read('plugins/amaster/protocol/workflows.json')).workflows['am35-direct-inventory-read'].steps
+    .filter((step) => step.command === 'am35-button-mapping');
+  assert.equal(inventorySteps.length, 7);
+  assert.ok(inventorySteps.every((step) => step.onFailure === 'continue'));
+
+  const firmware = await read('plugins/amaster/tests/fixtures/am35-firmware.json');
+  assert.equal(firmware.payload[7], firmware.expectedParsed.versionLength);
+  assert.equal(String.fromCharCode(...firmware.payload.slice(8, 14)), firmware.expectedParsed.versionString);
+  const serial = await read('plugins/amaster/tests/fixtures/am35-serial.json');
+  assert.deepEqual(serial.payload.slice(13, 28), serial.expectedParsed.serialRaw);
+});
+
+test('validator rejects a postWrite that references a missing command', async () => {
+  const { validatePostWrites } = await import('../scripts/validate.mjs');
+  assert.throws(
+    () => validatePostWrites('amaster', 'invalid-post-write', {
+      inputs: {},
+      postWrites: [{ command: 'does-not-exist', settleMs: 30 }],
+    }, { commands: {}, parsers: {}, transports: {} }),
+    /postWrite 1 references missing command/,
+  );
 });
 
 // P0-E: AM35 sleep-time capability must use family-aware statusDisplay variants.

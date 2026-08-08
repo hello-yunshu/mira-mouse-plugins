@@ -385,6 +385,21 @@
       { "offset": 11, "value": "0x10" },
       { "offset": 12, "param": "color", "encoding": "rgb", "repeat": 12 }
     ], "checksum": null } }
+    ,"am35-mouse-light-apply": { "request": { "length": 13, "bytes": [
+      { "offset": 0, "value": "0x05" },
+      { "offset": 1, "value": "0x5A" },
+      { "offset": 2, "value": "0x09" },
+      { "offset": 3, "value": "0x00" },
+      { "offset": 4, "value": "0xC0" },
+      { "offset": 5, "value": "0x30" },
+      { "offset": 6, "value": "0x80" },
+      { "offset": 7, "value": "0x01" },
+      { "offset": 8, "value": "0x10" },
+      { "offset": 9, "value": "0x01" },
+      { "offset": 10, "value": "0xFF" },
+      { "offset": 11, "value": "0xFF" },
+      { "offset": 12, "value": "0xFF" }
+    ], "checksum": null } }
     ,"am35-dpi-color-write": { "request": { "length": 50, "bytes": [
       { "offset": 0, "value": "0x05" },
       { "offset": 1, "value": "0x5A" },
