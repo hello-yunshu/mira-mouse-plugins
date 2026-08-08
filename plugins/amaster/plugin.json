@@ -3,7 +3,7 @@
   "packageFormatVersion": 1,
   "pluginId": "mira.amaster",
   "name": "AMaster Mouse Plugin",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "pluginApi": ">=1.1.0, <2.0.0",
   "publisherKeyId": null,
   "evidence": "source-confirmed",
@@ -70,7 +70,15 @@
           "validConnections": [
             "wireless",
             "bluetooth"
-          ]
+          ],
+          "chargingEstimate": {
+            "mode": "local-learning",
+            "componentId": "receiver",
+            "groundTruthComponentId": "mouse",
+            "families": [
+              "protocol-a-receiver"
+            ]
+          }
         }
       }
     },
