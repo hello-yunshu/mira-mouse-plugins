@@ -43,3 +43,22 @@ Implement one capability at a time: exact match, fixture first, read workflow
 before UI metadata, and no writes without bounded input plus readback evidence.
 Run npm run validate and npm test. Do not change host-app files.
 ```
+
+## 软件 DPI 档位
+
+鼠标不支持硬件 DPI 档位、但支持直接写入 DPI 时，插件可以声明 Host 管理的软件档位：
+
+```json
+{
+  "mode": "software",
+  "currentValueSource": "state.dpi",
+  "defaultValues": [400, 800, 1600, 3200, 6400],
+  "setMutation": "set-dpi",
+  "valueParam": "dpi",
+  "range": { "min": 100, "max": 26000, "step": 50 }
+}
+```
+
+Host 按插件与设备身份在本机保存预设，切换时只调用插件声明的单值 DPI mutation。插件无需伪造设备档位能力，但仍须通过 `stateMapping` 提供 `currentValueSource`。
+
+同一协议族同时覆盖硬件分档和单值 DPI 设备时，使用 `mode: "auto"` 并保留硬件档位的 `dotsSource`、`selectMutation`、`valueSource`。Host 只在至少有两个可用档位且切档 mutation 可写时采用硬件档位，否则自动使用软件档位。

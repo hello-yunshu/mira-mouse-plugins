@@ -207,6 +207,35 @@ test('validator rejects a postWrite that references a missing command', async ()
   );
 });
 
+test('validator accepts Host-managed software DPI stages without hardware stage fields', async () => {
+  const { validStageLayout } = await import('../scripts/validate.mjs');
+  assert.equal(validStageLayout({
+    mode: 'software',
+    currentValueSource: 'state.dpi',
+    defaultValues: [400, 800, 1600, 3200, 6400],
+    setMutation: 'set-dpi',
+    valueParam: 'dpi',
+    range: { min: 100, max: 26000, step: 50 },
+  }), true);
+  assert.equal(validStageLayout({
+    mode: 'software',
+    currentValueSource: 'state.dpi',
+    defaultValues: [400],
+    setMutation: 'set-dpi',
+    range: { min: 100, max: 26000, step: 50 },
+  }), false);
+  assert.equal(validStageLayout({
+    mode: 'auto',
+    dotsSource: 'state.dpiStages',
+    selectMutation: 'set-dpi-stage',
+    setMutation: 'set-dpi',
+    valueSource: 'state.dpiStages',
+    currentValueSource: 'state.dpi',
+    defaultValues: [400, 800, 1600, 3200, 6400],
+    range: { min: 100, max: 26000, step: 50 },
+  }), true);
+});
+
 // P0-E: AM35 sleep-time capability must use family-aware statusDisplay variants.
 // Previously the statusDisplay pointed at the Protocol A path
 // (capabilities.settings.wirelessSleepValue + onClickField protocol-a-wireless)

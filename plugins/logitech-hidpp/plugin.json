@@ -3,7 +3,7 @@
   "packageFormatVersion": 1,
   "pluginId": "mira.logitech-hidpp",
   "name": "Logitech HID++",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "pluginApi": ">=1.1.0, <2.0.0",
   "publisherKeyId": null,
   "evidence": "hardware-verified",
@@ -201,6 +201,7 @@
       ],
       "metadata": {
         "stageLayout": {
+          "mode": "auto",
           "dotsSource": "state.dpiStages",
           "selectMutation": "set-dpi-stage",
           "setMutation": [
@@ -208,6 +209,14 @@
             "set-dpi-value-extended"
           ],
           "valueSource": "state.dpiStages",
+          "currentValueSource": "state.dpi",
+          "defaultValues": [
+            400,
+            800,
+            1600,
+            3200,
+            6400
+          ],
           "range": {
             "min": 50,
             "max": 30000,
@@ -218,6 +227,7 @@
           "valueParam": "dpi"
         },
         "stateMapping": {
+          "dpi": "dpi",
           "dpiStages": "dpiStages"
         }
       }

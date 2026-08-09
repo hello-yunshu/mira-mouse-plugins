@@ -71,3 +71,22 @@ Implement one capability at a time: exact match, fixture first, read workflow
 before UI metadata, and no writes without bounded input plus readback evidence.
 Run npm run validate and npm test. Do not change host-app files.
 ```
+
+## Software DPI stages
+
+When a mouse has no hardware DPI stages but does support direct DPI writes, the plugin can declare Host-managed software stages:
+
+```json
+{
+  "mode": "software",
+  "currentValueSource": "state.dpi",
+  "defaultValues": [400, 800, 1600, 3200, 6400],
+  "setMutation": "set-dpi",
+  "valueParam": "dpi",
+  "range": { "min": 100, "max": 26000, "step": 50 }
+}
+```
+
+The Host stores presets locally per plugin and device identity and only calls the declared single-value DPI mutation when switching. The plugin does not fake a hardware-stage capability, but it must still expose `currentValueSource` through `stateMapping`.
+
+When a protocol family covers both hardware-stage and single-value DPI devices, use `mode: "auto"` while retaining the hardware `dotsSource`, `selectMutation`, and `valueSource`. The Host uses hardware stages only when at least two enabled stages are reported and the select mutation is writable; otherwise it automatically uses software stages.
