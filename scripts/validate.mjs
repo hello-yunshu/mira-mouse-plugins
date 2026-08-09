@@ -415,10 +415,23 @@ function validField(field) {
     && Object.hasOwn(field.switch, 'offValue')
     && (field.switch.restoreField === undefined || validPath(field.switch.restoreField)));
 }
-function validStageLayout(value) {
-  return value && typeof value === 'object' && validPath(value.dotsSource) && validPath(value.valueSource)
-    && validMutationRef(value.selectMutation) && validMutationRef(value.setMutation) && validRange(value.range)
-    && ['selectParam', 'stageParam', 'valueParam'].every((key) => value[key] === undefined || validPath(value[key]));
+export function validStageLayout(value) {
+  if (!value || typeof value !== 'object' || !validMutationRef(value.setMutation) || !validRange(value.range)) return false;
+  const validParams = ['selectParam', 'stageParam', 'valueParam']
+    .every((key) => value[key] === undefined || validPath(value[key]));
+  if (!validParams) return false;
+  const validSoftware = validPath(value.currentValueSource)
+    && Array.isArray(value.defaultValues)
+    && value.defaultValues.length >= 2
+    && value.defaultValues.length <= 8
+    && new Set(value.defaultValues).size === value.defaultValues.length
+    && value.defaultValues.every((dpi) => Number.isInteger(dpi)
+      && dpi >= value.range.min && dpi <= value.range.max);
+  const validHardware = validPath(value.dotsSource) && validPath(value.valueSource)
+    && validMutationRef(value.selectMutation);
+  if (value.mode === 'software') return validSoftware;
+  if (value.mode === 'auto') return validSoftware && validHardware;
+  return (value.mode === undefined || value.mode === 'hardware') && validHardware;
 }
 function validSummary(value) {
   return Array.isArray(value) && value.length <= 4 && value.every((item) => item && typeof item === 'object'
