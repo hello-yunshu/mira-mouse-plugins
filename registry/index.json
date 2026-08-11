@@ -5,19 +5,19 @@
   "plugins": [
     {
       "pluginId": "mira.amaster",
-      "version": "1.9.0",
-      "releaseTag": "plugin/mira.amaster/v1.9.0",
-      "url": "https://github.com/hello-yunshu/mira-mouse-plugins/releases/download/plugin/mira.amaster/v1.9.0/mira-amaster-1.9.0.mira-plugin",
-      "packageSha": "2c8bdbed8f95c3b4cf16eaf4189a4967ca4e7089067d01f69661daa84feaf7ab",
+      "version": "1.9.2",
+      "releaseTag": "plugin/mira.amaster/v1.9.2",
+      "url": "https://github.com/hello-yunshu/mira-mouse-plugins/releases/download/plugin/mira.amaster/v1.9.2/mira-amaster-1.9.2.mira-plugin",
+      "packageSha": "9b70f0c1a3dac4b2396339fca325edcf0f2d19f9556d0d360eba412d291388cb",
       "publisherKeyId": "mira-plugins-2026-002",
       "pluginApi": ">=1.1.0, <2.0.0",
       "packageFormatVersion": 1,
       "minimumHostVersion": null,
-      "publishedAt": "2026-07-29T12:37:11.280Z",
+      "publishedAt": "2026-08-11T16:16:27.855Z",
       "channel": "beta",
       "yanked": false,
-      "notes": "Mira plugin mira.amaster 1.9.0",
-      "entrySha": "69f2b5df81b3941759095575678cb823665b4b587b5d0ea9986eb6498d60c2c1"
+      "notes": "AMaster Mouse Plugin 1.9.2",
+      "entrySha": "0a90034b571cbec88f298892d2c1102b8540ae960f4e2c533a78e95669227b7c"
     },
     {
       "pluginId": "mira.logitech-hidpp",
@@ -56,8 +56,8 @@
   "signature": {
     "keyId": "mira-plugins-2026-001",
     "algorithm": "ed25519",
-    "signedAt": "2026-08-11T15:57:21.164Z",
-    "payloadSha": "03227eda6c12c5ad5b37f80a2465be0f5aafda1c7520f8c88e5879925fc58920",
-    "value": "188c20945acb566069216316bba405da5fe16199f60941ab1b4c9ec334f240d250fe8015035a5cad75f05d94fef9ed0c1163282262e83f70b82c6a96d06e9309"
+    "signedAt": "2026-08-11T16:16:28.098Z",
+    "payloadSha": "635286c3655f132fef52e06d5c157cb0e3baa60163d1ed8f46d710e6403913a0",
+    "value": "5c6717cf581f90216b0e90ffe8d338fc4d859b490939cd16524ec46abe9ef2e52d8a28cdbf66938ed5ceccc6b4044c8948eb428dc4048214bacfb3c2e61a9009"
   }
 }
