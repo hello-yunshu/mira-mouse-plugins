@@ -56,8 +56,8 @@ jobs:
       targets: '${{ steps.plan.outputs.targets }}'
       targets_count: '${{ steps.plan.outputs.targets_count }}'
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: 22
       - name: Validate repository-level rules
@@ -203,8 +203,8 @@ jobs:
       matrix:
         target: '${{ fromJson(needs.gate.outputs.targets) }}'
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: 22
       - name: Validate target plugin only
@@ -218,7 +218,7 @@ jobs:
           npm run validate:plugin -- --plugin "$PLUGIN_ID"
           npm run test:all
       - name: Cache mira-plugin-cli
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: .cache/mira-plugin-cli
           key: mira-plugin-cli-${{ hashFiles('mira-plugin-cli.version.json') }}
@@ -254,12 +254,12 @@ jobs:
           unzip -p "$ASSET_PATH" META-INF/signature.ed25519 | xxd -p -c 64
           echo "=== sha256 ==="
           cat "$ASSET_PATH.sha256"
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: plugin-${{ matrix.target.pluginId }}
           path: dist/${{ matrix.target.pluginId }}/*
           if-no-files-found: error
-      - uses: actions/attest-build-provenance@v4
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4
         with:
           subject-path: 'dist/${{ matrix.target.pluginId }}/*'
       - name: Create per-plugin immutable Release

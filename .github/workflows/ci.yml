@@ -16,10 +16,10 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           submodules: false
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with: { node-version: 22 }
       - run: node scripts/sync-hidpp-features.mjs --check
       - run: npm run validate
@@ -44,7 +44,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - shell: bash
         run: |
           find plugins registry -name '*.json' -print0 | xargs -0 node -e "const fs=require('fs'); for (const f of process.argv.slice(1)) { try { JSON.parse(fs.readFileSync(f)); } catch (e) { console.error(f + ': ' + e.message); process.exit(1); } }"
@@ -65,7 +65,7 @@ jobs:
       # admins can override via the MIRA_HOST_REPO variable.
       HOST_REPO: ${{ vars.MIRA_HOST_REPO || format('{0}/{1}', 'hello-yunshu', 'mira-mouse') }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Resolve Host ref (ITERATION-009 §10)
         id: host-ref
         shell: bash
@@ -106,19 +106,19 @@ jobs:
           FALLBACK_HOST_SHA="6487ac389f92cccfd86d27a77aa99677692b2871"
           echo "ref=$FALLBACK_HOST_SHA" >> "$GITHUB_OUTPUT"
           echo "source=fixed compatible Host SHA" >> "$GITHUB_OUTPUT"
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: ${{ env.HOST_REPO }}
           path: host
           ref: ${{ steps.host-ref.outputs.ref }}
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable @ 2026-11-05
       - name: Install Linux build dependencies
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libudev-dev
       - name: Cache mira-plugin CLI
         id: cli-cache
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: host/target/release/mira-plugin
           key: mira-plugin-cli-${{ runner.os }}-${{ steps.host-ref.outputs.ref }}-${{ hashFiles('host/crates/mira-plugin-cli/**', 'host/crates/mira-plugin-runtime/**', 'host/crates/mira-plugin-api/**', 'host/Cargo.lock') }}
